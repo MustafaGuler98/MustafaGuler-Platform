@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="MustafaGuler.API/MustafaGuler.API.csproj" />
+    <Project Path="MustafaGuler.Core/MustafaGuler.Core.csproj" />
+    <Project Path="MustafaGuler.Repository/MustafaGuler.Repository.csproj" />
+    <Project Path="MustafaGuler.Service/MustafaGuler.Service.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/">
+    <Project Path="MustafaGuler.Core.Tests/MustafaGuler.Core.Tests.csproj" />
+    <Project Path="MustafaGuler.Service.Tests/MustafaGuler.Service.Tests.csproj" />
+  </Folder>
+</Solution>
