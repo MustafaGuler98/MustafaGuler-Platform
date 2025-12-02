@@ -1,0 +1,6 @@
+@MustafaGuler.API_HostAddress = http://localhost:5281
+
+GET {{MustafaGuler.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
