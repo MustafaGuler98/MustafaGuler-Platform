@@ -6,7 +6,7 @@
     <Project Path="MustafaGuler.Service/MustafaGuler.Service.csproj" />
   </Folder>
   <Folder Name="/backend/tests/">
-    <Project Path="MustafaGuler.Core.Tests/MustafaGuler.Core.Tests.csproj" />
-    <Project Path="MustafaGuler.Service.Tests/MustafaGuler.Service.Tests.csproj" />
+    <Project Path="tests/MustafaGuler.Core.Tests/MustafaGuler.Core.Tests.csproj" />
+    <Project Path="tests/MustafaGuler.Service.Tests/MustafaGuler.Service.Tests.csproj" />
   </Folder>
 </Solution>
