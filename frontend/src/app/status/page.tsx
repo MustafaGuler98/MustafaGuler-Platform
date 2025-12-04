@@ -21,10 +21,10 @@ export default function StatusPage() {
 
   return (
     <div>
-      <h1>Sunucu Durumu:</h1>
-      {status === "loading" && "Yükleniyor..."}
-      {status === "online" && "🟢 Çevrimiçi"}
-      {status === "offline" && "🔴 Çevrimdışı"}
+      <h1>Server Status:</h1>
+      {status === "loading" && "Loading..."}
+      {status === "online" && "🟢 Online"}
+      {status === "offline" && "🔴 Offline"}
     </div>
   );
 }

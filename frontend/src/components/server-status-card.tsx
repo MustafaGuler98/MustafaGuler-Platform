@@ -24,7 +24,7 @@ export default function ServerStatusCard() {
   return (
     <Card className="w-[320px]">
       <CardHeader>
-        <CardTitle>Sunucu Durumu</CardTitle>
+        <CardTitle>Server Status</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -36,13 +36,13 @@ export default function ServerStatusCard() {
 
         {status === "online" && (
           <Badge className="bg-green-600 hover:bg-green-700">
-            🟢 Çevrimiçi
+            🟢 Online
           </Badge>
         )}
 
         {status === "offline" && (
           <Badge className="bg-red-600 hover:bg-red-700">
-            🔴 Çevrimdışı
+            🔴 Offline
           </Badge>
         )}
       </CardContent>
