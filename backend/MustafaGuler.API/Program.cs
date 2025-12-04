@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MustafaGuler.API.Extensions;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
 using MustafaGuler.Repository.Repositories;
@@ -32,6 +33,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.ApplyMigrations();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
