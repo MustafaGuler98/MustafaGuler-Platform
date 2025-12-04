@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: mustafa-prod-db
+    environment:
+      POSTGRES_USER: mustafa
+      POSTGRES_PASSWORD: sifre123
+      POSTGRES_DB: mustafa_platform
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mustafa -d mustafa_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/MustafaGuler.API/Dockerfile
+    container_name: mustafa-prod-api
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mustafa_platform;Username=mustafa;Password=sifre123
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  postgres_data:

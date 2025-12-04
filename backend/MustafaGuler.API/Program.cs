@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MustafaGuler.API.Extensions;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
 using MustafaGuler.Repository.Repositories;
@@ -20,7 +21,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000", "https://mustafaguler.me")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
+app.ApplyMigrations();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -28,6 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 
