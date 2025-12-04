@@ -30,7 +30,7 @@ export default function ServerStatusCard() {
       <CardContent>
         {status === "loading" && (
           <Badge variant="secondary" className="text-gray-600">
-            Yükleniyor...
+            Loading...
           </Badge>
         )}
 
