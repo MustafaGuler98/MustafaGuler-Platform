@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MustafaGuler.Core.Common;
@@ -11,16 +10,14 @@ namespace MustafaGuler.Core.Interfaces {
     {
         // CRUD signatures
         Task<T> GetByIdAsync(Guid id);
-        Task<IEnumerable<T>> GetAllAsync();
-
-        // filters
-        // IQueryable: enables deferred execution and composition of queries
-        IQueryable<T> Where(Expression<Func<T, bool>> expression);
-
-        Task<bool> AnyAsync(Expression<Func<T, bool>> expression);
+        Task<IEnumerable<T>> GetAllAsync(
+           Expression<Func<T, bool>>? filter = null,
+           params Expression<Func<T, object>>[] includes);
 
         Task AddAsync(T entity);
         void Remove(T entity);
         void Update(T entity);
+
+        Task<bool> AnyAsync(Expression<Func<T, bool>> expression);
     }
 }

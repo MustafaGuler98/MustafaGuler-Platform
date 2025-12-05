@@ -31,9 +31,25 @@ namespace MustafaGuler.Repository.Repositories
             return await _dbSet.AnyAsync(expression);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>>? filter = null,
+            params Expression<Func<T, object>>[] includes)
         {
-            return await _dbSet.ToListAsync();
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includes != null)
+            {
+                foreach (var includeItem in includes)
+                {
+                    query = query.Include(includeItem);
+                }
+            }
+            // We use AsNoTracking() for read-only operations to increase performance
+            return await query.AsNoTracking().ToListAsync();
         }
 
         public async Task<T> GetByIdAsync(Guid id)

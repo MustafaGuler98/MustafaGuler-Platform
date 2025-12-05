@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
 using MustafaGuler.Core.Interfaces;
+using System.Threading.Tasks;
 
 namespace MustafaGuler.API.Controllers
 {
@@ -16,19 +18,21 @@ namespace MustafaGuler.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? languageCode, [FromQuery] Guid? categoryId)
         {
-            var articles = await _articleService.GetAllAsync();
-            return Ok(articles);
+            var result = await _articleService.GetAllAsync(languageCode, categoryId);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Save(Article article)
+        public async Task<IActionResult> Save(ArticleAddDto articleAddDto)
         {
-            // For testing purposes only.
-            // We will use DTOs here, not the Entity directly.
-            var newArticle = await _articleService.AddAsync(article);
-            return Ok(newArticle);
+            var result = await _articleService.AddAsync(articleAddDto);
+
+            if (result.Success) return Ok(result);
+            return BadRequest(result);
         }
     }
 }
