@@ -9,5 +9,12 @@ namespace MustafaGuler.Repository.Contexts
         {
         }
         public DbSet<Article> Articles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
