@@ -57,6 +57,23 @@ namespace MustafaGuler.Repository.Repositories
             return await _dbSet.FindAsync(id);
         }
 
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            query = query.Where(filter);
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.AsNoTracking().FirstOrDefaultAsync();
+        }
+
         // Remove and Update are synchronous, they just modify the state of the entity
         public void Remove(T entity)
         {
