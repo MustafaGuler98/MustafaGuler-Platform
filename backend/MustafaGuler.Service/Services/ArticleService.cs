@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using AutoMapper;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
+using MustafaGuler.Core.Entities.DTOs;
 using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace MustafaGuler.Service.Services
 {
@@ -12,43 +16,47 @@ namespace MustafaGuler.Service.Services
     {
         private readonly IGenericRepository<Article> _repository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ArticleService(IGenericRepository<Article> repository, IUnitOfWork unitOfWork)
+        public ArticleService(IGenericRepository<Article> repository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
-
-        public async Task<IDataResult<IEnumerable<Article>>> GetAllAsync()
+        public async Task<IDataResult<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null)
         {
-            var articles = await _repository.GetAllAsync();
+            Expression<Func<Article, bool>> filterExpression = x =>
+                !x.IsDeleted
+                && (string.IsNullOrEmpty(languageCode) || x.LanguageCode == languageCode)
+                && (!categoryId.HasValue || x.CategoryId == categoryId);
+
+            var articles = await _repository.GetAllAsync(
+                filter: filterExpression,
+                includes: x => x.Category
+            );
+
             if (articles == null)
-                return new ErrorDataResult<IEnumerable<Article>>("No articles found.");
+                return new ErrorDataResult<IEnumerable<ArticleListDto>>("No articles found.");
 
-            return new SuccessDataResult<IEnumerable<Article>>(articles, "Articles listed.");
+            var articleDtos = _mapper.Map<IEnumerable<ArticleListDto>>(articles);
+            return new SuccessDataResult<IEnumerable<ArticleListDto>>(articleDtos, "Articles listed successfully.");
         }
-
         public async Task<IResult> AddAsync(ArticleAddDto articleAddDto)
         {
-            // (Will be replaced by FluentValidation later)
             if (string.IsNullOrEmpty(articleAddDto.Title))
             {
                 return new ErrorResult("Title is required.");
             }
 
-            // We manually map properties because we don't have AutoMapper yet.
-            var article = new Article
-            {
-                Id = Guid.NewGuid(),
-                Title = articleAddDto.Title,
-                Content = articleAddDto.Content,
-                LanguageCode = articleAddDto.LanguageCode,
-                // CategoryId = articleAddDto.CategoryId,
-                CreatedDate = DateTime.UtcNow,
-                IsDeleted = false,
-                ViewCount = 0,
-                GroupId = Guid.NewGuid() // Temporary
-            };
+            var article = _mapper.Map<Article>(articleAddDto);
+
+            article.Id = Guid.NewGuid();
+            article.CreatedDate = DateTime.UtcNow;
+            article.IsDeleted = false;
+            article.ViewCount = 0;
+            article.GroupId = Guid.NewGuid(); // Temp logic
+            article.Slug = SlugHelper.GenerateSlug(article.Title);
 
             await _repository.AddAsync(article);
             await _unitOfWork.CommitAsync();

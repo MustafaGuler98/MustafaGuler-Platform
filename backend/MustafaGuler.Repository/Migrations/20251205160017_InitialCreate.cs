@@ -44,6 +44,7 @@ namespace MustafaGuler.Repository.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
+                    Slug = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: false),
                     LanguageCode = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
                     GroupId = table.Column<Guid>(type: "uuid", nullable: false),
                     ViewCount = table.Column<int>(type: "integer", nullable: false),
@@ -76,17 +77,23 @@ namespace MustafaGuler.Repository.Migrations
 
             migrationBuilder.InsertData(
                 table: "Articles",
-                columns: new[] { "Id", "CategoryId", "Content", "CreatedDate", "GroupId", "IsDeleted", "LanguageCode", "Title", "UpdatedDate", "ViewCount" },
+                columns: new[] { "Id", "CategoryId", "Content", "CreatedDate", "GroupId", "IsDeleted", "LanguageCode", "Slug", "Title", "UpdatedDate", "ViewCount" },
                 values: new object[,]
                 {
-                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-4444-4444-4444-444444444444"), "Türkçe içerik...", new DateTime(2024, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new Guid("99999999-9999-9999-9999-999999999999"), false, "tr", "Onion Architecture Nedir?", null, 100 },
-                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-4444-4444-4444-444444444445"), "English content...", new DateTime(2024, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new Guid("99999999-9999-9999-9999-999999999999"), false, "en", "What is Onion Architecture?", null, 50 }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), new Guid("44444444-4444-4444-4444-444444444444"), "Türkçe içerik...", new DateTime(2024, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new Guid("99999999-9999-9999-9999-999999999999"), false, "tr", "onion-architecture-nedir", "Onion Architecture Nedir?", null, 100 },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), new Guid("44444444-4444-4444-4444-444444444445"), "English content...", new DateTime(2024, 1, 1, 12, 0, 0, 0, DateTimeKind.Utc), new Guid("99999999-9999-9999-9999-999999999999"), false, "en", "what-is-onion-architecture", "What is Onion Architecture?", null, 50 }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Articles_CategoryId",
                 table: "Articles",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Articles_Slug",
+                table: "Articles",
+                column: "Slug",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Category_ParentId",
