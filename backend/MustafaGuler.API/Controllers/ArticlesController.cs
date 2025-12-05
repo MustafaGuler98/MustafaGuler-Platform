@@ -50,7 +50,6 @@ namespace MustafaGuler.API.Controllers
         [HttpGet("test-error")]
         public IActionResult TestError()
         {
-            // Bu hata Middleware tarafından yakalanmalı
             throw new InvalidOperationException("Test log.");
         }
     }
