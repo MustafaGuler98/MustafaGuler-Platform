@@ -1,5 +1,5 @@
 export interface StatusResponse {
-  status: string;
+ status: string;
   database: string;
   time: string;
 }

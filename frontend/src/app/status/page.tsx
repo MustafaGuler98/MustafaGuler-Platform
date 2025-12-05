@@ -1,30 +1,9 @@
-"use client";
+import ServerStatusCard from "@/components/server-status-card";
 
-import { useEffect, useState } from "react";
-import { getServerStatus } from "@/lib/status";
-
-export default function StatusPage() {
-  const [status, setStatus] = useState<"online" | "offline" | "loading">("loading");
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const result = await getServerStatus();
-        setStatus(result);
-      } catch {
-        setStatus("offline");
-      }
-    }
-
-    load();
-  }, []);
-
+export default function Home() {
   return (
-    <div>
-      <h1>Server Status:</h1>
-      {status === "loading" && "Loading..."}
-      {status === "online" && "🟢 Online"}
-      {status === "offline" && "🔴 Offline"}
-    </div>
+    <main className="flex items-center justify-center h-screen">
+      <ServerStatusCard />
+    </main>
   );
 }
