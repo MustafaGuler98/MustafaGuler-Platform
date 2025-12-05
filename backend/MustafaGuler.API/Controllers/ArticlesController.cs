@@ -47,5 +47,11 @@ namespace MustafaGuler.API.Controllers
             if (result.Success) return Ok(result);
             return BadRequest(result);
         }
+        [HttpGet("test-error")]
+        public IActionResult TestError()
+        {
+            // Bu hata Middleware tarafından yakalanmalı
+            throw new InvalidOperationException("Test log.");
+        }
     }
 }
