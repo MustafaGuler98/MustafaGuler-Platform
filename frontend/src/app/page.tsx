@@ -15,6 +15,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       
+      
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-100/50 dark:bg-blue-500/10 rounded-full blur-3xl -z-10 opacity-70"></div>
         <div className="container mx-auto px-4 text-center">
