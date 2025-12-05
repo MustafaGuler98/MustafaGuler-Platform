@@ -4,4 +4,10 @@ export interface Article {
     content: string;
     CategoryId: string;
     LanguageCode: string;
+    slug: string;
+    imageUrl?: string;
+    createdAt: string;
+    updatedAt: string;
+    summary?: string;
+
 }
