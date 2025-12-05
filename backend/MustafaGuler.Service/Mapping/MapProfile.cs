@@ -13,6 +13,10 @@ namespace MustafaGuler.Service.Mapping
             CreateMap<Article, ArticleListDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
 
+            CreateMap<Article, ArticleDetailDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name))
+                .ForMember(dest => dest.Author, opt => opt.MapFrom(src => "Mustafa Güler")); // Hardcoded for now
+
             // Allows converting DTO back to Entity
             CreateMap<ArticleListDto, Article>();
 

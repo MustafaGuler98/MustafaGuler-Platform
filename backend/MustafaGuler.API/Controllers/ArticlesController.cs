@@ -26,6 +26,19 @@ namespace MustafaGuler.API.Controllers
             return BadRequest(result);
         }
 
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var result = await _articleService.GetBySlugAsync(slug);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return NotFound(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Save(ArticleAddDto articleAddDto)
         {
@@ -33,6 +46,11 @@ namespace MustafaGuler.API.Controllers
 
             if (result.Success) return Ok(result);
             return BadRequest(result);
+        }
+        [HttpGet("test-error")]
+        public IActionResult TestError()
+        {
+            throw new InvalidOperationException("Test log.");
         }
     }
 }

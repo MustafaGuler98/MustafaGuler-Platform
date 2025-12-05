@@ -4,8 +4,12 @@ using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
 using MustafaGuler.Repository.Repositories;
 using MustafaGuler.Service.Mapping;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container.
 // Configure PostgreSQL database connection
@@ -43,6 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<MustafaGuler.API.Middlewares.GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();

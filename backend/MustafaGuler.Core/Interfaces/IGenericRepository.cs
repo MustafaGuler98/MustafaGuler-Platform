@@ -19,5 +19,7 @@ namespace MustafaGuler.Core.Interfaces {
         void Update(T entity);
 
         Task<bool> AnyAsync(Expression<Func<T, bool>> expression);
+        Task<T> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes);
+
     }
 }

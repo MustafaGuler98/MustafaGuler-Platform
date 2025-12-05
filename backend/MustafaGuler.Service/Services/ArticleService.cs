@@ -5,8 +5,10 @@ using MustafaGuler.Core.Entities.DTOs;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -38,10 +40,26 @@ namespace MustafaGuler.Service.Services
 
             if (articles == null)
                 return new ErrorDataResult<IEnumerable<ArticleListDto>>("No articles found.");
+            articles = articles.OrderByDescending(x => x.CreatedDate);
 
             var articleDtos = _mapper.Map<IEnumerable<ArticleListDto>>(articles);
             return new SuccessDataResult<IEnumerable<ArticleListDto>>(articleDtos, "Articles listed successfully.");
         }
+
+        public async Task<IDataResult<ArticleDetailDto>> GetBySlugAsync(string slug)
+        {
+            var article = await _repository.GetAsync(
+                filter: x => x.Slug == slug && !x.IsDeleted,
+                includes: x => x.Category
+            );
+            if (article == null)
+            {
+                return new ErrorDataResult<ArticleDetailDto>("Article not found.");
+            }
+            var articleDetailDto = _mapper.Map<ArticleDetailDto>(article);
+            return new SuccessDataResult<ArticleDetailDto>(articleDetailDto);
+        }
+
         public async Task<IResult> AddAsync(ArticleAddDto articleAddDto)
         {
             if (string.IsNullOrEmpty(articleAddDto.Title))
@@ -55,7 +73,7 @@ namespace MustafaGuler.Service.Services
             article.CreatedDate = DateTime.UtcNow;
             article.IsDeleted = false;
             article.ViewCount = 0;
-            article.GroupId = Guid.NewGuid(); // Temp logic
+            article.GroupId = Guid.NewGuid(); // Temp
             article.Slug = SlugHelper.GenerateSlug(article.Title);
 
             await _repository.AddAsync(article);
