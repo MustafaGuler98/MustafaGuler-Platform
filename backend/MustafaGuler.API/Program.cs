@@ -3,6 +3,7 @@ using MustafaGuler.API.Extensions;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
 using MustafaGuler.Repository.Repositories;
+using MustafaGuler.Service.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(MustafaGuler.Service.Services.Service<>));
 builder.Services.AddScoped<IArticleService, MustafaGuler.Service.Services.ArticleService>();
+
+builder.Services.AddAutoMapper(typeof(MapProfile));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

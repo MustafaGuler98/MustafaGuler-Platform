@@ -18,12 +18,11 @@ namespace MustafaGuler.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] string? languageCode, [FromQuery] Guid? categoryId)
         {
-            var result = await _articleService.GetAllAsync();
+            var result = await _articleService.GetAllAsync(languageCode, categoryId);
 
             if (result.Success) return Ok(result);
-
             return BadRequest(result);
         }
 

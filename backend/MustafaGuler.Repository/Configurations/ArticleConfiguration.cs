@@ -13,6 +13,9 @@ namespace MustafaGuler.Repository.Configurations
             builder.Property(x => x.Content).IsRequired();
             builder.Property(x => x.LanguageCode).HasMaxLength(5);
 
+            builder.Property(x => x.Slug).IsRequired().HasMaxLength(250);
+            builder.HasIndex(x => x.Slug).IsUnique();
+
             builder.HasOne(x => x.Category)
                    .WithMany(x => x.Articles)
                    .HasForeignKey(x => x.CategoryId)
@@ -24,6 +27,7 @@ namespace MustafaGuler.Repository.Configurations
                  {
                      Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                      Title = "Onion Architecture Nedir?",
+                     Slug = "onion-architecture-nedir",
                      Content = "Türkçe içerik...",
                      LanguageCode = "tr",
                      GroupId = Guid.Parse("99999999-9999-9999-9999-999999999999"),
@@ -36,6 +40,7 @@ namespace MustafaGuler.Repository.Configurations
                 {
                     Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                     Title = "What is Onion Architecture?",
+                    Slug = "what-is-onion-architecture",
                     Content = "English content...",
                     LanguageCode = "en",
                     GroupId = Guid.Parse("99999999-9999-9999-9999-999999999999"),

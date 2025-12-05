@@ -49,6 +49,11 @@ namespace MustafaGuler.Repository.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -64,6 +69,9 @@ namespace MustafaGuler.Repository.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.ToTable("Articles");
 
                     b.HasData(
@@ -76,6 +84,7 @@ namespace MustafaGuler.Repository.Migrations
                             GroupId = new Guid("99999999-9999-9999-9999-999999999999"),
                             IsDeleted = false,
                             LanguageCode = "tr",
+                            Slug = "onion-architecture-nedir",
                             Title = "Onion Architecture Nedir?",
                             ViewCount = 100
                         },
@@ -88,6 +97,7 @@ namespace MustafaGuler.Repository.Migrations
                             GroupId = new Guid("99999999-9999-9999-9999-999999999999"),
                             IsDeleted = false,
                             LanguageCode = "en",
+                            Slug = "what-is-onion-architecture",
                             Title = "What is Onion Architecture?",
                             ViewCount = 50
                         });
