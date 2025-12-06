@@ -82,12 +82,30 @@ namespace MustafaGuler.Service.Services
             article.IsDeleted = false;
             article.ViewCount = 0;
             article.GroupId = Guid.NewGuid(); // Temp
-            article.Slug = SlugHelper.GenerateSlug(article.Title);
+            article.UserId = Guid.Parse("CB94223B-CCB8-4F2F-93D7-0DF96A7F3839");
+
+            article.Slug = await GenerateUniqueSlugAsync(article.Title);
 
             await _repository.AddAsync(article);
             await _unitOfWork.CommitAsync();
 
             return new SuccessResult("Article added successfully.");
+        }
+
+ 
+        private async Task<string> GenerateUniqueSlugAsync(string title)
+        {
+            var baseSlug = SlugHelper.GenerateSlug(title);
+            var slug = baseSlug;
+            int counter = 1;
+
+            while (await _repository.AnyAsync(x => x.Slug == slug))
+            {
+                slug = $"{baseSlug}-{counter}";
+                counter++;
+            }
+
+            return slug;
         }
     }
 }
