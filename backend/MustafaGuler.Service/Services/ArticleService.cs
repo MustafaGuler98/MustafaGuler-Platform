@@ -35,7 +35,11 @@ namespace MustafaGuler.Service.Services
 
             var articles = await _repository.GetAllAsync(
                 filter: filterExpression,
-                includes: x => x.Category
+                includes: new Expression<Func<Article, object>>[]
+                {
+                    x => x.Category,
+                    x => x.User
+                }
             );
 
             if (articles == null)
@@ -50,7 +54,11 @@ namespace MustafaGuler.Service.Services
         {
             var article = await _repository.GetAsync(
                 filter: x => x.Slug == slug && !x.IsDeleted,
-                includes: x => x.Category
+                includes: new Expression<Func<Article, object>>[]
+                {
+                    x => x.Category,
+                    x => x.User 
+                }
             );
             if (article == null)
             {
