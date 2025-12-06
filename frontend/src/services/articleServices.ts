@@ -1,6 +1,6 @@
-import { Article } from "@/types";
+import { Article, ServiceResponse } from "@/types/article";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL; 
 
 export const articleService = {
   
@@ -13,26 +13,38 @@ export const articleService = {
       });
 
       if (!res.ok) return null;
-      return await res.json();
+
+      const result: ServiceResponse<Article> = await res.json();
+
+      if (!result.success || !result.data) {
+        return null;
+      }
+
+      return result.data;
+
     } catch (error) {
       console.error("Detay çekme hatası:", error);
       return null;
     }
   },
-
-  async getLatestArticles(): Promise<Article[]> {
+  async getAllArticles(): Promise<Article[]> {
     if (!API_URL) return [];
 
     try {
+      // C# Controller'da [Route("api/[controller]")] olduğu için adres: /api/articles
       const res = await fetch(`${API_URL}/articles`, { 
+        cache: 'no-store' 
       });
 
-      if (!res.ok) {
-        console.error("API Hatası (Status):", res.status);
+      if (!res.ok) return [];
+
+      const result: ServiceResponse<Article[]> = await res.json();
+
+      if (!result.success || !result.data) {
         return [];
       }
 
-      return await res.json();
+      return result.data;
     } catch (error) {
       console.error("Liste çekme hatası:", error);
       return [];
