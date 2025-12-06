@@ -9,12 +9,16 @@ import { formatDate } from "@/lib/utils";
 
 export default async function Home() {
   
-  const articles = await articleService.getLatestArticles();
-  const latestArticles = articles.slice(0, 6);
+  const allArticles = await articleService.getAllArticles();
+  
+  // 👇 BU SATIRLARI EKLE (Debug için)
+  console.log("--------------------------------------------------");
+  console.log("API'DEN GELEN İLK MAKALE:", allArticles[0]); 
+  console.log("--------------------------------------------------");
+  const latestArticles = allArticles ? allArticles.slice(0, 6) : [];
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
-      
       
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-100/50 dark:bg-blue-500/10 rounded-full blur-3xl -z-10 opacity-70"></div>
@@ -37,6 +41,7 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ARTICLES LIST SECTION */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-10">
@@ -56,7 +61,8 @@ export default async function Home() {
               {latestArticles.map((article) => (
                 <Link 
                   key={article.id} 
-                  href={`/blog/${article.CategoryId}/${article.slug}`}
+                  // DİKKAT: C# Modelinde categoryId küçük harfle başlıyorsa burayı düzelt: article.categoryId
+                  href={`/blog/${article.slug}`}
                   className="group block h-full"
                 >
                   <div className="flex flex-col h-full bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
