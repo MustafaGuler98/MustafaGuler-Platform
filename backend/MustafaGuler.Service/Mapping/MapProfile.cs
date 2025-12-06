@@ -24,6 +24,8 @@ namespace MustafaGuler.Service.Mapping
 
             // Also add the existing mapping for AddDto
             CreateMap<ArticleAddDto, Article>();
+
+            CreateMap<Article, ArticleNavigationDto>();
         }
     }
 }

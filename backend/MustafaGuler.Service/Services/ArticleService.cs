@@ -65,6 +65,17 @@ namespace MustafaGuler.Service.Services
                 return new ErrorDataResult<ArticleDetailDto>("Article not found.");
             }
             var articleDetailDto = _mapper.Map<ArticleDetailDto>(article);
+
+            var nextArticle = await GetNextArticleAsync(article);
+            var prevArticle = await GetPreviousArticleAsync(article);
+
+            articleDetailDto.NextArticle = nextArticle != null
+               ? _mapper.Map<ArticleNavigationDto>(nextArticle)
+               : null;
+            articleDetailDto.PreviousArticle = prevArticle != null
+               ? _mapper.Map<ArticleNavigationDto>(prevArticle)
+               : null;
+
             return new SuccessDataResult<ArticleDetailDto>(articleDetailDto);
         }
 
@@ -106,6 +117,62 @@ namespace MustafaGuler.Service.Services
             }
 
             return slug;
+        }
+        private async Task<Article?> GetNextArticleAsync(Article currentArticle)
+        {
+            // If dates are equal, we compare by ID to ensure consistent ordering.
+            var categoryCandidates = await _repository.GetAllAsync(x =>
+                x.LanguageCode == currentArticle.LanguageCode &&
+                x.CategoryId == currentArticle.CategoryId &&
+                !x.IsDeleted &&
+                (x.CreatedDate > currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id > currentArticle.Id))
+            );
+
+            var nextInCategory = categoryCandidates
+                .OrderBy(x => x.CreatedDate)
+                .ThenBy(x => x.Id)
+                .FirstOrDefault();
+            if (nextInCategory != null) return nextInCategory;
+
+            // If no next article in the same category, search globally
+            var globalCandidates = await _repository.GetAllAsync(x =>
+                x.LanguageCode == currentArticle.LanguageCode &&
+                !x.IsDeleted &&
+                (x.CreatedDate > currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id > currentArticle.Id))
+            );
+
+            return globalCandidates
+                .OrderBy(x => x.CreatedDate)
+                .ThenBy(x => x.Id)
+                .FirstOrDefault();
+        }
+
+        private async Task<Article?> GetPreviousArticleAsync(Article currentArticle)
+        {
+            var categoryCandidates = await _repository.GetAllAsync(x =>
+                x.LanguageCode == currentArticle.LanguageCode &&
+                x.CategoryId == currentArticle.CategoryId &&
+                !x.IsDeleted &&
+                (x.CreatedDate < currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id < currentArticle.Id))
+            );
+
+            var prevInCategory = categoryCandidates
+                .OrderByDescending(x => x.CreatedDate)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefault();
+
+            if (prevInCategory != null) return prevInCategory;
+
+            var globalCandidates = await _repository.GetAllAsync(x =>
+                x.LanguageCode == currentArticle.LanguageCode &&
+                !x.IsDeleted &&
+                (x.CreatedDate < currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id < currentArticle.Id))
+            );
+
+            return globalCandidates
+                .OrderByDescending(x => x.CreatedDate)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefault();
         }
     }
 }
