@@ -16,5 +16,6 @@ namespace MustafaGuler.Core.Entities.DTOs
     
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; }
+        public string Author { get; set; }
     }
 }

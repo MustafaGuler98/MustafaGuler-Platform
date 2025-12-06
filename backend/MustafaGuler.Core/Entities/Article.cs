@@ -12,5 +12,8 @@ namespace MustafaGuler.Core.Entities
         public int ViewCount { get; set; } = 0;
         public Guid? CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public Guid UserId { get; set; } 
+        public AppUser User { get; set; }
     }
 }
