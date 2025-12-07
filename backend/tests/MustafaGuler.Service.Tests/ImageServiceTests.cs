@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using MustafaGuler.Core.Constants;
 using MustafaGuler.Service.Services;
 using System.Threading.Tasks;
 using Xunit;
@@ -15,9 +16,7 @@ namespace MustafaGuler.Service.Tests
         public ImageServiceTests()
         {
             _mockEnvironment = new Mock<IWebHostEnvironment>();
-
             _mockEnvironment.Setup(e => e.WebRootPath).Returns("fake/path/wwwroot");
-
             _imageService = new ImageService(_mockEnvironment.Object);
         }
 
@@ -27,7 +26,7 @@ namespace MustafaGuler.Service.Tests
 
             var result = await _imageService.UploadAsync(null, "some-name");
 
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.Equal("No file uploaded.", result.Message);
         }
 
@@ -40,7 +39,7 @@ namespace MustafaGuler.Service.Tests
 
             var result = await _imageService.UploadAsync(mockFile.Object, "some-name");
 
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.Equal("File size exceeds the 5MB limit.", result.Message);
         }
 
@@ -54,7 +53,7 @@ namespace MustafaGuler.Service.Tests
 
             var result = await _imageService.UploadAsync(mockFile.Object, "my-document");
 
-            Assert.False(result.Success);
+            Assert.False(result.IsSuccess);
             Assert.Equal("Invalid file type. Only JPG, JPEG, and PNG are allowed.", result.Message);
         }
 

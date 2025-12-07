@@ -6,6 +6,6 @@ namespace MustafaGuler.Core.Interfaces
 {
     public interface IImageService
     {
-        Task<IDataResult<string>> UploadAsync(IFormFile file, string customName);
+        Task<Result<string>> UploadAsync(IFormFile file, string customName);
     }
 }

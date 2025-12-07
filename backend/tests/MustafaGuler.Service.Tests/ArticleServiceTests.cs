@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Moq;
+using MustafaGuler.Core.Constants;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
 using MustafaGuler.Core.Interfaces;
@@ -42,7 +43,7 @@ namespace MustafaGuler.Service.Tests
                      .ReturnsAsync(true)  
                      .ReturnsAsync(false);
 
-            await _articleService.AddAsync(articleDto);
+            var result = await _articleService.AddAsync(articleDto);
 
             Assert.Equal("test-article-1", articleEntity.Slug);
 
@@ -58,8 +59,8 @@ namespace MustafaGuler.Service.Tests
 
             var result = await _articleService.AddAsync(articleDto);
 
-            Assert.False(result.Success);
-            Assert.Equal("Title is required.", result.Message);
+            Assert.False(result.IsSuccess);
+            Assert.Equal(Messages.ArticleTitleRequired, result.Message);
 
             _mockRepo.Verify(x => x.AddAsync(It.IsAny<Article>()), Times.Never);
         }

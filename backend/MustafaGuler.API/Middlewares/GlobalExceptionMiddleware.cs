@@ -46,7 +46,7 @@ namespace MustafaGuler.API.Middlewares
                 message = "An unexpected error occurred. Please try again later.";
             }
 
-            var response = new ErrorResult(message);
+            var response = Result.Failure(500, message);
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var json = JsonSerializer.Serialize(response, options);

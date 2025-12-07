@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using MustafaGuler.Core.Constants;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
@@ -19,25 +20,25 @@ namespace MustafaGuler.Service.Services
             _env = env;
         }
 
-        public async Task<IDataResult<string>> UploadAsync(IFormFile file, string customName)
+        public async Task<Result<string>> UploadAsync(IFormFile file, string customName)
         {
             if (file == null || file.Length == 0)
-                return new ErrorDataResult<string>("No file uploaded.");
+                return Result<string>.Failure(400, Messages.NoFileUploaded);
 
             long fileSizeLimit = 5 * 1024 * 1024;
             if (file.Length > fileSizeLimit)
-                return new ErrorDataResult<string>("File size exceeds the 5MB limit.");
+                return Result<string>.Failure(400, Messages.FileSizeLimitExceeded);
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
             if (!allowedExtensions.Contains(extension))
-                return new ErrorDataResult<string>("Invalid file type. Only JPG, JPEG, and PNG are allowed.");
+                return Result<string>.Failure(400, Messages.InvalidFileType);
 
             string safeName = SlugHelper.GenerateSlug(customName);
 
             if (string.IsNullOrEmpty(safeName))
-                return new ErrorDataResult<string>("Invalid filename provided.");
+                return Result<string>.Failure(400, Messages.InvalidFilename);
 
             string fileName = $"{safeName}{extension}";
 
@@ -52,7 +53,7 @@ namespace MustafaGuler.Service.Services
 
             if (File.Exists(filePath))
             {
-                return new ErrorDataResult<string>($"A file with the name '{safeName}' already exists. Please choose a different name.");
+                return Result<string>.Failure(409, string.Format(Messages.FileAlreadyExists, safeName));
             }
 
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -60,7 +61,7 @@ namespace MustafaGuler.Service.Services
                 await file.CopyToAsync(stream);
             }
             string returnPath = $"/uploads/articles/{fileName}";
-            return new SuccessDataResult<string>(returnPath, "Image uploaded successfully.");
+            return Result<string>.Success(returnPath, 201, Messages.ImageUploaded);
         }
     }
 }

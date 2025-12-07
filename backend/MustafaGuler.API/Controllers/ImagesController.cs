@@ -7,7 +7,7 @@ namespace MustafaGuler.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ImagesController : ControllerBase
+    public class ImagesController : CustomBaseController
     {
         private readonly IImageService _imageService;
 
@@ -20,13 +20,7 @@ namespace MustafaGuler.API.Controllers
         public async Task<IActionResult> Upload([FromForm] ImageUploadDto uploadDto)
         {
             var result = await _imageService.UploadAsync(uploadDto.File, uploadDto.CustomName);
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-
-            return BadRequest(result);
+            return CreateActionResultInstance(result);
         }
     }
 }

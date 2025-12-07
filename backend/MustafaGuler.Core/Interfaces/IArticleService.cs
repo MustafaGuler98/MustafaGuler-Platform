@@ -9,8 +9,8 @@ namespace MustafaGuler.Core.Interfaces
 {
     public interface IArticleService
     {
-        Task<IDataResult<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null);
-        Task<IDataResult<ArticleDetailDto>> GetBySlugAsync(string slug);
-        Task<IResult> AddAsync(ArticleAddDto articleAddDto);
+        Task<Result<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null);
+        Task<Result<ArticleDetailDto>> GetBySlugAsync(string slug);
+        Task<Result> AddAsync(ArticleAddDto articleAddDto);
     }
 }
