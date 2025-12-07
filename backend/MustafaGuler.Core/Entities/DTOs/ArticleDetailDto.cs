@@ -17,6 +17,8 @@ namespace MustafaGuler.Core.Entities.DTOs
 
         public string Author { get; set; }
 
+        public string MainImage { get; set; }
+
         public ArticleNavigationDto? NextArticle { get; set; }
         public ArticleNavigationDto? PreviousArticle { get; set; }
     }

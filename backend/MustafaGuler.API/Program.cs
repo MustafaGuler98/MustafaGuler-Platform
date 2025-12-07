@@ -34,6 +34,7 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IService<>), typeof(MustafaGuler.Service.Services.Service<>));
 builder.Services.AddScoped<IArticleService, MustafaGuler.Service.Services.ArticleService>();
+builder.Services.AddScoped<IImageService, MustafaGuler.Service.Services.ImageService>();
 
 builder.Services.AddAutoMapper(typeof(MapProfile));
 
@@ -62,6 +63,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseMiddleware<MustafaGuler.API.Middlewares.GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
