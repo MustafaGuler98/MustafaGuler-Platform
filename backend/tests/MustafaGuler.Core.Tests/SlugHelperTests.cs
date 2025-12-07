@@ -17,7 +17,6 @@ namespace MustafaGuler.Core.Tests
             Assert.Equal(expected, result);
         }
 
-        // Test 2: Turkish characters
         [Fact]
         public void GenerateSlug_WhenTextContainsTurkishCharacters_ReturnsEnglishCharacters()
         {
@@ -29,7 +28,6 @@ namespace MustafaGuler.Core.Tests
             Assert.Equal(expected, result);
         }
 
-        // Test 3: Multiple spaces and trim
         [Fact]
         public void GenerateSlug_WhenTextHasMultipleSpaces_RemovesExtraSpaces()
         {
@@ -41,7 +39,6 @@ namespace MustafaGuler.Core.Tests
             Assert.Equal(expected, result);
         }
 
-        // Test 4: Empty or Null input
         [Theory]
         [InlineData("")]
         [InlineData(null)]
