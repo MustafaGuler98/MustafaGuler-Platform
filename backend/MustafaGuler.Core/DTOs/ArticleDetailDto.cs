@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MustafaGuler.Core.Entities.DTOs
+namespace MustafaGuler.Core.DTOs
 {
     public class ArticleDetailDto
     {
@@ -16,5 +16,10 @@ namespace MustafaGuler.Core.Entities.DTOs
         public string CategoryName { get; set; }
 
         public string Author { get; set; }
+
+        public string MainImage { get; set; }
+
+        public ArticleNavigationDto? NextArticle { get; set; }
+        public ArticleNavigationDto? PreviousArticle { get; set; }
     }
 }

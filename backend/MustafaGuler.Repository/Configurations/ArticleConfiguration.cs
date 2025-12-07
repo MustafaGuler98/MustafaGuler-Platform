@@ -21,6 +21,8 @@ namespace MustafaGuler.Repository.Configurations
                    .HasForeignKey(x => x.CategoryId)
                    .OnDelete(DeleteBehavior.SetNull); // For safe delete
 
+            var adminId = Guid.Parse("CB94223B-CCB8-4F2F-93D7-0DF96A7F3839"); // Example Admin in AppUser seed data
+
             // Seed Data for testing purposes.
             builder.HasData(
                  new Article
@@ -34,7 +36,9 @@ namespace MustafaGuler.Repository.Configurations
                      ViewCount = 100,
                      CreatedDate = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc),
                      IsDeleted = false,
-                     CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444444")
+                     CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                     MainImage = null,
+                     UserId = adminId
                  },
                 new Article
                 {
@@ -47,7 +51,9 @@ namespace MustafaGuler.Repository.Configurations
                     ViewCount = 50,
                     CreatedDate = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc),
                     IsDeleted = false,
-                    CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444445")
+                    CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444445"),
+                    MainImage = "/uploads/articles/backend-setup.jpg",
+                    UserId = adminId
                 }
             );
         }

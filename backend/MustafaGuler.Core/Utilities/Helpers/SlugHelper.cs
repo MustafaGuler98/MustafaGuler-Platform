@@ -8,6 +8,13 @@ namespace MustafaGuler.Core.Utilities.Helpers
         {
             if (string.IsNullOrEmpty(text)) return string.Empty;
 
+            // Somehow toLowerInvariant does not convert Turkish characters correctly, so we handle them first
+            text = text.Replace("İ", "i");
+            text = text.Replace("I", "i");
+            text = text.Replace("Ğ", "g");
+            text = text.Replace("Ü", "u");
+            text = text.Replace("Ş", "s");
+            text = text.Replace("Ö", "o");
             text = text.ToLowerInvariant();
 
             // Normalization

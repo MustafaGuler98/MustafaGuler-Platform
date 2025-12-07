@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MustafaGuler.Repository.Contexts;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MustafaGuler.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251206115701_IdentityStaticFix")]
+    partial class IdentityStaticFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,9 +275,6 @@ namespace MustafaGuler.Repository.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
-                    b.Property<string>("MainImage")
-                        .HasColumnType("text");
-
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -329,7 +329,6 @@ namespace MustafaGuler.Repository.Migrations
                             GroupId = new Guid("99999999-9999-9999-9999-999999999999"),
                             IsDeleted = false,
                             LanguageCode = "en",
-                            MainImage = "/uploads/articles/backend-setup.jpg",
                             Slug = "what-is-onion-architecture",
                             Title = "What is Onion Architecture?",
                             UserId = new Guid("cb94223b-ccb8-4f2f-93d7-0df96a7f3839"),
