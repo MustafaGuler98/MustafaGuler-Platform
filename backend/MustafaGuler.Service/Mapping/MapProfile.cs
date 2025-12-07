@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
-using MustafaGuler.Core.Entities.DTOs;
 
 namespace MustafaGuler.Service.Mapping
 {

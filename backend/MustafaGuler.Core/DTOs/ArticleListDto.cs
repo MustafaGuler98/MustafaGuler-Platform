@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MustafaGuler.Core.Entities.DTOs
+namespace MustafaGuler.Core.DTOs
 {
     public class ArticleListDto
     {

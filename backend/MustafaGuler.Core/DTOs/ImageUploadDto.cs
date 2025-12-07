@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 
-namespace MustafaGuler.Core.Entities.DTOs
+namespace MustafaGuler.Core.DTOs
 {
     public class ImageUploadDto
     {

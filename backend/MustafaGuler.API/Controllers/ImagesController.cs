@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MustafaGuler.Core.DTOs;
-using MustafaGuler.Core.Entities.DTOs;
 using MustafaGuler.Core.Interfaces;
 using System.Threading.Tasks;
 

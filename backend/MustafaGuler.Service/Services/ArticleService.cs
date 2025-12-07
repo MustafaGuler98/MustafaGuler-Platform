@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
-using MustafaGuler.Core.Entities.DTOs;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;

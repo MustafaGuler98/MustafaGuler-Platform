@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MustafaGuler.Core.Entities.DTOs
+namespace MustafaGuler.Core.DTOs
 {
     public class ArticleDetailDto
     {
