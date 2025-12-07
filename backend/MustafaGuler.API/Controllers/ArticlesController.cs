@@ -8,7 +8,7 @@ namespace MustafaGuler.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ArticlesController : ControllerBase
+    public class ArticlesController : CustomBaseController
     {
         private readonly IArticleService _articleService;
 
@@ -21,31 +21,21 @@ namespace MustafaGuler.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] string? languageCode, [FromQuery] Guid? categoryId)
         {
             var result = await _articleService.GetAllAsync(languageCode, categoryId);
-
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return CreateActionResultInstance(result);
         }
 
         [HttpGet("{slug}")]
         public async Task<IActionResult> GetBySlug(string slug)
         {
             var result = await _articleService.GetBySlugAsync(slug);
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-
-            return NotFound(result);
+            return CreateActionResultInstance(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Save(ArticleAddDto articleAddDto)
         {
             var result = await _articleService.AddAsync(articleAddDto);
-
-            if (result.Success) return Ok(result);
-            return BadRequest(result);
+            return CreateActionResultInstance(result);
         }
         [HttpGet("test-error")]
         public IActionResult TestError()
