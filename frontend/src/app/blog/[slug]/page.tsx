@@ -27,13 +27,14 @@ export default async function ArticlePage({ params }: PageProps) {
 
 
   const post = await articleService.getArticleBySlug(resolvedParams.slug);
-
-
+  
 
   if (!post) {
     notFound();
   }
 
+  const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
+  const finalImage = post.mainImage ? `${backendBaseUrl}${post.mainImage}` : null;
 
   const words = post.content ? post.content.split(/\s+/).length : 0;
   const readTime = Math.ceil(words / 200);
@@ -109,14 +110,15 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         </div>
 
-        {post.mainImage && (
+        {finalImage && (
             <div className="relative w-full h-[300px] md:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
               <Image 
-                  src={post.mainImage} 
+                  src={finalImage} 
                   alt={post.title}
                   fill
                   className="object-cover"
                   priority
+                  unoptimized
               />
             </div>
         )}

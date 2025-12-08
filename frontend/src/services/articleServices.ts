@@ -15,6 +15,7 @@ export const articleService = {
       if (!res.ok) return null;
 
       const json = await res.json();
+      console.log("📦[DEBUG] Raw JSON from API:", JSON.stringify(json, null, 2));
 
       const isSuccessful = json.isSuccess === true || json.success === true || json.Success === true;
       const data = json.data || json.Data;
