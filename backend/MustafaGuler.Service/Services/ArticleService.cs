@@ -1,16 +1,11 @@
 ﻿using AutoMapper;
+using MustafaGuler.Core.Constants; // Added for Messages
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
-using MustafaGuler.Core.Entities.DTOs;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
-using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace MustafaGuler.Service.Services
 {
@@ -26,7 +21,8 @@ namespace MustafaGuler.Service.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<IDataResult<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null)
+
+        public async Task<Result<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null)
         {
             Expression<Func<Article, bool>> filterExpression = x =>
                 !x.IsDeleted
@@ -42,48 +38,53 @@ namespace MustafaGuler.Service.Services
                 }
             );
 
-            if (articles == null)
-                return new ErrorDataResult<IEnumerable<ArticleListDto>>("No articles found.");
+            if (articles == null || !articles.Any())
+                return Result<IEnumerable<ArticleListDto>>.Failure(404, Messages.NoArticlesFound);
+
             articles = articles.OrderByDescending(x => x.CreatedDate);
 
             var articleDtos = _mapper.Map<IEnumerable<ArticleListDto>>(articles);
-            return new SuccessDataResult<IEnumerable<ArticleListDto>>(articleDtos, "Articles listed successfully.");
+
+            return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
         }
 
-        public async Task<IDataResult<ArticleDetailDto>> GetBySlugAsync(string slug)
+        public async Task<Result<ArticleDetailDto>> GetBySlugAsync(string slug)
         {
             var article = await _repository.GetAsync(
                 filter: x => x.Slug == slug && !x.IsDeleted,
                 includes: new Expression<Func<Article, object>>[]
                 {
                     x => x.Category,
-                    x => x.User 
+                    x => x.User
                 }
             );
+
             if (article == null)
             {
-                return new ErrorDataResult<ArticleDetailDto>("Article not found.");
+                return Result<ArticleDetailDto>.Failure(404, Messages.ArticleNotFound);
             }
+
             var articleDetailDto = _mapper.Map<ArticleDetailDto>(article);
 
             var nextArticle = await GetNextArticleAsync(article);
             var prevArticle = await GetPreviousArticleAsync(article);
 
             articleDetailDto.NextArticle = nextArticle != null
-               ? _mapper.Map<ArticleNavigationDto>(nextArticle)
-               : null;
-            articleDetailDto.PreviousArticle = prevArticle != null
-               ? _mapper.Map<ArticleNavigationDto>(prevArticle)
-               : null;
+                ? _mapper.Map<ArticleNavigationDto>(nextArticle)
+                : null;
 
-            return new SuccessDataResult<ArticleDetailDto>(articleDetailDto);
+            articleDetailDto.PreviousArticle = prevArticle != null
+                ? _mapper.Map<ArticleNavigationDto>(prevArticle)
+                : null;
+
+            return Result<ArticleDetailDto>.Success(articleDetailDto);
         }
 
-        public async Task<IResult> AddAsync(ArticleAddDto articleAddDto)
+        public async Task<Result> AddAsync(ArticleAddDto articleAddDto)
         {
             if (string.IsNullOrEmpty(articleAddDto.Title))
             {
-                return new ErrorResult("Title is required.");
+                return Result.Failure(400, Messages.ArticleTitleRequired);
             }
 
             var article = _mapper.Map<Article>(articleAddDto);
@@ -92,7 +93,7 @@ namespace MustafaGuler.Service.Services
             article.CreatedDate = DateTime.UtcNow;
             article.IsDeleted = false;
             article.ViewCount = 0;
-            article.GroupId = Guid.NewGuid(); // Temp
+            article.GroupId = Guid.NewGuid(); //temp
             article.UserId = Guid.Parse("CB94223B-CCB8-4F2F-93D7-0DF96A7F3839");
 
             article.Slug = await GenerateUniqueSlugAsync(article.Title);
@@ -100,10 +101,8 @@ namespace MustafaGuler.Service.Services
             await _repository.AddAsync(article);
             await _unitOfWork.CommitAsync();
 
-            return new SuccessResult("Article added successfully.");
+            return Result.Success(201, Messages.ArticleAdded);
         }
-
- 
         private async Task<string> GenerateUniqueSlugAsync(string title)
         {
             var baseSlug = SlugHelper.GenerateSlug(title);
@@ -118,20 +117,21 @@ namespace MustafaGuler.Service.Services
 
             return slug;
         }
+
         private async Task<Article?> GetNextArticleAsync(Article currentArticle)
         {
-            // If dates are equal, we compare by ID to ensure consistent ordering.
             var categoryCandidates = await _repository.GetAllAsync(x =>
-                x.LanguageCode == currentArticle.LanguageCode &&
-                x.CategoryId == currentArticle.CategoryId &&
-                !x.IsDeleted &&
-                (x.CreatedDate > currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id > currentArticle.Id))
-            );
+               x.LanguageCode == currentArticle.LanguageCode &&
+               x.CategoryId == currentArticle.CategoryId &&
+               !x.IsDeleted &&
+               (x.CreatedDate > currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id > currentArticle.Id))
+           );
 
             var nextInCategory = categoryCandidates
                 .OrderBy(x => x.CreatedDate)
                 .ThenBy(x => x.Id)
                 .FirstOrDefault();
+
             if (nextInCategory != null) return nextInCategory;
 
             // If no next article in the same category, search globally
@@ -150,11 +150,11 @@ namespace MustafaGuler.Service.Services
         private async Task<Article?> GetPreviousArticleAsync(Article currentArticle)
         {
             var categoryCandidates = await _repository.GetAllAsync(x =>
-                x.LanguageCode == currentArticle.LanguageCode &&
-                x.CategoryId == currentArticle.CategoryId &&
-                !x.IsDeleted &&
-                (x.CreatedDate < currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id < currentArticle.Id))
-            );
+               x.LanguageCode == currentArticle.LanguageCode &&
+               x.CategoryId == currentArticle.CategoryId &&
+               !x.IsDeleted &&
+               (x.CreatedDate < currentArticle.CreatedDate || (x.CreatedDate == currentArticle.CreatedDate && x.Id < currentArticle.Id))
+           );
 
             var prevInCategory = categoryCandidates
                 .OrderByDescending(x => x.CreatedDate)
