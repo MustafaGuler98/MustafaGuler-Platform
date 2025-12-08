@@ -12,7 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MustafaGuler.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:backend/MustafaGuler.Repository/Migrations/20251208170539_InitialCreate.Designer.cs
     [Migration("20251208170539_InitialCreate")]
+========
+    [Migration("20251208171115_InitialCreate")]
+>>>>>>>> 31493f19af60d624a69bb70b65a82d560d95c9cb:backend/MustafaGuler.Repository/Migrations/20251208171115_InitialCreate.Designer.cs
     partial class InitialCreate
     {
         /// <inheritdoc />
