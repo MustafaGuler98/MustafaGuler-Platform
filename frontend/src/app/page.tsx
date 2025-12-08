@@ -11,10 +11,6 @@ export default async function Home() {
   
   const allArticles = await articleService.getAllArticles();
   
-  // 👇 BU SATIRLARI EKLE (Debug için)
-  console.log("--------------------------------------------------");
-  console.log("API'DEN GELEN İLK MAKALE:", allArticles[0]); 
-  console.log("--------------------------------------------------");
   const latestArticles = allArticles ? allArticles.slice(0, 6) : [];
 
   return (
@@ -24,7 +20,7 @@ export default async function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-100/50 dark:bg-blue-500/10 rounded-full blur-3xl -z-10 opacity-70"></div>
         <div className="container mx-auto px-4 text-center">
           <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm font-medium">
-            🚀 Welcome to BlogTech
+            Welcome to Blog
           </Badge>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
             Share Knowledge <br />
@@ -61,7 +57,6 @@ export default async function Home() {
               {latestArticles.map((article) => (
                 <Link 
                   key={article.id} 
-                  // DİKKAT: C# Modelinde categoryId küçük harfle başlıyorsa burayı düzelt: article.categoryId
                   href={`/blog/${article.slug}`}
                   className="group block h-full"
                 >

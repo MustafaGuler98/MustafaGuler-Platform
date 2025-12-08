@@ -3,6 +3,7 @@ export interface Article {
   title: string;
   content: string;
   categoyId: string;
+  categoryName: string;
   categorySlug: string;
   languageCode: string;
   slug: string;
@@ -10,7 +11,7 @@ export interface Article {
   createdAt: string;
   updatedAt: string;
   summary?: string;
-  authorName?: string; 
+  author?: string; 
 }
 
 export interface ServiceResponse<T> {

@@ -31,7 +31,6 @@ export const articleService = {
     if (!API_URL) return [];
 
     try {
-      // C# Controller'da [Route("api/[controller]")] olduğu için adres: /api/articles
       const res = await fetch(`${API_URL}/articles`, { 
         cache: 'no-store' 
       });
