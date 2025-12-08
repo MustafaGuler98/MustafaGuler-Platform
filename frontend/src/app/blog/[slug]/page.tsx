@@ -23,23 +23,12 @@ export default async function ArticlePage({ params }: PageProps) {
   
 
   const resolvedParams = await params;
-console.log("\n==================================================");
-  console.log("🚀 DETAY SAYFASI DEBUG RAPORU");
-  console.log("--------------------------------------------------");
-  console.log("1. URL'den Gelen Slug:", resolvedParams.slug);
+
 
 
   const post = await articleService.getArticleBySlug(resolvedParams.slug);
 
-  console.log("2. API'den Gelen Ham Veri:", post);
-   if (!post) {
-      console.error("❌ HATA: Post 'null' döndü. (API 404 vermiş veya bağlantı kopuk)");
-  } else {
-      console.log("✅ BAŞARILI: Veri alındı. Başlık:", post.title);
-      // Büyük/Küçük harf kontrolü için
-      console.log("🔍 Field Kontrolü -> title:", post.title, "| Title:", (post as any).Title);
-  }
-  console.log("==================================================\n");
+
 
   if (!post) {
     notFound();
@@ -47,14 +36,13 @@ console.log("\n==================================================");
 
 
   const words = post.content ? post.content.split(/\s+/).length : 0;
-  const readTime = Math.ceil(words / 200); // Ortalama 200 kelime/dk
+  const readTime = Math.ceil(words / 200);
 
-  const displayCategory = "Tech Article"; 
+  const displayCategory = post.categoryName; 
 
   return (
     <div className="min-h-screen bg-background pb-20">
       
-      {/* HEADER: Geri Dön Butonu ve Aksiyonlar */}
       <div className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link 
@@ -76,16 +64,17 @@ console.log("\n==================================================");
       </div>
 
       <article className="container max-w-4xl mx-auto px-4 mt-10">
-        
+
         <div className="mb-6">
           <Badge variant="secondary" className="text-sm px-3 py-1">
             {displayCategory}
           </Badge>
         </div>
-
+        
         <h1 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight mb-6">
           {post.title}
         </h1>
+        
 
         {post.summary && (
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
@@ -102,9 +91,8 @@ console.log("\n==================================================");
             </Avatar>
             <div>
               <p className="font-semibold text-foreground">
-                {post.authorName || "Blog Editor"}
+                {post.author || "Blog Editor"}
               </p>
-              <p className="text-sm text-muted-foreground">Author</p>
             </div>
           </div>
           
@@ -121,7 +109,6 @@ console.log("\n==================================================");
           </div>
         </div>
 
-        {/* KAPAK GÖRSELİ */}
         {post.imageUrl && (
             <div className="relative w-full h-[300px] md:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
               <Image 
@@ -134,7 +121,6 @@ console.log("\n==================================================");
             </div>
         )}
 
-        {/* İÇERİK ALANI (Typography Plugin Aktif) */}
         <div 
           className="
             prose prose-lg dark:prose-invert max-w-none 

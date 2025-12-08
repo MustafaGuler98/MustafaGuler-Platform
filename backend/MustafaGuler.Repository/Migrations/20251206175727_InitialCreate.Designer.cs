@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MustafaGuler.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251206115701_IdentityStaticFix")]
-    partial class IdentityStaticFix
+    [Migration("20251206175727_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
