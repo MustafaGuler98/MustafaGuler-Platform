@@ -99,7 +99,7 @@ export default async function ArticlePage({ params }: PageProps) {
           <div className="text-right hidden sm:block">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
               <Calendar className="w-4 h-4" />
-              <span>{formatDate(post.createdAt)}</span>
+              <span>{formatDate(post.createdDate)}</span>
             </div>
             
             <div className="flex items-center gap-2 text-sm text-muted-foreground justify-end">
@@ -109,10 +109,10 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         </div>
 
-        {post.imageUrl && (
+        {post.mainImage && (
             <div className="relative w-full h-[300px] md:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
               <Image 
-                  src={post.imageUrl} 
+                  src={post.mainImage} 
                   alt={post.title}
                   fill
                   className="object-cover"

@@ -1,6 +1,6 @@
-import { Article, ServiceResponse } from "@/types/article";
+import { Article } from "@/types/article";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL; 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const articleService = {
   
@@ -14,39 +14,43 @@ export const articleService = {
 
       if (!res.ok) return null;
 
-      const result: ServiceResponse<Article> = await res.json();
+      const json = await res.json();
 
-      if (!result.success || !result.data) {
-        return null;
+      const isSuccessful = json.isSuccess === true || json.success === true || json.Success === true;
+      const data = json.data || json.Data;
+
+      if (isSuccessful && data) {
+        return {
+            ...data,
+            imageUrl: data.mainImage || data.imageUrl, 
+            authorName: data.author || data.authorName
+        };
       }
 
-      return result.data;
+      return null;
 
     } catch (error) {
-      console.error("Detay çekme hatası:", error);
+      console.error("Service Error:", error);
       return null;
     }
   },
+
   async getAllArticles(): Promise<Article[]> {
     if (!API_URL) return [];
 
     try {
-      const res = await fetch(`${API_URL}/articles`, { 
-        cache: 'no-store' 
-      });
+        const res = await fetch(`${API_URL}/articles`, { cache: 'no-store' });
+        if (!res.ok) return [];
 
-      if (!res.ok) return [];
-
-      const result: ServiceResponse<Article[]> = await res.json();
-
-      if (!result.success || !result.data) {
+        const json = await res.json();
+        const isSuccessful = json.isSuccess === true || json.success === true;
+        
+        if (isSuccessful && json.data) {
+            return json.data;
+        }
         return [];
-      }
-
-      return result.data;
     } catch (error) {
-      console.error("Liste çekme hatası:", error);
-      return [];
+        return [];
     }
   }
 };

@@ -63,9 +63,9 @@ export default async function Home() {
                   <div className="flex flex-col h-full bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300">
                     
                     <div className="relative h-48 bg-muted w-full">
-                      {article.imageUrl ? (
+                      {article.mainImage ? (
                          <Image 
-                           src={article.imageUrl} 
+                           src={article.mainImage} 
                            alt={article.title}
                            fill
                            className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -77,7 +77,7 @@ export default async function Home() {
                       )}
                       
                       <div className="absolute top-4 right-4 bg-background/90 px-3 py-1 rounded-full text-xs font-bold shadow-sm backdrop-blur-sm">
-                        {formatDate(article.createdAt)}
+                        {formatDate(article.createdDate)}
                       </div>
                     </div>
 
