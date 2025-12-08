@@ -19,6 +19,7 @@ interface PageProps {
   }>;
 }
 
+
 export default async function ArticlePage({ params }: PageProps) {
   
 
@@ -62,8 +63,24 @@ export default async function ArticlePage({ params }: PageProps) {
              </Button>
           </div>
         </div>
-      </div>
+      </div> 
 
+            {/*Image*/}
+
+            {finalImage && (
+  <div className="relative w-full max-w-2xl mx-auto h-[300px] md:h-[300px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
+    <Image 
+        src={finalImage!} 
+        alt={post.title}
+        fill
+        className="object-cover"
+        priority
+        unoptimized
+              />
+            </div>
+            )}
+
+      {/* Title */}
       <article className="container max-w-4xl mx-auto px-4 mt-10">
 
         <div className="mb-6">
@@ -82,7 +99,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {post.summary}
           </p>
         )}
-
+        
         <div className="flex items-center justify-between py-6 border-y border-border mb-10">
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12 border border-border bg-muted">
@@ -109,20 +126,6 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
           </div>
         </div>
-
-        {finalImage && (
-            <div className="relative w-full h-[300px] md:h-[500px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
-              <Image 
-                  src={finalImage} 
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                  priority
-                  unoptimized
-              />
-            </div>
-        )}
-
         <div 
           className="
             prose prose-lg dark:prose-invert max-w-none 
