@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MustafaGuler.Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251206115701_IdentityStaticFix")]
-    partial class IdentityStaticFix
+    [Migration("20251208171115_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -275,6 +275,9 @@ namespace MustafaGuler.Repository.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<string>("MainImage")
+                        .HasColumnType("text");
+
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(250)
@@ -329,6 +332,7 @@ namespace MustafaGuler.Repository.Migrations
                             GroupId = new Guid("99999999-9999-9999-9999-999999999999"),
                             IsDeleted = false,
                             LanguageCode = "en",
+                            MainImage = "/uploads/articles/backend-setup.jpg",
                             Slug = "what-is-onion-architecture",
                             Title = "What is Onion Architecture?",
                             UserId = new Guid("cb94223b-ccb8-4f2f-93d7-0df96a7f3839"),
