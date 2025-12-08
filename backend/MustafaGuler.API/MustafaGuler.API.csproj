@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MustafaGuler.Repository\MustafaGuler.Repository.csproj" />
     <ProjectReference Include="..\MustafaGuler.Service\MustafaGuler.Service.csproj" />
-	<FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
