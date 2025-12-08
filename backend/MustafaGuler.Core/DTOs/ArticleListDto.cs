@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MustafaGuler.Core.DTOs
+namespace MustafaGuler.Core.Entities.DTOs
 {
     public class ArticleListDto
     {
@@ -17,6 +17,5 @@ namespace MustafaGuler.Core.DTOs
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; }
         public string Author { get; set; }
-        public string MainImage { get; set; }
     }
 }

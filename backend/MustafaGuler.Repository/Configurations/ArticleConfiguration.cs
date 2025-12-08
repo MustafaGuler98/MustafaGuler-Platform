@@ -37,7 +37,6 @@ namespace MustafaGuler.Repository.Configurations
                      CreatedDate = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc),
                      IsDeleted = false,
                      CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                     MainImage = null,
                      UserId = adminId
                  },
                 new Article
@@ -52,7 +51,6 @@ namespace MustafaGuler.Repository.Configurations
                     CreatedDate = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc),
                     IsDeleted = false,
                     CategoryId = Guid.Parse("44444444-4444-4444-4444-444444444445"),
-                    MainImage = "/uploads/articles/backend-setup.jpg",
                     UserId = adminId
                 }
             );
