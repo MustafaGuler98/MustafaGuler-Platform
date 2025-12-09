@@ -9,11 +9,14 @@ export interface Article {
   mainImage?: string;
   createdDate: string;
   author: string;
-  nextArticle: string | null;
-  previousArticle: string | null;
+  nextArticle: ArticleNavigation | null;
+  previousArticle: ArticleNavigation | null;
   summary?: string;
 }
-
+export interface ArticleNavigation {
+title: string;
+slug: string;
+}
 export interface ServiceResponse<T> {
   data: T;
   isSuccess: boolean; 
