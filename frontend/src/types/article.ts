@@ -12,6 +12,7 @@ export interface Article {
   nextArticle: ArticleNavigation | null;
   previousArticle: ArticleNavigation | null;
   summary?: string;
+  authorImage?: string;
 }
 export interface ArticleNavigation {
 title: string;
