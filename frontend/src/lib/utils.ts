@@ -13,3 +13,19 @@ export function formatDate(dateString: string): string {
     year: 'numeric'
   });
 }
+
+// Our wwwroot is in the backend folder.
+export function getImageUrl(path: string | null | undefined): string {
+  if (!path) return `${getBackendUrl()}/assets/images/default-article.png`;
+
+  if (path.startsWith("http")) return path;
+
+  const baseUrl = getBackendUrl();
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
+  return `${baseUrl}${cleanPath}`;
+}
+
+function getBackendUrl(): string {
+  return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
+}
