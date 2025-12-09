@@ -154,7 +154,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3 text-[10px] font-mono text-muted-foreground/60 shrink-0 sm:pl-4 sm:border-l sm:border-white/5">
+                                        <div className="flex sm:justify-between items-center gap-3 text-[10px] font-mono text-muted-foreground/60 shrink-0 sm:w-24 sm:pl-4 sm:border-l sm:border-white/5">
                                             <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
                                                 <Calendar className="w-3 h-3" />
                                                 <span>{formatCardDate(article.createdDate)}</span>
