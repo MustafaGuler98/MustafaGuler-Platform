@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Article } from "@/types/article";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -28,4 +29,15 @@ export function getImageUrl(path: string | null | undefined): string {
 
 function getBackendUrl(): string {
   return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
+}
+
+export function groupArticlesByYear(articles: Article[]): { [year: string]: Article[] } {
+  return articles.reduce((acc, article) => {
+    const year = new Date(article.createdDate).getFullYear().toString();
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+    acc[year].push(article);
+    return acc;
+  }, {} as { [year: string]: Article[] });
 }

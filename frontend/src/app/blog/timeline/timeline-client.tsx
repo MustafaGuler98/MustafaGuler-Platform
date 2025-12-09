@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Article } from "@/types/article";
-import { Hourglass, Calendar, Tag, ArrowUpCircle, Search } from "lucide-react";
+import { Calendar, Search, Activity, ChevronRight, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GroupedArticles {
   [year: string]: Article[];
@@ -16,12 +17,17 @@ interface TimelineClientProps {
 export default function TimelineClient({ initialArticles }: TimelineClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  
+  // Using this to understand publish date of hovered article
+  const [hoveredYear, setHoveredYear] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const filteredArticles = initialArticles.filter((article) => {
+  const safeArticles = initialArticles || [];
+
+  const filteredArticles = safeArticles.filter((article) => {
     const query = searchQuery.toLowerCase();
     const matchTitle = article.title.toLowerCase().includes(query);
     const matchCategory = article.categoryName?.toLowerCase().includes(query);
@@ -35,9 +41,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
   const grouped = sortedArticles.reduce<GroupedArticles>((acc, article) => {
     const date = new Date(article.createdDate);
     const year = date.getFullYear().toString();
-
     if (!acc[year]) acc[year] = [];
-    
     acc[year].push(article);
     return acc;
   }, {});
@@ -45,133 +49,128 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
   const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
 
   const formatCardDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'long', 
-      year: 'numeric'
+    return new Date(dateString).toLocaleString('en-US', {
+      month: 'short', 
+      day: 'numeric'
     });
   };
 
-  if (!isMounted) {
-      return <div className="min-h-screen bg-background" />;
-  }
+  if (!isMounted) return <div className="min-h-screen bg-transparent" />;
+
+  let globalIndex = 0;
 
   return (
-    <div className="container max-w-4xl mx-auto">
-        
-        {/* HEADER SECTION */}
-        <div className="flex flex-col items-center justify-center mb-10 text-center">
-           <h1 className="text-5xl md:text-6xl font-bold font-heading mb-6 flex items-center gap-4 text-foreground">
-             <Hourglass className="w-8 h-8 text-primary rotate-180" />
-             <span className="bg-gradient-to-r from-primary via-purple-400 to-secondary bg-clip-text text-transparent drop-shadow-sm">
-               TIMELINE
-             </span>
-             <Hourglass className="w-8 h-8 text-primary" />
-           </h1>
-           
-           <div className="text-muted-foreground font-sans text-lg tracking-wide border-b border-border/30 pb-2 mb-8">
-             Archive Logs
-           </div>
-
-           {/* SEARCH INPUT */}
-           <div className="relative w-full max-w-md">
-             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-muted-foreground" />
-             </div>
-             <input 
-               type="text" 
-               placeholder="Search protocol..." 
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-               className="w-full bg-background/50 border border-primary/30 rounded-full py-2 pl-9 pr-4 text-sm
-                          text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-primary 
-                          focus:ring-1 focus:ring-primary shadow-[0_0_15px_rgba(168,85,247,0.1)] transition-all"
-             />
-           </div>
+    <div className="relative min-h-screen pb-32">
+        <div className="fixed inset-0 z-0 pointer-events-none">
+            <img 
+                src="/bg-magic.png" 
+                alt="Magic Background" 
+                className="w-full h-full object-cover opacity-40 mix-blend-screen" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#020103] via-transparent to-[#020103]" />
         </div>
 
-        {/* CONTENT */}
-        <div className="relative border-l-2 border-border/40 ml-4 md:ml-12 space-y-12 min-h-[300px]">
-          
-          {years.length === 0 ? (
-             <div className="pl-12 pt-10 text-muted-foreground font-mono text-sm">
-               No logs match your search criteria.
-             </div>
-          ) : (
-            years.map((year) => (
-              <div key={year} className="relative">
-                
-                {/* STICKY YEAR MARKER */}
-                <div className="sticky top-24 z-30 -ml-[2.55rem] w-20 h-20 mb-6 flex items-center justify-center">
-                   <div className="flex items-center justify-center w-20 h-20 bg-background border-4 border-background rounded-full">
-                      <span className="flex items-center justify-center w-full h-full text-xl font-heading font-bold text-secondary bg-muted/20 border border-secondary/50 rounded-full shadow-[0_0_15px_rgba(255,165,0,0.2)]">
-                        {year}
-                      </span>
-                   </div>
-                </div>
+        <div className="relative z-10 container max-w-5xl mx-auto px-4 pt-10">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pl-2 border-b border-primary/20 pb-6">
+               <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 text-xs font-mono text-cyan-neon tracking-widest uppercase animate-pulse">
+                     <Activity className="w-3 h-3" />
+                     <span>System_Ready</span>
+                  </div>
+                  <Link href="/blog/timeline" className="group/title w-fit no-underline">
+                    <h1 className="text-5xl md:text-6xl font-bold font-[family-name:var(--font-michroma)] text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300">
+                        TIMELINE
+                    </h1>
+                  </Link>
+               </div>
 
-                {/* YEAR CONTENT (Direct Articles List) */}
-                <div className="pl-8 md:pl-16 -mt-20">
+               {/* Search Input */}
+               <div className="relative w-full md:w-72 group">
+                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-muted-foreground group-focus-within:text-cyan-neon transition-colors" />
+                 </div>
+                 <input 
+                   type="text" 
+                   placeholder="Search logs..." 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   className="w-full bg-transparent border border-white/100 rounded-md py-2.5 pl-10 pr-4 text-xs font-mono
+                              text-foreground placeholder-muted-foreground/50 
+                              transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+                 />
+               </div>
+            </div>
+            
+            <div className="relative min-h-[300px]">
+              <div className="absolute left-[23px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary via-purple-900/40 to-transparent opacity-80"></div>
+              {years.length === 0 ? (
+                 <div className="pl-16 pt-8 text-destructive font-mono text-sm">
+                   [WARNING]: No logs found. Please check database connection.
+                 </div>
+              ) : (
+                years.map((year) => (
+                  <div key={year} className="relative mb-12 last:mb-0">
                     
-                    <div className="space-y-4">
-                    {grouped[year].map((article) => (
-                        <Link 
-                        href={`/blog/${article.slug}`} 
-                        key={article.id}
-                        className="group block relative pl-6 transition-all"
-                        >
-                        {/* Horizontal Line Connector */}
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-[2px] bg-border group-hover:bg-red-600 transition-colors duration-300" />
-                        
-                        {/* Small Dot Connector */}
-                        <div className="absolute -left-[3.0rem] md:-left-[5.05rem] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-background border border-muted-foreground 
-                                        group-hover:border-red-600 group-hover:bg-red-600 group-hover:shadow-[0_0_10px_rgba(220,38,38,0.8)] 
-                                        transition-all duration-300 z-20" />
+                    <div className="sticky top-32 z-20 flex items-center mb-4 self-start">
+                       <div className={cn(
+                          "relative flex items-center justify-center w-12 h-12 bg-[#020103] border-2 rounded-full shrink-0 z-30 transition-all duration-300",
+                          hoveredYear === year 
+                            ? "border-cyan-neon shadow-[0_0_20px_var(--cyan-neon)]" 
+                            : "border-white/50"
+                       )}>
+                           <span className="font-heading font-bold text-xs text-cyan-neon">
+                            {year}
+                          </span>
+                       </div>
+                    </div>
 
-                        {/* COMPACT CARD */}
-                        <div className="bg-card border border-border rounded-md p-3 relative overflow-hidden transition-all duration-300
-                                        group-hover:border-red-600 group-hover:shadow-[0_0_15px_rgba(220,38,38,0.2)] group-hover:-translate-x-[-4px]">
-                            
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                {/* Title & Category Wrapper */}
-                                <div className="flex flex-col gap-1 min-w-0">
-                                    <h4 className="text-base font-bold font-heading text-foreground group-hover:text-red-500 transition-colors leading-tight truncate">
-                                    {article.title}
-                                    </h4>
-                                    
-                                    <div className="flex items-center gap-2">
-                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-secondary/30 text-secondary bg-secondary/5 w-fit">
-                                        <Tag className="w-3 h-3" />
-                                        {article.categoryName || "Log"}
-                                    </span>
+                    <div className="pl-6 md:pl-10 -mt-12 ml-6 space-y-4 pb-4">
+                        {grouped[year].map((article) => {
+                            const delay = globalIndex * 75; 
+                            globalIndex++;
+
+                            return (
+                              <Link 
+                                href={`/blog/${article.slug}`} 
+                                key={article.id}
+                                className="group relative block animate-in fade-in slide-in-from-bottom-2 duration-500 fill-mode-both"
+                                style={{ animationDelay: `${delay}ms` }}
+                                // Mouse events to update the state ---
+                                onMouseEnter={() => setHoveredYear(year)}
+                                onMouseLeave={() => setHoveredYear(null)}
+                              >
+                                {/* Card */}
+                                <div className="absolute -left-[1.7rem] md:-left-[2.8rem] top-1/2 -translate-y-1/2 w-8 md:w-14 h-[2px] bg-primary/50 group-hover:bg-cyan-neon group-hover:shadow-[0_0_8px_var(--cyan-neon)] transition-all duration-300 z-0"></div>
+                                <div className={cn("relative overflow-hidden rounded-lg border transition-all duration-300 z-10", "bg-[#0f0518]/90 border-primary/20 backdrop-blur-sm", "hover:bg-[#1a0b2e] hover:border-cyan-neon/40 hover:translate-x-1 hover:shadow-[0_4px_20px_-10px_rgba(34,211,238,0.15)]")}>
+                                    <div className="py-4 px-4 flex flex-col sm:flex-row gap-2 sm:items-center justify-between">
+                                        <div className="flex flex-col gap-1 min-w-0">
+                                            <h4 className="text-sm md:text-base font-bold font-heading text-white/90 group-hover:text-cyan-neon transition-colors truncate">
+                                              {article.title}
+                                            </h4>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-mono text-[10px] text-amber-400 border border-amber-500/20 bg-amber-500/5 px-1.5 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider">
+                                                    <Zap className="w-3 h-3" />
+                                                    {article.categoryName || "LOG"}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-[10px] font-mono text-muted-foreground/60 shrink-0 sm:pl-4 sm:border-l sm:border-white/5">
+                                            <div className="flex items-center gap-1.5 group-hover:text-primary transition-colors">
+                                                <Calendar className="w-3 h-3" />
+                                                <span>{formatCardDate(article.createdDate)}</span>
+                                            </div>
+                                            <ChevronRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-cyan-neon" />
+                                        </div>
                                     </div>
                                 </div>
-
-                                {/* Date Info (Right aligned on desktop) */}
-                                <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground shrink-0 sm:text-right">
-                                <Calendar className="w-3 h-3 text-secondary" />
-                                <span>{formatCardDate(article.createdDate)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        </Link>
-                    ))}
+                              </Link>
+                            );
+                        })}
                     </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* SCROLL TO TOP */}
-        <div className="flex justify-center mt-12 pb-10">
-            <button 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-xs font-mono border border-border px-4 py-2 rounded-full hover:bg-muted"
-            >
-                <ArrowUpCircle className="w-4 h-4" />
-                Return to Surface
-            </button>
+                  </div>
+                ))
+              )}
+            </div>
         </div>
     </div>
   );
