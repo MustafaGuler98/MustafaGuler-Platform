@@ -6,26 +6,21 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https', 
-        hostname: 'localhost',
-        port: '7019', 
-        pathname: '/**', 
-      },
-      {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'localhost',
         port: '7019',
-        pathname: '/**',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'http',
-        hostname: '159.69.196.46',
-        pathname: '/**',
+        hostname: 'localhost',
+        port: '5000',
+        pathname: '/uploads/**',
       },
       {
         protocol: 'https',
         hostname: 'mustafaguler.me',
-        pathname: '/**',
+        pathname: '/uploads/**',
       }
     ],
   },
