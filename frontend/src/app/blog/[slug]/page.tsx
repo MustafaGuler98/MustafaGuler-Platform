@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, Calendar, ChevronLeft, Share2, Bookmark, User, ChevronRight } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, User, ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
+import { AvatarName } from "@/components/articlePage/avatar-name";
 
 
 interface PageProps {
@@ -30,10 +31,8 @@ export default async function ArticlePage({ params }: PageProps) {
     notFound();
   }
 
-  // const backendBaseUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
-  // const finalImage = post.mainImage ? `${backendBaseUrl}${post.mainImage}` : null;
-  const words = post.content ? post.content.split(/\s+/).length : 0;
-  const readTime = Math.ceil(words / 200);
+  // const words = post.content ? post.content.split(/\s+/).length : 0;
+  // const readTime = Math.ceil(words / 200);
   const displayCategory = post.categoryName; 
 
   return (
@@ -53,9 +52,11 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
       {/* Title */}
-      <article className="container max-w-4xl mx-auto px-4 mt-10">
 
+      <article className="container max-w-4xl mx-auto px-4 mt-10">
+          <AvatarName name={post.author} authorImage={post.authorImage} createdDate={post.createdDate} readTime={post.viewCount}/>
         <div className="mb-6">
+          
           <Badge variant="secondary" className="text-sm px-3 py-1">
             {displayCategory}
           </Badge>
@@ -63,6 +64,7 @@ export default async function ArticlePage({ params }: PageProps) {
         
         <h1 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight mb-6">
           {post.title}
+          <Separator className="my-12" />
         </h1>
         
 
@@ -71,33 +73,7 @@ export default async function ArticlePage({ params }: PageProps) {
             {post.summary}
           </p>
         )}
-        
-        <div className="flex items-center justify-between py-6 border-y border-border mb-10">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 border border-border bg-muted">
-              <AvatarFallback>
-                <User className="w-6 h-6 text-muted-foreground" />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-semibold text-foreground">
-                {post.author || "Blog Editor"}
-              </p>
-            </div>
-          </div>
-          
-          <div className="text-right hidden sm:block">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
-              <Calendar className="w-4 h-4" />
-              <span>{formatDate(post.createdDate)}</span>
-            </div>
-            
-            <div className="flex items-center gap-2 text-sm text-muted-foreground justify-end">
-                <Clock className="w-4 h-4" />
-                <span>{readTime} min read</span>
-            </div>
-          </div>
-        </div>
+
         {/* Content */}
         <div 
           className="
@@ -110,7 +86,7 @@ export default async function ArticlePage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
         
-        <Separator className="my-12" />
+        
         {/* NEXT AND BACK ARTİCLE NAVIGATION BUTTONS */}
         {post.previousArticle?.slug ? (
             <Link
