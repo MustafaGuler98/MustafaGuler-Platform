@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Globe, Menu } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
+import { LangToggle } from "./mode-lang";
 
 export default function Header() {
   const pathname = usePathname();
@@ -45,19 +46,9 @@ export default function Header() {
         <div className="flex items-center gap-2">
           
           <ModeToggle />
+          <LangToggle />
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full">
-                <Globe className="h-4 w-4" />
-                <span className="sr-only">Language</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem className="justify-center cursor-pointer">Turkish (TR)</DropdownMenuItem>
-              <DropdownMenuItem className="justify-center cursor-pointer">English (EN)</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          
 
           <Button variant="default" size="sm" className="hidden md:flex rounded-full px-6 ml-2">
             Subscribe
