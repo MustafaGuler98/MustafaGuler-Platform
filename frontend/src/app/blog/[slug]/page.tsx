@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, Calendar, ChevronLeft, Share2, Bookmark, User } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, Share2, Bookmark, User, ChevronRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,29 +44,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      
-      <div className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="container max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link 
-            href="/" 
-            className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Back to Home
-          </Link>
-          <div className="flex gap-2">
-             <Button variant="ghost" size="icon">
-                <Bookmark className="w-5 h-5 text-muted-foreground" />
-             </Button>
-             <Button variant="ghost" size="icon">
-                <Share2 className="w-5 h-5 text-muted-foreground" />
-             </Button>
-          </div>
-        </div>
-      </div> 
-
             {/*Image*/}
-
             {finalImage && (
   <div className="relative w-full max-w-2xl mx-auto h-[300px] md:h-[300px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
     <Image 
@@ -126,6 +104,7 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
           </div>
         </div>
+        {/* Content */}
         <div 
           className="
             prose prose-lg dark:prose-invert max-w-none 
@@ -138,6 +117,40 @@ export default async function ArticlePage({ params }: PageProps) {
         />
         
         <Separator className="my-12" />
+        {/* NEXT AND BACK ARTİCLE NAVIGATION BUTTONS */}
+        {post.previousArticle?.slug ? (
+            <Link
+              href={`/blog/${post.previousArticle.slug}`}
+              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group text-sm sm:text-base"
+            >
+              <div className="p-2 rounded-full bg-muted group-hover:bg-primary/10 transition-colors">
+                <ChevronLeft className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="block text-xs text-muted-foreground/70">Previous Article</span>
+                <span className="font-medium">{post.previousArticle.title}</span>
+              </div>
+            </Link>
+          ) : (
+            <div className="hidden sm:block w-1/2" />
+          )}
+
+         {post.nextArticle?.slug ? (
+            <Link
+              href={`/blog/${post.nextArticle.slug}`}
+              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group text-sm sm:text-base"
+            >
+              <div className="p-2 rounded-full bg-muted group-hover:bg-primary/10 transition-colors">
+                <ChevronRight className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <span className="block text-xs text-muted-foreground/70">Previous Article</span>
+                <span className="font-medium">{post.nextArticle.title}</span>
+              </div>
+            </Link>
+          ) : (
+            <div className="hidden sm:block w-1/2" />
+          )}
       </article>
     </div>
   );
