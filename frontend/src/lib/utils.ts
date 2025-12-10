@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(dateString: string): string {
   if (!dateString) return "";
-  return new Date(dateString).toLocaleDateString('en-EN', {
+  return new Date(dateString).toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric'
@@ -25,8 +25,7 @@ const formatCardDate = (dateString: string) => {
 
 // Our wwwroot is in the backend folder.
 export function getImageUrl(path: string | null | undefined): string {
-  if (!path) return `${getBackendUrl()}/assets/images/default-article.png`;
-
+  if (!path || path.includes("default-article")) return "/default-article.png";
   if (path.startsWith("http")) return path;
 
   const baseUrl = getBackendUrl();

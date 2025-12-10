@@ -53,7 +53,7 @@ export default async function Home() {
                            alt={article.title}
                            fill
                            className="object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700"
-                           unoptimized={true} 
+                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                          />
                       ) : (
                         <div className="flex items-center justify-center h-full text-muted-foreground/30">
