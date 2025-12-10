@@ -114,12 +114,13 @@ export default async function ArticlePage({ params }: PageProps) {
                 <ChevronRight className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <span className="block text-xs text-muted-foreground/70">Previous Article</span>
+                <span className="block text-xs text-muted-foreground/70">Next Article</span>
                 <span className="font-medium">{post.nextArticle.title}</span>
               </div>
             </Link>
           ) : (
             <div className="hidden sm:block w-1/2" />
+            
           )}
       </article>
     </div>
