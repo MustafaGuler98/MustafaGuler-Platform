@@ -93,7 +93,7 @@ export default function RootLayout({
       `}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <Header />
-          <main className="min-h-screen">
+          <main className="min-h-screen pt-36">
             {children}
           </main>
         </ThemeProvider>
