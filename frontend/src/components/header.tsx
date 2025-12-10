@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,49 +10,126 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, Menu } from "lucide-react";
+import { Globe, Menu, Sparkles } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
-import { LangToggle } from "./mode-lang";
+import { useScrollDirection } from "@/hooks/use-scroll-direction";
+import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const pathname = usePathname();
+  const scrollDirection = useScrollDirection();
+  const [scrolled, setScrolled] = useState(false);
+
+  // Check if page is scrolled to add background blur/opacity styling
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
-  return (
-    <header className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+  // Custom NavLink Component for RPG Style
+  const NavLink = ({ href, label }: { href: string; label: string }) => {
+    const active = isActive(href);
+    return (
+      <Link 
+        href={href} 
+        className={cn(
+          "relative group px-1 py-2 text-sm font-medium transition-all duration-300 font-heading tracking-wide",
+          active ? "text-cyan-neon" : "text-muted-foreground hover:text-cyan-neon"
+        )}
+      >
+        <span className="relative z-10 flex items-center gap-2">
+            {active && <Sparkles className="w-3 h-3 animate-pulse" />}
+            {label}
+        </span>
         
-        <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">B</div>
-          <span className="hidden sm:inline-block">Blog</span>
+        {/* Hover Effect: Expanding Underline */}
+        <span className={cn(
+          "absolute bottom-0 left-0 h-[2px] bg-cyan-neon transition-all duration-300 ease-out",
+          active ? "w-full shadow-[0_0_10px_var(--cyan-neon)]" : "w-0 group-hover:w-full group-hover:shadow-[0_0_8px_var(--cyan-neon)]"
+        )} />
+        
+        {/* Hover Effect: Top Glitch Line (Optional subtle tech detail) */}
+        <span className="absolute top-0 right-0 h-[1px] bg-primary/0 transition-all duration-300 group-hover:bg-primary/50 group-hover:w-1/2 w-0" />
+      </Link>
+    );
+  };
+
+  return (
+    <header 
+      className={cn(
+        "fixed top-0 w-full z-50 transition-all duration-500 border-b",
+        // Smart Scroll Logic: Hide on down (translate-y-full), Show on up (translate-y-0)
+        scrollDirection === "down" ? "-translate-y-full" : "translate-y-0",
+        // Visual Logic: Transparent at top, Glassmorphism + Border when scrolled
+        scrolled 
+          ? "bg-background/80 backdrop-blur-md border-primary/20 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.5)]" 
+          : "bg-transparent border-transparent"
+      )}
+    >
+      <div className="w-full px-6 h-36 flex items-center justify-between">
+        
+        {/* --- LEFT: LOGO --- */}
+        <Link href="/" className="flex items-center gap-3 group">
+            {/* Avatar Container with Neon Glow */}
+          <div className="relative w-30 h-30 rounded-full overflow-hidden border-2 border-primary/30 group-hover:border-cyan-neon transition-colors duration-300 shadow-[0_0_0_rgba(0,0,0,0)] group-hover:shadow-[0_0_15px_var(--cyan-neon)]">
+                <Image 
+                    src="/logo1.png" 
+                    alt="Mustafa Guler" 
+                    fill 
+                    className="object-cover"
+                />
+            </div>
+            
+            {/* Typography Logo */}
+            <div className="flex flex-col">
+                <span className="font-heading font-bold text-lg leading-none tracking-wider text-foreground group-hover:text-primary transition-colors">
+                    MUSTAFA GULER
+                </span>
+                <span className="font-mono text-[10px] text-muted-foreground tracking-[0.2em] group-hover:text-cyan-neon transition-colors">
+                    DIGITAL_MIND
+                </span>
+            </div>
         </Link>
 
-        <nav className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center gap-8">
-          <Link 
-            href="/blog" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/blog') ? 'text-primary font-bold' : 'text-muted-foreground'}`}
-          >
-            Blog
-          </Link>
-
-          <Link 
-            href="/about" 
-            className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/about') ? 'text-primary font-bold' : 'text-muted-foreground'}`}
-          >
-            About Us
-          </Link>
+        {/* --- CENTER: NAVIGATION (RPG STYLE) --- */}
+        <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+          <NavLink href="/" label="PORTAL" />
+          <NavLink href="/blog" label="ARCHIVE" />
+          <NavLink href="/blog/timeline" label="TIMELINE" />
+          <NavLink href="/about" label="ABOUT.ME" />
         </nav>
 
-        <div className="flex items-center gap-2">
+        {/* --- RIGHT: ACTIONS --- */}
+        <div className="flex items-center gap-3">
           
-          <ModeToggle />
-          <LangToggle />
+          {/* <ModeToggle /> */}
+          {/* 
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full hover:bg-primary/10 hover:text-cyan-neon transition-colors">
+                <Globe className="h-4 w-4" />
+                <span className="sr-only">Language</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-[#0a0118] border-primary/20 text-foreground">
+              <DropdownMenuItem className="justify-center cursor-pointer hover:text-cyan-neon focus:text-cyan-neon focus:bg-primary/10">TR</DropdownMenuItem>
+              <DropdownMenuItem className="justify-center cursor-pointer hover:text-cyan-neon focus:text-cyan-neon focus:bg-primary/10">EN</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu> 
+            */}
 
-          
-
-          <Button variant="default" size="sm" className="hidden md:flex rounded-full px-6 ml-2">
-            Subscribe
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="hidden md:flex rounded-none border-primary/50 text-primary hover:bg-primary/10 hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase hover:shadow-[0_0_15px_var(--primary)]"
+          >
+            Connect_
           </Button>
           
           <Button variant="ghost" size="icon" className="md:hidden">
