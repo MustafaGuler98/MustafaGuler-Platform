@@ -26,7 +26,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
   }, []);
 
   const safeArticles = initialArticles || [];
-
+  
   const filteredArticles = safeArticles.filter((article) => {
     const query = searchQuery.toLowerCase();
     const matchTitle = article.title.toLowerCase().includes(query);

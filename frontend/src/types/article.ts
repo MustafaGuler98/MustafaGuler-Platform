@@ -5,6 +5,7 @@ export interface Article {
   categoryId: string;
   categoryName: string;
   languageCode: string;
+  viewCount: number;
   slug: string;
   mainImage?: string;
   createdDate: string;

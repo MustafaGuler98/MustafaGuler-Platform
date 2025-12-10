@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { AvatarName } from "@/components/articlePage/avatar-name";
+import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 
 
 interface PageProps {
@@ -88,39 +89,7 @@ export default async function ArticlePage({ params }: PageProps) {
         
         
         {/* NEXT AND BACK ARTİCLE NAVIGATION BUTTONS */}
-        {post.previousArticle?.slug ? (
-            <Link
-              href={`/blog/${post.previousArticle.slug}`}
-              className="flex items-center gap-2 text-muted-foreground hover:text-chart-5 transition-colors group text-sm sm:text-base"
-            >
-              <div className="p-2 rounded-full bg-muted group-hover:bg-primary/10 transition-colors">
-                <ChevronLeft className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <span className="block text-xs text-muted-foreground/70">Previous Article</span>
-                <span className="font-medium">{post.previousArticle.title}</span>
-              </div>
-            </Link>
-          ) : (
-            <div className="hidden sm:block w-1/2" />
-          )}
-          
-         {post.nextArticle?.slug ? (
-            <Link
-              href={`/blog/${post.nextArticle.slug}`}
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group text-sm sm:text-base"
-            >
-              <div className="p-2 rounded-full bg-muted group-hover:bg-primary/10 transition-colors">
-                <ChevronRight className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <span className="block text-xs text-muted-foreground/70">Previous Article</span>
-                <span className="font-medium">{post.nextArticle.title}</span>
-              </div>
-            </Link>
-          ) : (
-            <div className="hidden sm:block w-1/2" />
-          )}
+        <BottomNavButtons articleHref={post.slug} articleTitle={post.title} />
       </article>
     </div>
   );
