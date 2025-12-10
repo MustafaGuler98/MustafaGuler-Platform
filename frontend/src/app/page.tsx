@@ -107,7 +107,6 @@ export default async function Home({ searchParams }: HomeProps) {
               </div>
 
               {/* --- PAGINATION BAR --- */}
-              {/* Buraya sadece hesaplanmış sayıları veriyoruz, bütün işi component yapıyor */}
               <PaginationBar 
                 currentPage={meta.currentPage} 
                 totalPages={meta.totalPages} 
