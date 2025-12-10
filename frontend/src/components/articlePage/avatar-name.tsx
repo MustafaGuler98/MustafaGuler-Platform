@@ -11,7 +11,8 @@ interface AvatarProps {
 export function AvatarName({name,authorImage,createdDate,readTime}:AvatarProps) {
     return (
         <div className="flex items-center justify-between border-border mb-6">
-            <div className="flex items-center gap-4">
+          {/*Author Info*/}
+            <div className="flex items-center gap-4 hidden">
                 {authorImage ? (
             <Avatar className="h-12 w-12 border border-border bg-muted">
                 <img src={authorImage} alt={name} />
@@ -28,9 +29,9 @@ export function AvatarName({name,authorImage,createdDate,readTime}:AvatarProps) 
               </p>
             </div>
           </div>
-          
+          {/*Time and read*/}
           <div className="text-right hidden sm:block">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
+            <div className="font-mono text-[11px] flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
               <Calendar className="w-4 h-4" />
               <span>{formatDate(createdDate)}</span>
             </div>

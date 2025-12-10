@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Article } from "@/types/article";
+export { formatCardDate };
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,6 +15,13 @@ export function formatDate(dateString: string): string {
     year: 'numeric'
   });
 }
+
+const formatCardDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      month: 'short', 
+      day: 'numeric'
+    });
+  };
 
 // Our wwwroot is in the backend folder.
 export function getImageUrl(path: string | null | undefined): string {

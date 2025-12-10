@@ -1,7 +1,8 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, Calendar, ChevronLeft, User, ChevronRight } from "lucide-react";
+import { Clock, Calendar, ChevronLeft, User, ChevronRight, Zap, LucideEye } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,10 +38,12 @@ export default async function ArticlePage({ params }: PageProps) {
   const displayCategory = post.categoryName; 
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen pb-20 mt-16">
             {/*Image*/}
             {getImageUrl(post.mainImage) && (
-  <div className="relative w-full max-w-2xl mx-auto h-[300px] md:h-[300px] mb-12 rounded-2xl overflow-hidden shadow-sm bg-muted">
+  <div className="
+  relative w-full max-w-2xl mx-auto h-[300px] md:h-[300px]
+   mb-12 rounded-2xl overflow-hidden shadow-[0_0_15px_2px_rgba(0,255,255,0.6)] border-3 border-cyan-600 ">
     <Image 
         src={getImageUrl(post.mainImage)} 
         alt={post.title}
@@ -53,14 +56,26 @@ export default async function ArticlePage({ params }: PageProps) {
             )}
 
       {/* Title */}
-
       <article className="container max-w-4xl mx-auto px-4 mt-10">
-          <AvatarName name={post.author} authorImage={post.authorImage} createdDate={post.createdDate} readTime={post.viewCount}/>
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           
-          <Badge variant="secondary" className="text-sm px-3 py-1">
-            {displayCategory}
-          </Badge>
+          <div className="flex gap-2">
+             <span className="font-mono text-[11px] text-amber-400 border border-amber-500/20 bg-amber-500/5 px-1.5 py-0.5 rounded flex items-center gap-1 uppercase tracking-wider">
+                <Zap className="w-3 h-3" />
+                {post.categoryName || "CategoryName"}
+             </span>
+          </div>
+          <div className="hidden sm:block">
+            <div className="font-mono text-[11px] flex items-center gap-2 text-sm text-muted-foreground mb-1 justify-end">
+              <Calendar className="w-4 h-4 text-primary" />
+              <span>{formatDate(post.createdDate)}</span>
+            </div>
+            
+            <div className="font-mono text-[11px] flex items-center gap-2 text-sm text-muted-foreground justify-end">
+                <LucideEye className="w-4 h-4 text-primary" />
+                <span>{post.viewCount} Views</span>
+            </div>
+          </div>
         </div>
         
         <h1 className="text-3xl md:text-5xl font-extrabold text-foreground leading-tight mb-6">
@@ -86,10 +101,16 @@ export default async function ArticlePage({ params }: PageProps) {
           "
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
-        
+       
         
         {/* NEXT AND BACK ARTİCLE NAVIGATION BUTTONS */}
-        <BottomNavButtons articleHref={post.slug} articleTitle={post.title} />
+        <BottomNavButtons
+         nextArticleTitle={post.nextArticle?.title}
+         nextArticle={post.nextArticle?.slug}
+         previousArticleTitle={post.previousArticle?.title}
+         previousArticle={post.previousArticle?.slug}
+            />
+            
       </article>
     </div>
   );
