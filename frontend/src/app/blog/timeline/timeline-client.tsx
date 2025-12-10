@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Article } from "@/types/article";
 import { Calendar, Search, Activity, ChevronRight, Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatCardDate } from "@/lib/utils";
 
 interface GroupedArticles {
   [year: string]: Article[];
@@ -26,7 +26,6 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
   }, []);
 
   const safeArticles = initialArticles || [];
-  
   const filteredArticles = safeArticles.filter((article) => {
     const query = searchQuery.toLowerCase();
     const matchTitle = article.title.toLowerCase().includes(query);
@@ -47,13 +46,6 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
   }, {});
 
   const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
-
-  const formatCardDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      month: 'short', 
-      day: 'numeric'
-    });
-  };
 
   if (!isMounted) return <div className="min-h-screen bg-transparent" />;
 

@@ -67,7 +67,6 @@ const pressStart = Press_Start_2P({
   display: "swap",
 });
 
-
 export const metadata: Metadata = {
   title: "Mustafa Guler",
   description: "Digital Mind",
@@ -90,10 +89,21 @@ export default function RootLayout({
         ${michroma.variable}
         ${pressStart.variable}
         font-sans antialiased
-      `}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        bg-transparent  
+      `}> 
+        <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
+           
+            <img 
+              src="/bg-magic.png" 
+              alt="background" 
+              className="h-full w-full object-cover opacity-30" 
+            />
+        </div>
+        
+
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
           <Header />
-          <main className="min-h-screen pt-36">
+          <main className="min-h-screen bg transparent pt-36 relative z-10">
             {children}
           </main>
         </ThemeProvider>
