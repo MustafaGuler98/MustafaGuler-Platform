@@ -50,7 +50,6 @@ export default async function ArticlePage({ params }: PageProps) {
         fill
         className="object-cover"
         priority
-        unoptimized
               />
             </div>
             )}
