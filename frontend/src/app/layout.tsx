@@ -87,21 +87,15 @@ export default function RootLayout({
         font-sans antialiased
         bg-transparent  
       `}> 
-      {/* 👆 BURAYA DİKKAT: "bg-transparent" ekledik. 
-          Bu sayede body'nin kendi siyah rengi kalkacak ve arkadaki resim görünecek. */}
-
-        {/* --- SABİT ARKA PLAN --- */}
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
-            {/* 1. Resim */}
+           
             <img 
               src="/bg-magic.png" 
               alt="background" 
               className="h-full w-full object-cover opacity-30" 
             />
-           
-            
         </div>
-        {/* ----------------------- */}
+        
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
           <Header />
