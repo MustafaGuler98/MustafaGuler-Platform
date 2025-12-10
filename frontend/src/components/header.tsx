@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe, Menu, Sparkles } from "lucide-react";
+import { Globe, Menu, Sparkles, Github, Linkedin } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
@@ -100,13 +100,35 @@ export default function Header() {
         {/* --- CENTER: NAVIGATION (RPG STYLE) --- */}
         <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <NavLink href="/" label="PORTAL" />
-          <NavLink href="/blog" label="ARCHIVE" />
+          <NavLink href="/blog" label="BLOG" />
           <NavLink href="/blog/timeline" label="TIMELINE" />
           <NavLink href="/about" label="ABOUT.ME" />
         </nav>
 
         {/* --- RIGHT: ACTIONS --- */}
-        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
+          
+          {/* Desktop: Socials & Connect Button Stack */}
+          <div className="hidden md:flex flex-col items-end gap-5">
+            
+            {/* Row 1: Social Icons */}
+            <div className="flex items-center gap-9 pr-0">
+              <Link 
+                href="https://www.linkedin.com/in/mustafaguler98" 
+                target="_blank" 
+                className="text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]"
+              >
+                <Linkedin className="w-6 h-6" />
+              </Link>
+              <Link 
+                href="https://github.com/MustafaGuler98" 
+                target="_blank" 
+                className="text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]"
+              >
+                <Github className="w-6 h-6" />
+              </Link>
+            </div>
+          
           
           {/* <ModeToggle /> */}
           {/* 
@@ -129,8 +151,9 @@ export default function Header() {
             size="sm" 
             className="hidden md:flex rounded-none border-primary/50 text-primary hover:bg-primary/10 hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase hover:shadow-[0_0_15px_var(--primary)]"
           >
-            Connect_
+            CONTACT_
           </Button>
+           </div>
           
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
