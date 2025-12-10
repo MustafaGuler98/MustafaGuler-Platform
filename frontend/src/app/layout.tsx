@@ -67,6 +67,10 @@ const pressStart = Press_Start_2P({
   display: "swap",
 });
 
+export const metadata: Metadata = {
+  title: "Mustafa Guler",
+  description: "Digital Mind",
+};
 
 export default function RootLayout({
   children,
