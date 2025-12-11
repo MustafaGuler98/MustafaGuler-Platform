@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { ArrowRight, Sparkles, Github, Linkedin, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Github, Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Article } from "@/types/article";
 import { formatDate } from "@/lib/utils";
 import NeuralNetwork from "@/components/neural-network";

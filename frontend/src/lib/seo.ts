@@ -71,3 +71,44 @@ export function buildArticleMetadata(article: Article | null, slug: string): Met
     },
   };
 }
+interface StaticMetadataProps {
+  title: string;
+  description: string;
+  image?: string;
+  path: string;
+}
+
+export function constructMetadata({ title, description, image, path }: StaticMetadataProps): Metadata {
+  const finalImage = image || "/default-og-image.png";
+
+  return {
+    title: title,
+    description: description,
+    
+    alternates: {
+      canonical: path,
+    },
+
+    openGraph: {
+      title: title,
+      description: description,
+      url: path,
+      type: "website",
+      images: [
+        {
+          url: finalImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [finalImage],
+    },
+  };
+}

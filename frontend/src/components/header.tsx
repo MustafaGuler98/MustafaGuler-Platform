@@ -4,12 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Globe, Menu, Sparkles, Github, Linkedin } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
@@ -84,7 +78,7 @@ export default function Header() {
                 alt="Mustafa Guler"
                 fill
                 className="object-cover"
-              />
+              />              
             </div>
           </div>
 

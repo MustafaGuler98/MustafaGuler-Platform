@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/header";
+import Image from "next/image";
 import HeaderWrapper from "@/components/header-wrapper";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -95,11 +95,17 @@ export default function RootLayout({
       `}>
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
 
-          <img
-            src="/bg-magic.png"
-            alt="background"
-            className="h-full w-full object-cover opacity-30"
-          />
+          <Image 
+  src="/bg-magic.png" 
+  alt="background"
+  width={96}
+  height={96}
+  title="Background"
+  priority
+  sizes="100vw"
+  className="object-cover opacity-30" 
+  quality={75}
+/>
         </div>
 
 
