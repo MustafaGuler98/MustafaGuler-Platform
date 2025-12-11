@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header";
+import HeaderWrapper from "@/components/header-wrapper";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
@@ -103,8 +104,8 @@ export default function RootLayout({
 
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
-          <Header />
-          <main className="min-h-screen bg transparent pt-36 relative z-10">
+          <HeaderWrapper />
+          <main className="min-h-screen bg transparent relative z-10">
             {children}
           </main>
           <Footer />
