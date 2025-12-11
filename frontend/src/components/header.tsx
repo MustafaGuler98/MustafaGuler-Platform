@@ -54,8 +54,8 @@ export default function Header() {
           active ? "w-full shadow-[0_0_10px_var(--cyan-neon)]" : "w-0 group-hover:w-full group-hover:shadow-[0_0_8px_var(--cyan-neon)]"
         )} />
 
-        {/* Hover Effect: Top Glitch Line (Optional subtle tech detail) */}
-        <span className="absolute top-0 right-0 h-[1px] bg-primary/0 transition-all duration-300 group-hover:bg-primary/50 group-hover:w-1/2 w-0" />
+        {/* Hover Effect: Top Line */}
+        <span className="absolute top-0 right-0 h-[2px] bg-primary transition-all duration-300 ease-out w-0 group-hover:w-1/2 group-hover:shadow-[0_0_8px_var(--primary)]" />
       </Link>
     );
   };
