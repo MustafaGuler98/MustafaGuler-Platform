@@ -110,7 +110,7 @@ export default function Footer() {
                             <div className="mt-1 h-[1px] w-16 bg-gradient-to-r from-primary/50 to-transparent" />
                         </div>
 
-                        {/* Email Cyber-Card */}
+                        {/* Email */}
                         <button
                             onClick={handleCopyEmail}
                             className={cn(
@@ -141,7 +141,7 @@ export default function Footer() {
                                 href="https://github.com/MustafaGuler98"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-2 rounded-md border border-gray-700/50 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
+                                className="p-2 rounded-md border-2 border-white/40 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
                             >
                                 <Github className="w-5 h-5" />
                             </Link>
@@ -149,7 +149,7 @@ export default function Footer() {
                                 href="https://www.linkedin.com/in/mustafaguler98"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-2 rounded-md border border-gray-700/50 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
+                                className="p-2 rounded-md border-2 border-white/40 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
                             >
                                 <Linkedin className="w-5 h-5" />
                             </Link>
