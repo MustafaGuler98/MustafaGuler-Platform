@@ -12,10 +12,10 @@ export const metadata = constructMetadata({
 });
 
 export default async function TimelinePage() {
-  const allArticles = await articleService.getAllArticles();
+  const allArticles = await articleService.getAllArticles('en');
 
   // The client component will handle grouping and filtering.
   return (
-      <TimelineClient initialArticles={allArticles || []} />
+    <TimelineClient initialArticles={allArticles || []} />
   );
 }
