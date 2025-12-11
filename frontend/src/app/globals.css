@@ -69,8 +69,63 @@
     font-family: var(--font-sans);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
+  }
+}
+
+/* LOGO ANIMATION EFFECTS                       */
+.logo-glow-border {
+  box-shadow:
+    0 0 0 3px rgba(147, 51, 234, 0.5),
+    0 0 15px rgba(147, 51, 234, 0.4),
+    0 0 30px rgba(147, 51, 234, 0.2);
+}
+
+/* Enhanced glow on group hover */
+.group:hover .logo-glow-border {
+  box-shadow:
+    0 0 0 3px rgba(34, 211, 238, 0.6),
+    0 0 20px rgba(34, 211, 238, 0.5),
+    0 0 40px rgba(34, 211, 238, 0.25);
+}
+
+/* Orbital ring effect on hover */
+.logo-orbital {
+  position: relative;
+}
+
+.logo-orbital::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  border-top-color: var(--cyan-neon);
+  border-bottom-color: var(--primary);
+  opacity: 0;
+  animation: none;
+  transition: opacity 0.3s ease;
+}
+
+.logo-orbital:hover::before,
+.group:hover .logo-orbital::before {
+  opacity: 1;
+  animation: orbital-spin 3s linear infinite;
+}
+
+@keyframes orbital-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 
