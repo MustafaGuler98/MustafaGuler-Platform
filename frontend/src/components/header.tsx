@@ -76,14 +76,16 @@ export default function Header() {
 
         {/* --- LEFT: LOGO --- */}
         <Link href="/" className="flex items-center gap-3 group">
-          {/* Avatar Container with Neon Glow */}
-          <div className="relative w-30 h-30 rounded-full overflow-hidden border-2 border-primary/30 group-hover:border-cyan-neon transition-colors duration-300 shadow-[0_0_0_rgba(0,0,0,0)] group-hover:shadow-[0_0_15px_var(--cyan-neon)]">
-            <Image
-              src="/logo1.png"
-              alt="Mustafa Guler"
-              fill
-              className="object-cover"
-            />
+          {/* Avatar Container with Static Glow */}
+          <div className="logo-orbital relative w-30 h-30 rounded-full overflow-visible transition-all duration-300">
+            <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
+              <Image
+                src="/logo1.png"
+                alt="Mustafa Guler"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
 
           {/* Typography Logo */}
