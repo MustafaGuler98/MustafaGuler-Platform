@@ -95,17 +95,15 @@ export default function RootLayout({
       `}>
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
 
-          <Image 
-  src="/bg-magic.png" 
-  alt="background"
-  width={96}
-  height={96}
-  title="Background"
-  priority
-  sizes="100vw"
-  className="object-cover opacity-30" 
-  quality={75}
-/>
+          <Image
+            src="/bg-magic.png"
+            alt="background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-30"
+            quality={75}
+          />
         </div>
 
 
