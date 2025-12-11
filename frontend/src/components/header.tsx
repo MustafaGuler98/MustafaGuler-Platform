@@ -76,7 +76,7 @@ export default function Header() {
 
         {/* --- LEFT: LOGO --- */}
         <Link href="/" className="flex items-center gap-3 group">
-          {/* Avatar Container with Static Glow */}
+          {/* Avatar Container */}
           <div className="logo-orbital relative w-30 h-30 rounded-full overflow-visible transition-all duration-300">
             <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
               <Image
