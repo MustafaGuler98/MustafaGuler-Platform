@@ -1,34 +1,35 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { 
-  Inter, 
-  Orbitron, 
-  Cinzel, 
-  Audiowide, 
-  Rajdhani, 
-  Syncopate, 
-  Michroma, 
-  Press_Start_2P 
-} from "next/font/google"; 
+import {
+  Inter,
+  Orbitron,
+  Cinzel,
+  Audiowide,
+  Rajdhani,
+  Syncopate,
+  Michroma,
+  Press_Start_2P
+} from "next/font/google";
 
 // Fonts
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter", 
+  variable: "--font-inter",
   display: "swap",
 });
 
 const orbitron = Orbitron({
   subsets: ["latin"],
-  variable: "--font-orbitron", 
+  variable: "--font-orbitron",
   display: "swap",
 });
 
 const cinzel = Cinzel({
   subsets: ["latin"],
-  variable: "--font-cinzel", 
+  variable: "--font-cinzel",
   display: "swap",
 });
 
@@ -90,22 +91,23 @@ export default function RootLayout({
         ${pressStart.variable}
         font-sans antialiased
         bg-transparent  
-      `}> 
+      `}>
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
-           
-            <img 
-              src="/bg-magic.png" 
-              alt="background" 
-              className="h-full w-full object-cover opacity-30" 
-            />
+
+          <img
+            src="/bg-magic.png"
+            alt="background"
+            className="h-full w-full object-cover opacity-30"
+          />
         </div>
-        
+
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
           <Header />
           <main className="min-h-screen bg transparent pt-36 relative z-10">
             {children}
           </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
