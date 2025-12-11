@@ -15,15 +15,12 @@ interface PaginationBarProps {
 export function PaginationBar({ currentPage, totalPages, baseUrl = "/" }: PaginationBarProps) {
   const router = useRouter();
   
-  // Input değerini tutmak için state
   const [inputVal, setInputVal] = useState(currentPage.toString());
 
-  // Eğer dışarıdan sayfa değişirse input'u güncelle
   useEffect(() => {
     setInputVal(currentPage.toString());
   }, [currentPage]);
 
-  // Sayfaya gitme fonksiyonu
   const handleGoToPage = () => {
     let pageNum = parseInt(inputVal);
 
@@ -31,7 +28,6 @@ export function PaginationBar({ currentPage, totalPages, baseUrl = "/" }: Pagina
       setInputVal(currentPage.toString());
       return;
     }
-
     if (pageNum < 1) pageNum = 1;
     else if (pageNum > totalPages) pageNum = totalPages;
 
@@ -39,7 +35,6 @@ export function PaginationBar({ currentPage, totalPages, baseUrl = "/" }: Pagina
       setInputVal(currentPage.toString());
       return;
     }
-
     router.push(`${baseUrl}?page=${pageNum}`);
   };
 

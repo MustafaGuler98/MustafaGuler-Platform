@@ -5,24 +5,17 @@ import { Code2, ArrowRight, Sparkles } from "lucide-react";
 // Servisler ve Yardımcılar
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
-import { paginateData } from "@/lib/pagination"; // Oluşturduğumuz fonksiyon
-import { PaginationBar } from "@/components/ui/pagination-bar"; // Oluşturduğumuz bileşen
+import { paginateData } from "@/lib/pagination"; 
+import { PaginationBar } from "@/components/homePage/pagination-bar"; 
 
 interface HomeProps {
-  // Next.js 15+ için searchParams Promise olarak gelir
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function Home({ searchParams }: HomeProps) {
   
-  // 1. URL parametrelerini bekle (örn: ?page=2)
   const resolvedParams = await searchParams;
-  
-  // 2. Tüm makaleleri çek
   const allArticles = await articleService.getAllArticles();
-  
-  // 3. Veriyi Sayfala (Lib'deki fonksiyonu kullanıyoruz)
-  // 9'ar 9'ar listele dedik
   const { currentData: articles, meta } = paginateData(allArticles, resolvedParams.page, 9);
 
   return (
@@ -105,7 +98,6 @@ export default async function Home({ searchParams }: HomeProps) {
                   </Link>
                 ))}
               </div>
-
               {/* --- PAGINATION BAR --- */}
               <PaginationBar 
                 currentPage={meta.currentPage} 
