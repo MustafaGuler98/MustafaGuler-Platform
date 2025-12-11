@@ -1,27 +1,23 @@
 
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock, Calendar, ChevronLeft, User, ChevronRight, Zap, LucideEye } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Calendar, Zap, LucideEye } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
-import { AvatarName } from "@/components/articlePage/avatar-name";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
-
+import { buildArticleMetadata } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{
     slug: string;
   }>;
 }
-
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const post = await articleService.getArticleBySlug(slug);
+  return buildArticleMetadata(post, slug);
+}
 
 export default async function ArticlePage({ params }: PageProps) {
   
@@ -33,9 +29,6 @@ export default async function ArticlePage({ params }: PageProps) {
     notFound();
   }
 
-  // const words = post.content ? post.content.split(/\s+/).length : 0;
-  // const readTime = Math.ceil(words / 200);
-  const displayCategory = post.categoryName; 
 
   return (
     <div className="min-h-screen pb-20 mt-16">
