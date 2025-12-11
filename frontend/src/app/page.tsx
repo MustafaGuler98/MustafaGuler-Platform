@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Code2, ArrowRight, Sparkles } from "lucide-react";
 
-// Servisler ve Yardımcılar
+
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { paginateData } from "@/lib/pagination"; 
