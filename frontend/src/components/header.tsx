@@ -78,7 +78,7 @@ export default function Header() {
                 alt="Mustafa Guler"
                 fill
                 className="object-cover"
-              />              
+              />
             </div>
           </div>
 
@@ -142,13 +142,12 @@ export default function Header() {
           </DropdownMenu> 
             */}
 
-            <Button
-              variant="outline"
-              size="sm"
-              className="holo-terminal-btn hidden md:flex rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase"
+            <Link
+              href="/contact"
+              className="holo-terminal-btn hidden md:flex items-center justify-center rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase h-9 px-3 border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             >
               <span className="blink-cursor">CONTACT</span>
-            </Button>
+            </Link>
           </div>
 
           <Button variant="ghost" size="icon" className="md:hidden">
