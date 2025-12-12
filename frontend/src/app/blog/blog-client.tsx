@@ -89,18 +89,6 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
 
     return (
         <div className="min-h-screen text-foreground relative overflow-hidden flex flex-col">
-            {/* Background Layers */}
-            <div className="fixed inset-0 z-0 pointer-events-none">
-                <div className="absolute inset-0 bg-[#020103]" />
-                <Image
-                    src="/bg-magic.png"
-                    alt="Background"
-                    fill
-                    className="object-cover opacity-20 mix-blend-screen"
-                    quality={100}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#020103] via-transparent to-[#020103]" />
-            </div>
 
             <main className="relative z-10 flex-1 container max-w-7xl mx-auto px-4 py-8 md:py-12 flex flex-col gap-16">
 
