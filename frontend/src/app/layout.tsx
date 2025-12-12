@@ -98,11 +98,13 @@ export default function RootLayout({
           <Image
             src="/bg-magic.png"
             alt="background"
-            fill
+            width={1024}
+            height={1024}
             priority
             sizes="100vw"
-            className="object-cover opacity-30"
+            className="object-cover opacity-30 h-full w-full"
             quality={75}
+            title="Background"
           />
         </div>
 
