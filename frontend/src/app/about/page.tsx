@@ -9,37 +9,7 @@ export default function AboutMePage() {
             {/* Background Decor */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/15 rounded-full blur-[150px] -z-10 pointer-events-none" />
             <div className="absolute top-20 right-20 w-[300px] h-[300px] bg-cyan-neon/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
-            <div className="absolute bottom-20 left-20 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] -z-10 pointer-events-none" />
 
-            {/* Floating Code Particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none -z-5">
-                {[...Array(6)].map((_, i) => (
-                    <div
-                        key={i}
-                        className="absolute text-primary/20 font-mono text-xs animate-pulse"
-                        style={{
-                            top: `${20 + i * 15}%`,
-                            left: `${5 + i * 10}%`,
-                            animationDelay: `${i * 0.3}s`,
-                        }}
-                    >
-                        {["</>", "{}", "[]", "=>", "//", "/**/"][i]}
-                    </div>
-                ))}
-                {[...Array(6)].map((_, i) => (
-                    <div
-                        key={`right-${i}`}
-                        className="absolute text-cyan-neon/15 font-mono text-xs animate-pulse"
-                        style={{
-                            top: `${25 + i * 12}%`,
-                            right: `${5 + i * 8}%`,
-                            animationDelay: `${i * 0.4}s`,
-                        }}
-                    >
-                        {["01", "10", "11", "00", "&&", "||"][i]}
-                    </div>
-                ))}
-            </div>
 
             <div className="w-full max-w-2xl flex flex-col items-center text-center gap-8 relative">
 
