@@ -31,6 +31,13 @@ namespace MustafaGuler.API.Controllers
             return CreateActionResultInstance(result);
         }
 
+        [HttpGet("popular")]
+        public async Task<IActionResult> GetPopular([FromQuery] int count = 9, [FromQuery] string? languageCode = null)
+        {
+            var result = await _articleService.GetPopularAsync(count, languageCode);
+            return CreateActionResultInstance(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Save(ArticleAddDto articleAddDto)
         {
