@@ -12,19 +12,24 @@ interface PageProps {
     slug: string;
   }>;
 }
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
-  const post = await articleService.getArticleBySlug(slug);
-  return buildArticleMetadata(post, slug);
+  try {
+    const article = await articleService.getArticleBySlug(slug);
+    return buildArticleMetadata(article, slug);
+  } catch {
+    return buildArticleMetadata(null, slug);
+  }
 }
 
 export default async function ArticlePage({ params }: PageProps) {
-
   const resolvedParams = await params;
-  const post = await articleService.getArticleBySlug(resolvedParams.slug);
 
-
-  if (!post) {
+  let post;
+  try {
+    post = await articleService.getArticleBySlug(resolvedParams.slug);
+  } catch {
     notFound();
   }
 

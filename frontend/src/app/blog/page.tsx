@@ -12,5 +12,5 @@ export default async function BlogPage() {
     const articles = await articleService.getAllArticles('en');
     const popularArticles = await articleService.getPopularArticles(9, 'en');
 
-    return <BlogClient articles={articles || []} popularArticles={popularArticles || []} />;
+    return <BlogClient articles={articles} popularArticles={popularArticles} />;
 }

@@ -1,102 +1,72 @@
-import { Article } from "@/types/article";
+import { Article } from '@/types/article';
+import { apiClient } from '@/lib/api-client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+class ApiError extends Error {
+  statusCode: number;
+  errors: string[] | null;
+
+  constructor(message: string, statusCode: number, errors: string[] | null = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.statusCode = statusCode;
+    this.errors = errors;
+  }
+}
 
 export const articleService = {
+  async getArticleBySlug(slug: string): Promise<Article> {
+    const response = await apiClient.get<Article>(`/articles/${slug}`, {
+      next: { revalidate: 60 }
+    } as RequestInit);
 
-  async getArticleBySlug(slug: string): Promise<Article | null> {
-    if (!API_URL) return null;
-
-    try {
-      const res = await fetch(`${API_URL}/articles/${slug}`, {
-        next: { revalidate: 60 }
-      });
-
-      if (!res.ok) return null;
-
-      const json = await res.json();
-      console.log("📦 [DEBUG] Raw JSON from API:", JSON.stringify(json, null, 2));
-
-      // --- LOGIC CHECKS ---
-
-      // 1. Check Success Flag (Handles isSuccess, success, Success)
-      const isSuccessful = json.isSuccess === true || json.success === true || json.Success === true;
-
-      // 2. Check Data Object
-      const data = json.data || json.Data;
-
-      // 3. Fallback: If no wrapper, check if direct object
-      if (!data && (json.title || json.Title || json.id || json.Id)) {
-        console.log("✅ [DEBUG] No wrapper detected, direct object received.");
-        return json;
-      }
-      if (isSuccessful && data) {
-        return {
-          ...data,
-          imageUrl: data.mainImage || data.imageUrl,
-          authorName: data.author || data.authorName
-        };
-      }
-
-      return null;
-
-    } catch (error) {
-      console.error("Service Error:", error);
-      return null;
+    if (!response.isSuccess || !response.data) {
+      throw new ApiError(
+        response.message || 'Article not found',
+        response.statusCode,
+        response.errors
+      );
     }
+
+    return response.data;
   },
 
   async getAllArticles(languageCode?: string): Promise<Article[]> {
-    if (!API_URL) return [];
-
-    try {
-      const params = new URLSearchParams();
-      if (languageCode) {
-        params.append('languageCode', languageCode);
-      }
-
-      const url = `${API_URL}/articles${params.toString() ? `?${params.toString()}` : ''}`;
-      const res = await fetch(url, { cache: 'no-store' });
-
-      if (!res.ok) return [];
-
-      const json = await res.json();
-      console.log("📦 [DEBUG] Raw JSON from API:", JSON.stringify(json, null, 2));
-      const isSuccessful = json.isSuccess === true || json.success === true;
-
-      if (isSuccessful && json.data) {
-        return json.data;
-      }
-      return [];
-    } catch (error) {
-      return [];
+    const params = new URLSearchParams();
+    if (languageCode) {
+      params.append('languageCode', languageCode);
     }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await apiClient.get<Article[]>(`/articles${query}`, { cache: 'no-store' });
+
+    if (!response.isSuccess) {
+      throw new ApiError(
+        response.message || 'Failed to fetch articles',
+        response.statusCode,
+        response.errors
+      );
+    }
+
+    return response.data || [];
   },
 
   async getPopularArticles(count: number = 9, languageCode?: string): Promise<Article[]> {
-    if (!API_URL) return [];
-
-    try {
-      const params = new URLSearchParams();
-      params.append('count', count.toString());
-      if (languageCode) {
-        params.append('languageCode', languageCode);
-      }
-
-      const url = `${API_URL}/articles/popular?${params.toString()}`;
-      const res = await fetch(url, { cache: 'no-store' });
-
-      if (!res.ok) return [];
-
-      const json = await res.json();
-      const isSuccessful = json.isSuccess === true || json.success === true;
-
-      if (isSuccessful && json.data) {
-        return json.data;
-      }
-      return [];
-    } catch (error) {
-      return [];
+    const params = new URLSearchParams();
+    params.append('count', count.toString());
+    if (languageCode) {
+      params.append('languageCode', languageCode);
     }
+    const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, { cache: 'no-store' });
+
+    if (!response.isSuccess) {
+      throw new ApiError(
+        response.message || 'Failed to fetch popular articles',
+        response.statusCode,
+        response.errors
+      );
+    }
+
+    return response.data || [];
   }
 };
+
+export { ApiError };
