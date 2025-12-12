@@ -218,9 +218,9 @@ export default function PortalClient({ articles }: PortalClientProps) {
                             </a>
                         </div>
                         {/* Contact Button */}
-                        <button className="holo-terminal-btn rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase px-4 py-2 border border-primary/50">
+                        <Link href="/contact" className="holo-terminal-btn rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase px-4 py-2 border border-primary/50">
                             <span className="blink-cursor">CONTACT</span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
 

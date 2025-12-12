@@ -31,18 +31,18 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
 
         // Configuration
         const opts = {
-            range: 120,
+            range: 100, // Slightly reduced for faster init
             baseConnections: 3,
-            addedConnections: 3,
+            addedConnections: 2, // Reduced for faster init
             baseSize: 4,
             minSize: 1,
             sizeMultiplier: 0.7,
             allowedDist: 35,
             baseDist: 35,
             addedDist: 25,
-            connectionAttempts: 100,
-            rotVelX: 0.002,
-            rotVelY: 0.003,
+            connectionAttempts: 60, // Reduced from 100 for faster init
+            rotVelX: 0.12, // radians per second (not per frame!)
+            rotVelY: 0.18, // radians per second
             depth: 200,
             focalLength: 200,
             vanishPoint: { x: w / 2, y: h / 2 },
@@ -53,7 +53,8 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
         const mostDistant = opts.depth + opts.range;
 
         let sinX = 0, sinY = 0, cosX = 1, cosY = 1;
-        let tick = 0;
+        let time = 0; // Total elapsed time in seconds
+        let lastTime = performance.now();
 
         interface Connection {
             x: number;
@@ -179,13 +180,18 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
         function animate() {
             animationRef.current = requestAnimationFrame(animate);
 
+            // Calculate deltaTime for frame-rate independence
+            const now = performance.now();
+            const deltaTime = (now - lastTime) / 1000; // Convert to seconds
+            lastTime = now;
+            time += deltaTime;
+
             // Clear with transparency to show page background
             ctx.clearRect(0, 0, w, h);
 
-            tick++;
-
-            const rotX = tick * opts.rotVelX;
-            const rotY = tick * opts.rotVelY;
+            // Rotation based on elapsed time (not frame count)
+            const rotX = time * opts.rotVelX;
+            const rotY = time * opts.rotVelY;
 
             cosX = Math.cos(rotX);
             sinX = Math.sin(rotX);
@@ -195,10 +201,9 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
             // Update screen positions
             for (const conn of connections) {
                 setScreen(conn);
-                // Very slow, gentle firing effect
-                const firePhase = Math.sin(tick * conn.glowSpeed * 0.15 + conn.x * 0.02) * 0.5 + 0.5;
-                const isFiring = firePhase > 0.8; // Higher threshold = less frequent
-                // Purple when idle, cyan when firing
+                // Very slow, gentle firing effect (time-based)
+                const firePhase = Math.sin(time * conn.glowSpeed * 0.8 + conn.x * 0.02) * 0.5 + 0.5;
+                const isFiring = firePhase > 0.8;
                 const hue = isFiring ? 190 : 270;
                 const lightness = isFiring ? 65 : 40;
                 const alpha = 0.5 + (1 - conn.screen.z / mostDistant) * 0.5;
@@ -236,14 +241,14 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
             }
             ctx.shadowBlur = 0;
 
-            // Draw root node - steady cyan with subtle pulse
-            const rootPulse = Math.sin(tick * 0.006) * 0.5 + 0.5;
-            const rootLight = 55 + rootPulse * 10; // 55-65% brightness
+            // Draw root node - steady cyan with subtle pulse (time-based)
+            const rootPulse = Math.sin(time * 0.4) * 0.5 + 0.5;
+            const rootLight = 55 + rootPulse * 10;
             const rootSize = 1.5 + rootPulse * 0.1;
             const rootGlow = 30 + rootPulse * 15;
-            ctx.fillStyle = `hsla(195, 90%, ${rootLight}%, 1)`; // Always cyan
+            ctx.fillStyle = `hsla(195, 90%, ${rootLight}%, 1)`;
             ctx.shadowBlur = rootGlow;
-            ctx.shadowColor = "rgba(34, 211, 238, 0.85)"; // Cyan glow
+            ctx.shadowColor = "rgba(34, 211, 238, 0.85)";
             ctx.beginPath();
             ctx.arc(root.screen.x, root.screen.y, root.size * root.screen.scale * rootSize, 0, Math.PI * 2);
             ctx.fill();

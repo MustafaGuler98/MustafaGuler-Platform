@@ -11,9 +11,7 @@ export const metadata = constructMetadata({
   image: getImageUrl("/assets/images/logo1.png"),
 });
 export default async function Home() {
-  const allArticles = await articleService.getAllArticles();
+  const allArticles = await articleService.getAllArticles('en');
 
-  const latestArticles = allArticles || [];
-
-  return <PortalClient articles={latestArticles} />;
+  return <PortalClient articles={allArticles || []} />;
 }

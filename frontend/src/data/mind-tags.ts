@@ -37,7 +37,7 @@ export const mindTags = [
     "CSS",
     "HTML",
     "CI/CD",
-    "Url",
+    "TypeScript",
 
     // Literature & Philosophy
     "Umberto Eco",

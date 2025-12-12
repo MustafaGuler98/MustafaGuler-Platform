@@ -48,6 +48,35 @@ namespace MustafaGuler.Service.Services
             return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
         }
 
+        public async Task<Result<IEnumerable<ArticleListDto>>> GetPopularAsync(int count = 9, string? languageCode = null)
+        {
+            Expression<Func<Article, bool>> filterExpression = x =>
+                !x.IsDeleted
+                && (string.IsNullOrEmpty(languageCode) || x.LanguageCode == languageCode);
+
+            var articles = await _repository.GetAllAsync(
+                filter: filterExpression,
+                includes: new Expression<Func<Article, object>>[]
+                {
+                    x => x.Category,
+                    x => x.User
+                }
+            );
+
+            if (articles == null || !articles.Any())
+                return Result<IEnumerable<ArticleListDto>>.Failure(404, Messages.NoArticlesFound);
+
+            // Sort by ViewCount (desc), then by Slug (for consistent ordering when viewCount is equal)
+            var popularArticles = articles
+                .OrderByDescending(x => x.ViewCount)
+                .ThenBy(x => x.Slug)
+                .Take(count);
+
+            var articleDtos = _mapper.Map<IEnumerable<ArticleListDto>>(popularArticles);
+
+            return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
+        }
+
         public async Task<Result<ArticleDetailDto>> GetBySlugAsync(string slug)
         {
             var article = await _repository.GetAsync(
