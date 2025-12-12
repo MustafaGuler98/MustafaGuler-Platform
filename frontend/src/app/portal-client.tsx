@@ -187,8 +187,11 @@ export default function PortalClient({ articles }: PortalClientProps) {
                                 <Image
                                     src="/logo1.png"
                                     alt="Mustafa Guler"
-                                    fill
-                                    className="object-cover"
+                                    width={1024}
+                                    height={1024}
+                                    priority
+                                    className="object-cover w-full h-full"
+                                    title="Mustafa Guler Logo"
                                 />
                             </div>
                         </div>
