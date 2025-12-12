@@ -192,8 +192,11 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                                             <Image
                                                 src={getImageUrl(article.mainImage)}
                                                 alt={article.title}
-                                                fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
+                                                width={777}
+                                                height={494}
+                                                priority
+                                                title={article.title}
+                                                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 h-full w-full"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-[#0f0518]/60 to-transparent" />
                                         </div>
@@ -258,8 +261,11 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                                                 <Image
                                                     src={getImageUrl(article.mainImage)}
                                                     alt={article.title}
-                                                    fill
-                                                    className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-60"
+                                                    width={777}
+                                                    height={494}
+                                                    priority
+                                                    title={article.title}
+                                                    className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-60 h-full w-full"
                                                 />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-transparent to-transparent" />
                                             </div>
