@@ -35,22 +35,21 @@ export function BottomNavButtons({
               <span className="w-10 h-[2px] bg-gradient-to-r from-primary to-primary/30 group-hover:from-cyan-400 group-hover:to-cyan-400/30 transition-all duration-300"></span>
               PREV
             </span>
-            <h4 className="text-base font-bold text-gray-300 leading-tight transition-all duration-300 max-w-[200px] truncate
-                           group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-cyan-300
-                           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+            <h4 className="text-base font-bold text-gray-300 leading-tight transition-colors duration-300 max-w-[200px] truncate
+                           group-hover:text-cyan-300 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
               {previousArticleTitle}
             </h4>
           </div>
         </Link>
       ) : (
-        <div className="hidden w-1/3" />
+        <div className="flex-1" />
       )}
 
       {/* --- Next Article --- */}
       {nextArticle ? (
         <Link
           href={`/blog/${nextArticle}`}
-          className="group flex items-center gap-4 w-auto justify-end text-right"
+          className="group flex items-center gap-4 w-auto justify-end text-right ml-auto"
         >
           {/* Text */}
           <div className="flex flex-col items-end gap-1.5">
@@ -58,9 +57,8 @@ export function BottomNavButtons({
               NEXT
               <span className="w-10 h-[2px] bg-gradient-to-l from-primary to-primary/30 group-hover:from-cyan-400 group-hover:to-cyan-400/30 transition-all duration-300"></span>
             </span>
-            <h4 className="text-base font-bold text-gray-300 leading-tight transition-all duration-300 max-w-[200px] truncate
-                           group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-300 group-hover:to-white
-                           group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+            <h4 className="text-base font-bold text-gray-300 leading-tight transition-colors duration-300 max-w-[200px] truncate
+                           group-hover:text-cyan-300 group-hover:drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
               {nextArticleTitle}
             </h4>
           </div>
