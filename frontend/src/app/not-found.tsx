@@ -23,7 +23,7 @@ export default function NotFound() {
                     <div className="h-[2px] w-24 mx-auto bg-gradient-to-r from-transparent via-primary to-transparent" />
                 </div>
 
-                {/* Sarcastic message */}
+                {/* Message */}
                 <div className="space-y-4">
                     <p className="text-muted-foreground">
                         The neural pathway you&apos;re trying to access doesn&apos;t exist in this dimension.

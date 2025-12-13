@@ -84,7 +84,7 @@ export default function Error({
                     </div>
                 </div>
 
-                {/* Sarcastic message */}
+                {/* Message */}
                 <p className="text-muted-foreground text-sm italic">
                     &quot;Well, this is awkward. Something broke and honestly, we have no idea what happened either.&quot;
                 </p>

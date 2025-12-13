@@ -2,7 +2,6 @@ import { ServiceResponse } from '@/types/article';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Creates a failure response for network or unexpected errors
 function createErrorResponse<T>(statusCode: number, message: string): ServiceResponse<T> {
     return {
         data: null as T,
@@ -33,7 +32,6 @@ export async function fetchApi<T>(
     }
 }
 
-// Convenience methods for common HTTP verbs
 export const apiClient = {
     get<T>(endpoint: string, options?: RequestInit): Promise<ServiceResponse<T>> {
         return fetchApi<T>(endpoint, { ...options, method: 'GET' });
