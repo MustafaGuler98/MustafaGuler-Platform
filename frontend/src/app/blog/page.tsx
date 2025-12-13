@@ -2,6 +2,8 @@ import { articleService } from "@/services/articleServices";
 import BlogClient from "./blog-client";
 import { constructMetadata } from "@/lib/seo";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = constructMetadata({
     title: "Blog",
     description: "Transmissions from the Digital Mind. Articles on Software Architecture, .NET, and Cyberpunk culture.",
