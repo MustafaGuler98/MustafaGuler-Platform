@@ -1,5 +1,5 @@
 export interface Article {
-  id: string; 
+  id: string;
   title: string;
   content: string;
   categoryId: string;
@@ -16,11 +16,14 @@ export interface Article {
   authorImage?: string;
 }
 export interface ArticleNavigation {
-title: string;
-slug: string;
+  title: string;
+  slug: string;
 }
+
 export interface ServiceResponse<T> {
   data: T;
-  isSuccess: boolean; 
+  isSuccess: boolean;
   message: string;
+  statusCode: number;
+  errors: string[] | null;
 }
