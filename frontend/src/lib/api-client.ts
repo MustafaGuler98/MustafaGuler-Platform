@@ -1,6 +1,9 @@
 import { ServiceResponse } from '@/types/article';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// Server-side uses internal Docker network, client-side uses public URL
+const API_URL = typeof window === 'undefined'
+    ? (process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL)
+    : process.env.NEXT_PUBLIC_API_URL;
 
 function createErrorResponse<T>(statusCode: number, message: string): ServiceResponse<T> {
     return {
