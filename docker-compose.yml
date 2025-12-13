@@ -35,7 +35,7 @@ services:
       dockerfile: Dockerfile
     container_name: mustafa-prod-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=http://mustafaguler.me/api
+      - NEXT_PUBLIC_API_URL=http://159.69.196.46/api
     restart: always
 
   nginx:
