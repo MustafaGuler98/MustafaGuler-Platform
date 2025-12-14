@@ -24,6 +24,8 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mustafa_platform;Username=mustafa;Password=sifre123
       - ASPNETCORE_ENVIRONMENT=Production
+    volumes:
+      - ./uploads:/app/wwwroot/uploads
     depends_on:
       db:
         condition: service_healthy

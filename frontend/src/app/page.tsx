@@ -6,7 +6,7 @@ import { getImageUrl } from "@/lib/utils";
 export const dynamic = 'force-dynamic';
 
 export const metadata = constructMetadata({
-  title: "Portal",
+  title: "Mustafa Güler",
   description: "Mustafa Guler's digital garden. Exploring software architecture, .NET, Next.js and cyberpunk aesthetics.",
   path: "/",
   image: getImageUrl("/assets/images/logo1.png"),
