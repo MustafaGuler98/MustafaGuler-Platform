@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# User uploaded files
+uploads/
+
 # User-specific files
 *.rsuser
 *.suo
