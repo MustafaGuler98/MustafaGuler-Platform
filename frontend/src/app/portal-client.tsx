@@ -191,7 +191,6 @@ export default function PortalClient({ articles }: PortalClientProps) {
                                     height={1024}
                                     priority
                                     className="object-cover w-full h-full"
-                                    title="Mustafa Guler Logo"
                                 />
                             </div>
                         </div>

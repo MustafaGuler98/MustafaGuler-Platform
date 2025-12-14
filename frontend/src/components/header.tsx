@@ -79,7 +79,6 @@ export default function Header() {
                 width={1024}
                 height={1024}
                 priority
-                title="Mustafa Guler Logo"
                 className="object-cover h-full w-full"
               />
             </div>
