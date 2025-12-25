@@ -1,9 +1,9 @@
 import { ServiceResponse } from '@/types/article';
 
-// Server-side uses internal Docker network, client-side uses public URL
+// SSR uses INTERNAL_API_URL (direct backend), browser uses NEXT_PUBLIC_API_URL (proxy)
 const API_URL = typeof window === 'undefined'
-    ? (process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL)
-    : process.env.NEXT_PUBLIC_API_URL;
+    ? `${process.env.INTERNAL_API_URL || 'http://localhost:5281'}/api`
+    : (process.env.NEXT_PUBLIC_API_URL || '/api');
 
 function createErrorResponse<T>(statusCode: number, message: string): ServiceResponse<T> {
     return {

@@ -17,11 +17,11 @@ export function formatDate(dateString: string): string {
 }
 
 const formatCardDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
-      month: 'short', 
-      day: 'numeric'
-    });
-  };
+  return new Date(dateString).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+};
 
 // Our wwwroot is in the backend folder.
 export function getImageUrl(path: string | null | undefined): string {
@@ -35,7 +35,8 @@ export function getImageUrl(path: string | null | undefined): string {
 }
 
 function getBackendUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || '';
+  // Static files (images) are served directly from backend
+  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5281';
 }
 
 export function groupArticlesByYear(articles: Article[]): { [year: string]: Article[] } {

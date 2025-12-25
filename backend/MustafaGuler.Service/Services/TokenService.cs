@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using MustafaGuler.Core.DTOs;
@@ -10,40 +9,34 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MustafaGuler.Service.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _configuration;
 
-        public TokenService(UserManager<AppUser> userManager, IConfiguration configuration)
+        public TokenService(IConfiguration configuration)
         {
-            _userManager = userManager;
             _configuration = configuration;
         }
 
-        public async Task<TokenDto> GenerateTokenAsync(AppUser user)
+        public TokenDto GenerateToken(AppUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email!),
-                // Jti prevents token replay attacks by making each token unique
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            // Roles are embedded into the token so we don't need to query the database on every request
-            var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]!));
+                Encoding.UTF8.GetBytes(_configuration["Token:SecurityKey"]!)); // In appsettings.Development.json
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var expiration = DateTime.UtcNow.AddDays(1);
@@ -64,7 +57,6 @@ namespace MustafaGuler.Service.Services
             };
         }
 
-        // RandomNumberGenerator is cryptographically secure, unlike Guid.NewGuid() which has predictable patterns
         private string GenerateRefreshToken()
         {
             var randomBytes = new byte[32];

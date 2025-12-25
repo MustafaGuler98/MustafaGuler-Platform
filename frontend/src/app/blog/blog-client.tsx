@@ -187,20 +187,18 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                                             hover:shadow-[0_4px_25px_-8px_rgba(168,85,247,0.3)]">
 
                                     {/* Image Area */}
-                                    {article.mainImage && (
-                                        <div className="relative h-48 w-full overflow-hidden border-b border-purple-500/20">
-                                            <Image
-                                                src={getImageUrl(article.mainImage)}
-                                                alt={article.title}
-                                                width={777}
-                                                height={494}
-                                                priority
-                                                title={article.title}
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 h-full w-full"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-[#0f0518]/60 to-transparent" />
-                                        </div>
-                                    )}
+                                    <div className="relative h-48 w-full overflow-hidden border-b border-purple-500/20">
+                                        <Image
+                                            src={getImageUrl(article.mainImage)}
+                                            alt={article.title}
+                                            width={777}
+                                            height={494}
+                                            priority
+                                            title={article.title}
+                                            className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 h-full w-full"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-[#0f0518]/60 to-transparent" />
+                                    </div>
 
                                     {/* Content Area */}
                                     <div className="p-5 flex flex-col gap-3">
@@ -256,20 +254,18 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                                                 hover:shadow-[0_4px_25px_-8px_rgba(34,211,238,0.25)]">
 
                                         {/* Image Header */}
-                                        {article.mainImage && (
-                                            <div className="relative h-44 w-full overflow-hidden border-b border-cyan-500/15">
-                                                <Image
-                                                    src={getImageUrl(article.mainImage)}
-                                                    alt={article.title}
-                                                    width={777}
-                                                    height={494}
-                                                    priority
-                                                    title={article.title}
-                                                    className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-60 h-full w-full"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-transparent to-transparent" />
-                                            </div>
-                                        )}
+                                        <div className="relative h-44 w-full overflow-hidden border-b border-cyan-500/15">
+                                            <Image
+                                                src={getImageUrl(article.mainImage)}
+                                                alt={article.title}
+                                                width={777}
+                                                height={494}
+                                                priority
+                                                title={article.title}
+                                                className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-60 h-full w-full"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0518] via-transparent to-transparent" />
+                                        </div>
 
                                         <div className="p-4 flex flex-col gap-2 flex-1">
                                             {/* Category Tag - Amber */}

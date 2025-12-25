@@ -17,6 +17,7 @@ namespace MustafaGuler.Service.Tests
         private readonly Mock<IGenericRepository<Article>> _mockRepo;
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<ICurrentUserService> _mockCurrentUserService;
         private readonly ArticleService _articleService;
 
         public ArticleServiceTests()
@@ -24,8 +25,9 @@ namespace MustafaGuler.Service.Tests
             _mockRepo = new Mock<IGenericRepository<Article>>();
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
+            _mockCurrentUserService = new Mock<ICurrentUserService>();
 
-            _articleService = new ArticleService(_mockRepo.Object, _mockUnitOfWork.Object, _mockMapper.Object);
+            _articleService = new ArticleService(_mockRepo.Object, _mockUnitOfWork.Object, _mockMapper.Object, _mockCurrentUserService.Object);
         }
 
         [Fact]

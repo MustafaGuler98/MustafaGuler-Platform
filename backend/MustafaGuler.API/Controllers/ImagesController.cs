@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MustafaGuler.API.Models;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Parameters;
+using System;
 using System.Threading.Tasks;
 
 namespace MustafaGuler.API.Controllers
@@ -16,10 +20,57 @@ namespace MustafaGuler.API.Controllers
             _imageService = imageService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload([FromForm] ImageUploadDto uploadDto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Upload([FromForm] ImageUploadRequest request)
         {
-            var result = await _imageService.UploadAsync(uploadDto.File, uploadDto.CustomName);
+            if (request.File == null || request.File.Length == 0)
+            {
+                return BadRequest(new { message = "No file uploaded." });
+            }
+
+            var fileData = new FileUploadData
+            {
+                Content = request.File.OpenReadStream(),
+                FileName = request.File.FileName,
+                ContentType = request.File.ContentType,
+                Length = request.File.Length
+            };
+
+            var result = await _imageService.UploadAsync(fileData, request.CustomName);
+            return CreateActionResultInstance(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<IActionResult> GetPaged(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20,
+            [FromQuery] string? search = null)
+        {
+            var paginationParams = new PaginationParams
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+            var result = await _imageService.GetPagedAsync(paginationParams, search);
+            return CreateActionResultInstance(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] ImageUpdateDto dto)
+        {
+            var result = await _imageService.UpdateAsync(id, dto);
+            return CreateActionResultInstance(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _imageService.DeleteAsync(id);
             return CreateActionResultInstance(result);
         }
     }

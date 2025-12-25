@@ -7,5 +7,7 @@ namespace MustafaGuler.Core.Interfaces
     public interface IAuthService
     {
         Task<Result<TokenDto>> LoginAsync(LoginDto loginDto);
+        Task<Result<TokenDto>> RefreshTokenAsync(string refreshToken);
+        Task<Result> LogoutAsync(Guid userId);
     }
 }

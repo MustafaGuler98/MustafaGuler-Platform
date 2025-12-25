@@ -22,6 +22,11 @@ namespace MustafaGuler.Repository.Repositories
                 .FirstOrDefaultAsync(u => u.Email == email);
         }
 
+        public async Task<AppUser?> GetUserByIdAsync(Guid userId)
+        {
+            return await _userManager.FindByIdAsync(userId.ToString());
+        }
+
         public async Task<bool> CheckPasswordAsync(AppUser user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
@@ -33,6 +38,25 @@ namespace MustafaGuler.Repository.Repositories
             user.RefreshTokenEndDate = refreshTokenEndDate;
 
             await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<AppUser?> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _userManager.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken && u.RefreshTokenEndDate > DateTime.UtcNow);
+        }
+
+        public async Task ClearRefreshTokenAsync(AppUser user)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenEndDate = null;
+
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<IList<string>> GetRolesAsync(AppUser user)
+        {
+            return await _userManager.GetRolesAsync(user);
         }
     }
 }

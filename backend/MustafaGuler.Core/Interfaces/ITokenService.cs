@@ -1,11 +1,11 @@
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Entities;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MustafaGuler.Core.Interfaces
 {
     public interface ITokenService
     {
-        Task<TokenDto> GenerateTokenAsync(AppUser user);
+        TokenDto GenerateToken(AppUser user, IList<string> roles);
     }
 }

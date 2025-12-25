@@ -11,7 +11,6 @@ namespace MustafaGuler.Service.Services
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
 
-        // We inject interfaces, not concrete implementations - this is the core of Onion Architecture
         public AuthService(IUserRepository userRepository, ITokenService tokenService)
         {
             _userRepository = userRepository;
@@ -24,7 +23,6 @@ namespace MustafaGuler.Service.Services
 
             if (user == null)
             {
-                // Generic message prevents email enumeration attacks
                 return Result<TokenDto>.Failure(401, "Invalid email or password.");
             }
 
@@ -35,13 +33,48 @@ namespace MustafaGuler.Service.Services
                 return Result<TokenDto>.Failure(401, "Invalid email or password.");
             }
 
-            var tokenDto = await _tokenService.GenerateTokenAsync(user);
+            var roles = await _userRepository.GetRolesAsync(user);
+            var tokenDto = _tokenService.GenerateToken(user, roles);
 
-            // Refresh token expires in 30 days - stored in DB for validation on refresh requests
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(30);
             await _userRepository.UpdateRefreshTokenAsync(user, tokenDto.RefreshToken, refreshTokenExpiry);
 
             return Result<TokenDto>.Success(tokenDto);
+        }
+
+        public async Task<Result<TokenDto>> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _userRepository.GetUserByRefreshTokenAsync(refreshToken);
+
+            if (user == null)
+            {
+                return Result<TokenDto>.Failure(401, "Invalid or expired refresh token.");
+            }
+
+            var roles = await _userRepository.GetRolesAsync(user);
+            var tokenDto = _tokenService.GenerateToken(user, roles);
+
+            // Keep the same refresh token for now, maybe rotate later for better security
+            tokenDto.RefreshToken = refreshToken;
+
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(30);
+            await _userRepository.UpdateRefreshTokenAsync(user, refreshToken, refreshTokenExpiry);
+
+            return Result<TokenDto>.Success(tokenDto);
+        }
+
+        public async Task<Result> LogoutAsync(Guid userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                return Result.Failure(404, "User not found.");
+            }
+
+            await _userRepository.ClearRefreshTokenAsync(user);
+
+            return Result.Success();
         }
     }
 }
