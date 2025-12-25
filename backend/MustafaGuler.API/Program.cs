@@ -1,70 +1,78 @@
 using Microsoft.EntityFrameworkCore;
 using MustafaGuler.API.Extensions;
-using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
-using MustafaGuler.Repository.Repositories;
 using MustafaGuler.Service.Mapping;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MustafaGuler.Service.Validators;
 using Serilog;
-using Microsoft.AspNetCore.Identity;
-using MustafaGuler.Core.Entities;
+
+// TODO: Move complex setups to extension methods (in Extensions folder) to keep this file readable.
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
-// Add services to the container.
-// Configure PostgreSQL database connection
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<AppUser, AppRole>(options =>
-{
-    options.User.RequireUniqueEmail = true;
-    options.Password.RequireDigit = false;
-    options.Password.RequiredLength = 6;
-    //customize other options as needed
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+builder.Services.AddIdentityConfiguration();
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped(typeof(IService<>), typeof(MustafaGuler.Service.Services.Service<>));
-builder.Services.AddScoped<IArticleService, MustafaGuler.Service.Services.ArticleService>();
-builder.Services.AddScoped<IImageService, MustafaGuler.Service.Services.ImageService>();
+builder.Services.AddApplicationServices(); // Register application dependencies. /Extensions/DependencyInjectionExtensions.cs
 
 builder.Services.AddAutoMapper(typeof(MapProfile));
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<ArticleAddDtoValidator>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? Array.Empty<string>();
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000", "https://mustafaguler.me", "http://159.69.196.46:3000")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); // Required for cookies
+    });
 });
 
 var app = builder.Build();
+
+await app.SeedAdminUserAsync();
+
 app.ApplyMigrations();
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 app.UseMiddleware<MustafaGuler.API.Middlewares.GlobalExceptionMiddleware>();
-app.UseHttpsRedirection();
+
+// Only redirect to HTTPS in Production
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

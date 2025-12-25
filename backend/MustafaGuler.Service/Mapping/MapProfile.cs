@@ -27,6 +27,20 @@ namespace MustafaGuler.Service.Mapping
             CreateMap<ArticleAddDto, Article>();
 
             CreateMap<Article, ArticleNavigationDto>();
+
+            // Category mappings
+            CreateMap<Category, CategoryDto>();
+            CreateMap<CategoryAddDto, Category>();
+            CreateMap<CategoryUpdateDto, Category>();
+
+            // Image mappings
+            CreateMap<Image, ImageInfoDto>()
+                .ForMember(dest => dest.UploadedByName, opt => opt.MapFrom(src =>
+                    src.UploadedBy != null
+                        ? $"{src.UploadedBy.FirstName} {src.UploadedBy.LastName}"
+                        : null));
+
+            CreateMap<ImageUpdateDto, Image>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using MustafaGuler.Core.Constants;
 
 namespace MustafaGuler.Core.Utilities.Results
 {
@@ -38,7 +39,7 @@ namespace MustafaGuler.Core.Utilities.Results
     {
         public T? Data { get; private set; }
 
-        private Result(T data, bool isSuccess, int statusCode, string message, List<string>? errors = null)
+        protected Result(T data, bool isSuccess, int statusCode, string message, List<string>? errors = null)
             : base(isSuccess, statusCode, message, errors)
         {
             Data = data;
@@ -58,6 +59,18 @@ namespace MustafaGuler.Core.Utilities.Results
         public new static Result<T> Failure(int statusCode, string message)
         {
             return new Result<T>(default, false, statusCode, message, new List<string> { message });
+        }
+
+        public static Result<T> Unauthorized(string? message = null)
+        {
+            var msg = message ?? Messages.Unauthorized;
+            return new Result<T>(default, false, 401, msg, new List<string> { msg });
+        }
+
+        public static Result<T> Forbidden(string? message = null)
+        {
+            var msg = message ?? Messages.Forbidden;
+            return new Result<T>(default, false, 403, msg, new List<string> { msg });
         }
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using MustafaGuler.Core.Common;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Repository.Contexts;
+using MustafaGuler.Core.DTOs;
+using MustafaGuler.Core.Parameters;
+using MustafaGuler.Core.Utilities.Results;
 
 namespace MustafaGuler.Repository.Repositories
 {
@@ -48,16 +51,21 @@ namespace MustafaGuler.Repository.Repositories
                     query = query.Include(includeItem);
                 }
             }
-            // We use AsNoTracking() for read-only operations to increase performance
+            // AsNoTracking() for read-only operations to increase performance
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(Guid id)
+        public async Task<T?> GetByIdAsync(Guid id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+        {
+            return await GetAsync(filter, null, includes);
+        }
+
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
 
@@ -71,7 +79,41 @@ namespace MustafaGuler.Repository.Repositories
                 }
             }
 
+            if (orderBy != null)
+            {
+                return await orderBy(query).AsNoTracking().FirstOrDefaultAsync();
+            }
+
             return await query.AsNoTracking().FirstOrDefaultAsync();
+        }
+
+        public async Task<PagedResult<T>> GetPagedListAsync(
+            PaginationParams paginationParams,
+            Expression<Func<T, bool>>? filter = null,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includes != null)
+            {
+                foreach (var includeItem in includes)
+                {
+                    query = query.Include(includeItem);
+                }
+            }
+
+            int totalCount = await query.CountAsync();
+
+            var data = await query.AsNoTracking()
+                .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
+                .Take(paginationParams.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<T>(data, totalCount, paginationParams.PageNumber, paginationParams.PageSize);
         }
 
         // Remove and Update are synchronous, they just modify the state of the entity

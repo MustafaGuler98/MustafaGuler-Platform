@@ -24,6 +24,11 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=mustafa_platform;Username=mustafa;Password=sifre123
       - ASPNETCORE_ENVIRONMENT=Production
+      - Token__SecurityKey=pR0d9Xm2kL5sN8tY1wA4bC7eF0hJ3iK6M9oQ2rT5uV8xZ1aD4gG7jL0nP3qS6tW9
+      - Token__Issuer=mustafaguler.me
+      - Token__Audience=mustafaguler.me
+      - Cors__AllowedOrigins__0=https://mustafaguler.me
+      # - Cors__AllowedOrigins__1=http://159.69.196.46:3000  # Optional: Direct IP access (not needed with Nginx reverse proxy)
     volumes:
       - ./uploads:/app/wwwroot/uploads
     depends_on:
@@ -37,8 +42,9 @@ services:
       dockerfile: Dockerfile
     container_name: mustafa-prod-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=https://mustafaguler.me/api
-      - INTERNAL_API_URL=http://api:8080/api
+      - NEXT_PUBLIC_API_URL=/api
+      - INTERNAL_API_URL=http://api:8080
+      - NEXT_PUBLIC_BACKEND_URL=https://mustafaguler.me
     restart: always
 
   nginx:
