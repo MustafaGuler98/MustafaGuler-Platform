@@ -6,6 +6,7 @@ import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
+import DOMPurify from "isomorphic-dompurify";
 
 export const dynamic = 'force-dynamic';
 
@@ -119,7 +120,7 @@ export default async function ArticlePage({ params }: PageProps) {
             prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:py-1
             prose-li:marker:text-primary
           "
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
         />
 
         {/* Navigation Buttons */}
