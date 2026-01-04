@@ -37,7 +37,7 @@ namespace MustafaGuler.Service.Tests
             var articleEntity = new Article { Title = "Test Article" };
 
             _mockMapper.Setup(m => m.Map<Article>(articleDto)).Returns(articleEntity);
-
+            _mockCurrentUserService.Setup(x => x.UserId).Returns(Guid.NewGuid());
 
             // First check: "test-article" -> Exists (True)
             // Second check: "test-article-1" -> Does not exist (False)

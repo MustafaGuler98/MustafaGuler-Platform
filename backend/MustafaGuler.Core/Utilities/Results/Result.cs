@@ -7,19 +7,19 @@ namespace MustafaGuler.Core.Utilities.Results
     public class Result
     {
         public bool IsSuccess { get; private set; }
-        public string Message { get; private set; }
+        public string Message { get; private set; } = null!;
         public int StatusCode { get; private set; }
         public List<string>? Errors { get; private set; }
 
-        protected Result(bool isSuccess, int statusCode, string message, List<string>? errors = null)
+        protected Result(bool isSuccess, int statusCode, string? message, List<string>? errors = null)
         {
             IsSuccess = isSuccess;
             StatusCode = statusCode;
-            Message = message;
+            Message = message ?? string.Empty;
             Errors = errors;
         }
 
-        public static Result Success(int statusCode = 200, string message = null)
+        public static Result Success(int statusCode = 200, string? message = null)
         {
             return new Result(true, statusCode, message);
         }
@@ -39,38 +39,38 @@ namespace MustafaGuler.Core.Utilities.Results
     {
         public T? Data { get; private set; }
 
-        protected Result(T data, bool isSuccess, int statusCode, string message, List<string>? errors = null)
+        protected Result(T data, bool isSuccess, int statusCode, string? message, List<string>? errors = null)
             : base(isSuccess, statusCode, message, errors)
         {
             Data = data;
         }
 
 
-        public static Result<T> Success(T data, int statusCode = 200, string message = null)
+        public static Result<T> Success(T data, int statusCode = 200, string? message = null)
         {
             return new Result<T>(data, true, statusCode, message);
         }
 
         public new static Result<T> Failure(int statusCode, string message, List<string>? errors = null)
         {
-            return new Result<T>(default, false, statusCode, message, errors);
+            return new Result<T>(default!, false, statusCode, message, errors);
         }
 
         public new static Result<T> Failure(int statusCode, string message)
         {
-            return new Result<T>(default, false, statusCode, message, new List<string> { message });
+            return new Result<T>(default!, false, statusCode, message, new List<string> { message });
         }
 
         public static Result<T> Unauthorized(string? message = null)
         {
             var msg = message ?? Messages.Unauthorized;
-            return new Result<T>(default, false, 401, msg, new List<string> { msg });
+            return new Result<T>(default!, false, 401, msg, new List<string> { msg });
         }
 
         public static Result<T> Forbidden(string? message = null)
         {
             var msg = message ?? Messages.Forbidden;
-            return new Result<T>(default, false, 403, msg, new List<string> { msg });
+            return new Result<T>(default!, false, 403, msg, new List<string> { msg });
         }
     }
 }

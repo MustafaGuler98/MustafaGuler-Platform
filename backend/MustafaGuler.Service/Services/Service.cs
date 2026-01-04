@@ -29,7 +29,7 @@ namespace MustafaGuler.Service.Services
             return await _repository.GetAllAsync();
         }
 
-        public async Task<T> GetByIdAsync(Guid id)
+        public async Task<T?> GetByIdAsync(Guid id)
         {
             return await _repository.GetByIdAsync(id);
         }
@@ -37,6 +37,8 @@ namespace MustafaGuler.Service.Services
         public async Task RemoveAsync(Guid id)
         {
             var entity = await _repository.GetByIdAsync(id);
+            if (entity == null)
+                throw new KeyNotFoundException($"Entity with id {id} not found.");
             _repository.Remove(entity);
             await _unitOfWork.CommitAsync();
         }

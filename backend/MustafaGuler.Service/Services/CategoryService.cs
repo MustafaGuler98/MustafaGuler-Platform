@@ -74,7 +74,7 @@ namespace MustafaGuler.Service.Services
             }
 
             category.Name = categoryUpdateDto.Name;
-            category.Description = categoryUpdateDto.Description;
+            category.Description = categoryUpdateDto.Description ?? category.Description;
             category.ParentId = categoryUpdateDto.ParentId;
             category.Slug = SlugHelper.GenerateSlug(categoryUpdateDto.Name);
             category.UpdatedDate = DateTime.UtcNow;

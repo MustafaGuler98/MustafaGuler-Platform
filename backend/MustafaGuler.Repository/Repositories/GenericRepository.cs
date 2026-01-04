@@ -36,7 +36,7 @@ namespace MustafaGuler.Repository.Repositories
 
         public async Task<IEnumerable<T>> GetAllAsync(
             Expression<Func<T, bool>>? filter = null,
-            params Expression<Func<T, object>>[] includes)
+            params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet;
             if (filter != null)
@@ -60,12 +60,12 @@ namespace MustafaGuler.Repository.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object?>>[] includes)
         {
             return await GetAsync(filter, null, includes);
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet;
 
@@ -90,7 +90,7 @@ namespace MustafaGuler.Repository.Repositories
         public async Task<PagedResult<T>> GetPagedListAsync(
             PaginationParams paginationParams,
             Expression<Func<T, bool>>? filter = null,
-            params Expression<Func<T, object>>[] includes)
+            params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet;
             if (filter != null)

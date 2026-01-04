@@ -119,7 +119,7 @@ namespace MustafaGuler.Service.Services
                 x => x.UploadedBy!
             );
 
-            var sortedData = pagedResult.Data.OrderByDescending(x => x.CreatedDate).ToList();
+            var sortedData = (pagedResult.Data ?? new List<Image>()).OrderByDescending(x => x.CreatedDate).ToList();
             var dtos = _mapper.Map<List<ImageInfoDto>>(sortedData);
 
             return new PagedResult<ImageInfoDto>(dtos, pagedResult.TotalCount, pagedResult.PageNumber, pagedResult.PageSize);

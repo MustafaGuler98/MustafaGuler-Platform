@@ -13,7 +13,7 @@ namespace MustafaGuler.Core.Utilities.Results
         public bool HasNext => PageNumber < TotalPages;
 
         public PagedResult(List<T> data, int totalCount, int pageNumber, int pageSize) 
-            : base(data, true, 200, null)
+            : base(data, true, 200, null!)
         {
             TotalCount = totalCount;
             PageSize = pageSize;
@@ -22,7 +22,7 @@ namespace MustafaGuler.Core.Utilities.Results
         }
 
         private PagedResult(bool isSuccess, int statusCode, string message, List<string>? errors)
-             : base(default, isSuccess, statusCode, message, errors)
+             : base(default!, isSuccess, statusCode, message, errors)
         {
         }
 

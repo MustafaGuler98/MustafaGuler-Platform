@@ -33,7 +33,7 @@ namespace MustafaGuler.API.Controllers
                 return StatusCode(result.StatusCode, new { message = result.Message });
             }
 
-            _authCookieService.SetAuthCookies(result.Data);
+            _authCookieService.SetAuthCookies(result.Data!);
             return Ok(new { message = "Login successful" });
         }
 
@@ -54,7 +54,7 @@ namespace MustafaGuler.API.Controllers
                 return StatusCode(result.StatusCode, new { message = result.Message });
             }
 
-            _authCookieService.SetAuthCookies(result.Data);
+            _authCookieService.SetAuthCookies(result.Data!);
             return Ok(new { message = "Token refreshed." });
         }
 

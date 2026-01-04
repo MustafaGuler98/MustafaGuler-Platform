@@ -6,7 +6,7 @@ namespace MustafaGuler.Core.DTOs
 {
     public class ArticleNavigationDto
     {
-        public string Title { get; set; }
-        public string Slug { get; set; }
+        public string Title { get; set; } = null!;
+        public string Slug { get; set; } = null!;
     }
 }

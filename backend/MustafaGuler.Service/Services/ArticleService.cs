@@ -34,7 +34,7 @@ namespace MustafaGuler.Service.Services
 
             var articles = await _repository.GetAllAsync(
                 filter: filterExpression,
-                includes: new Expression<Func<Article, object>>[]
+                includes: new Expression<Func<Article, object?>>[]
                 {
                     x => x.Category,
                     x => x.User
@@ -78,7 +78,7 @@ namespace MustafaGuler.Service.Services
 
             var articles = await _repository.GetAllAsync(
                 filter: filterExpression,
-                includes: new Expression<Func<Article, object>>[]
+                includes: new Expression<Func<Article, object?>>[]
                 {
                     x => x.Category,
                     x => x.User
@@ -103,7 +103,7 @@ namespace MustafaGuler.Service.Services
         {
             var article = await _repository.GetAsync(
                 filter: x => x.Slug == slug && !x.IsDeleted,
-                includes: new Expression<Func<Article, object>>[]
+                includes: new Expression<Func<Article, object?>>[]
                 {
                     x => x.Category,
                     x => x.User
@@ -164,7 +164,7 @@ namespace MustafaGuler.Service.Services
         {
             var article = await _repository.GetAsync(
                 filter: x => x.Id == id && !x.IsDeleted,
-                includes: new Expression<Func<Article, object>>[]
+                includes: new Expression<Func<Article, object?>>[]
                 {
                     x => x.Category,
                     x => x.User
