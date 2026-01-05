@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
-// API URL for admin requests (uses Next.js proxy)
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Types
