@@ -15,8 +15,7 @@ namespace MustafaGuler.Service.Tests
         private readonly Mock<IUserRepository> _mockUserRepo;
         private readonly Mock<ITokenService> _mockTokenService;
         private readonly AuthService _authService;
-
-        // Fake test data
+        
         private readonly Guid _testUserId = Guid.NewGuid();
         private readonly AppUser _testUser;
         private readonly TokenDto _testTokenDto;

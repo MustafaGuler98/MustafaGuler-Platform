@@ -577,11 +577,10 @@ namespace MustafaGuler.Service.Tests
         public async Task AddAsync_WhenTitleContainsSqlChars_SlugHelperSanitizesInput()
         {
             // Arrange
-            // NOTE: This tests SlugHelper string sanitization, NOT database SQL injection protection.
-            // EF Core handles SQL injection via parameterization. This only validates slug generation.
+            // This tests SlugHelper string sanitization, NOT database SQL injection protection.
             var articleDto = new ArticleAddDto 
             { 
-                Title = TestConstants.EdgeCase.SqlInjectionTitle, // "Test'; DROP TABLE Articles--"
+                Title = TestConstants.EdgeCase.SqlInjectionTitle, 
                 Content = "Content" 
             };
             var articleEntity = new Article { Title = articleDto.Title };
@@ -596,7 +595,7 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Contains(TestConstants.EdgeCase.ExpectedSqlSlug, articleEntity.Slug); // Should be "test-drop-table"
+            Assert.Contains(TestConstants.EdgeCase.ExpectedSqlSlug, articleEntity.Slug);
             Assert.DoesNotContain("'", articleEntity.Slug);
             Assert.DoesNotContain(";", articleEntity.Slug);
         }
@@ -605,9 +604,7 @@ namespace MustafaGuler.Service.Tests
         public async Task AddAsync_WhenContentContainsHtmlTags_PreservesContent()
         {
             // Arrange
-            // ⚠️ SECURITY WARNING: Backend does NOT sanitize HTML/XSS.
-            // This is a DELIBERATE design decision. Frontend MUST handle sanitization.
-            // This test verifies that backend preserves content as-is for storage.
+            // Backend does NOT sanitize HTML/XSS.
             var articleDto = new ArticleAddDto 
             { 
                 Title = "Test Article",
@@ -625,7 +622,7 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(TestConstants.EdgeCase.XssContent, articleEntity.Content); // Not sanitized
+            Assert.Equal(TestConstants.EdgeCase.XssContent, articleEntity.Content);
         }
 
         [Fact]
@@ -634,7 +631,7 @@ namespace MustafaGuler.Service.Tests
             // Arrange
             var articleDto = new ArticleAddDto 
             { 
-                Title = TestConstants.EdgeCase.EmojiTitle, // "Hello 👋 World 🌍"
+                Title = TestConstants.EdgeCase.EmojiTitle,
                 Content = "Content" 
             };
             var articleEntity = new Article { Title = articleDto.Title };
@@ -660,7 +657,7 @@ namespace MustafaGuler.Service.Tests
             // Arrange
             var articleDto = new ArticleAddDto 
             { 
-                Title = TestConstants.EdgeCase.TurkishSpecialTitle, // "Çok Özel İçerik Şırınga"
+                Title = TestConstants.EdgeCase.TurkishSpecialTitle,
                 Content = "Content" 
             };
             var articleEntity = new Article { Title = articleDto.Title };
@@ -675,13 +672,13 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.True(result.IsSuccess);
-            Assert.Equal(TestConstants.EdgeCase.ExpectedTurkishSlug, articleEntity.Slug); // "cok-ozel-icerik-siringa"
+            Assert.Equal(TestConstants.EdgeCase.ExpectedTurkishSlug, articleEntity.Slug);
         }
 
         [Fact]
         public async Task AddAsync_WhenSlugCollidesMultipleTimes_IncrementsCounterCorrectly()
         {
-            // Arrange - Tests slug collision RETRY LOGIC (not true concurrency/race conditions)
+            // Arrange
             // Simulates scenario: "test-article", "test-article-1", "test-article-2" already exist
             var articleDto = new ArticleAddDto { Title = TestConstants.Article.TestTitle, Content = "Content" };
             var articleEntity = new Article { Title = articleDto.Title };
@@ -694,7 +691,7 @@ namespace MustafaGuler.Service.Tests
                      .ReturnsAsync(() =>
                      {
                          callCount++;
-                         return callCount <= 3; // "test-article", "test-article-1", "test-article-2" exist
+                         return callCount <= 3;
                      });
 
             // Act
@@ -716,7 +713,7 @@ namespace MustafaGuler.Service.Tests
                 Content = "Content",
                 CategoryId = _testCategoryId,
                 LanguageCode = "en",
-                MainImage = null // NULL image
+                MainImage = null
             };
 
             _mockRepo.Setup(x => x.GetByIdAsync(_testArticleId))
@@ -770,7 +767,7 @@ namespace MustafaGuler.Service.Tests
         [Fact]
         public async Task UpdateAsync_WhenChangingToExistingTitle_GeneratesUniqueSlug()
         {
-            // Arrange - Update to a title that's DIFFERENT from current, triggering regeneration
+            // Arrange - Update to a title that's DIFFERENT from current
             var updateDto = new ArticleUpdateDto
             {
                 Id = _testArticleId,

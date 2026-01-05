@@ -84,7 +84,7 @@ namespace MustafaGuler.Service.Tests
                 Content = new MemoryStream(),
                 FileName = TestConstants.File.ValidJpgName,
                 ContentType = TestConstants.File.JpegContentType,
-                Length = 11 * 1024 * 1024  // 11 MB - exceeds 10MB limit
+                Length = 11 * 1024 * 1024  
             };
 
             var result = await _imageService.UploadAsync(fileData, "some-name");
@@ -96,19 +96,18 @@ namespace MustafaGuler.Service.Tests
         [Fact]
         public async Task UploadAsync_WhenFileSizeIsExactlyLimit_PassesSizeCheck()
         {
-            // Arrange - 10MB is the limit, so exactly 10MB should pass size validation
             var fileData = new FileUploadData
             {
                 Content = new MemoryStream(),
                 FileName = TestConstants.File.ValidJpgName,
                 ContentType = TestConstants.File.JpegContentType,
-                Length = 10 * 1024 * 1024  // Exactly 10 MB
+                Length = 10 * 1024 * 1024 
             };
 
             // Act
             var result = await _imageService.UploadAsync(fileData, "valid-name");
 
-            // Assert - Should fail at a later stage (not size check), which means size check passed
+            // Assert
             Assert.False(result.IsSuccess);
             Assert.NotEqual(Messages.FileSizeLimitExceeded, result.Message);
         }
@@ -154,7 +153,7 @@ namespace MustafaGuler.Service.Tests
             // Act
             var result = await _imageService.UploadAsync(fileData, "valid-name");
 
-            // Assert - Should not fail at extension check
+            // Assert
             Assert.NotEqual(Messages.InvalidFileType, result.Message);
         }
 
@@ -209,7 +208,7 @@ namespace MustafaGuler.Service.Tests
         [Fact]
         public async Task UploadAsync_WhenCustomNameIsSpecialCharsOnly_ReturnsError()
         {
-            // Arrange - SlugHelper.GenerateSlug("!!!") returns empty string
+            // Arrange
             var fileData = new FileUploadData
             {
                 Content = new MemoryStream(),
