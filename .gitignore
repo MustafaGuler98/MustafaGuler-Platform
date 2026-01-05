@@ -24,7 +24,7 @@ bin/
 obj/
 TestResults/
 *.log
-wwwroot/uploads/
+**/wwwroot/uploads/
 
 # Frontend (Next.js)
 node_modules/
