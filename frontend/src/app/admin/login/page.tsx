@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-
-// API URL for login requests (uses Next.js proxy)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+import { authService } from '@/services/authService';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -22,66 +20,94 @@ export default function LoginPage() {
         }
     }, [isAuthenticated, router]);
 
-    const inputStyle = { width: '100%', padding: '8px', marginBottom: '10px', fontSize: '14px' };
-    const btnStyle = { padding: '6px 12px', cursor: 'pointer', border: 'none', borderRadius: '4px' };
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
-        try {
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ email, password }),
-            });
+        const result = await authService.login({ email, password });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                setError(data.message || 'Login failed');
-            } else {
-                // Force full page reload to re-run middleware
-                window.location.href = '/admin';
-            }
-        } catch {
-            setError('Network error');
-        } finally {
-            setLoading(false);
+        if (result.isSuccess) {
+            window.location.href = '/admin';
+        } else {
+            setError(result.message);
         }
+
+        setLoading(false);
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '100px auto', padding: '20px', border: '1px solid #333', borderRadius: '8px' }}>
-            <h1>Admin Login</h1>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                    style={inputStyle}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                    style={inputStyle}
-                />
-                {error && <div style={{ color: '#ef4444', marginBottom: '10px' }}>{error}</div>}
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ ...btnStyle, width: '100%', backgroundColor: '#3b82f6', color: 'white' }}
-                >
-                    {loading ? 'Loading...' : 'Login'}
-                </button>
-            </form>
+        <div className="min-h-screen flex items-start justify-center pt-24 footer-grid-pattern">
+            {/* Login Card */}
+            <div className="w-full max-w-md mx-4">
+                <div className="backdrop-blur-md bg-[#0a0118]/90 border border-primary/40 rounded-lg p-8 shadow-2xl">
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <h1 className="font-heading text-3xl text-cyan-neon tracking-wider mb-2">
+                            SYSTEM ACCESS
+                        </h1>
+                        <div className="h-0.5 w-24 mx-auto bg-gradient-to-r from-transparent via-cyan-neon to-transparent" />
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        {/* Email Input */}
+                        <div className="space-y-2">
+                            <label className="text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                                EMAIL_ADDRESS
+                            </label>
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                placeholder="admin@mustafaguler.me"
+                                className="w-full bg-[#020103] border-b-2 border-primary/50 focus:border-cyan-neon px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors duration-300 font-mono text-sm"
+                            />
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="space-y-2">
+                            <label className="text-xs text-muted-foreground font-mono uppercase tracking-widest">
+                                ACCESS_KEY
+                            </label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                placeholder="••••••••••••"
+                                className="w-full bg-[#020103] border-b-2 border-primary/50 focus:border-cyan-neon px-4 py-3 text-foreground placeholder:text-muted-foreground/50 focus:outline-none transition-colors duration-300 font-mono text-sm"
+                            />
+                        </div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/30 rounded px-4 py-3">
+                                <p className="text-red-400 text-sm font-mono">
+                                    <span className="text-red-500">&gt;</span> ERROR: {error.toUpperCase().replace(/ /g, '_')}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="group relative w-full py-4 overflow-hidden rounded bg-cyan-neon/5 border border-cyan-neon/30 hover:border-cyan-neon/60 transition-all duration-500 disabled:opacity-50 cursor-pointer"
+                        >
+                            <div className="absolute inset-0 w-1 bg-cyan-neon/20 transition-all duration-500 ease-out group-hover:w-full" />
+                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-cyan-neon/10 to-transparent" />
+                            <span className="relative flex items-center justify-center gap-3 font-mono text-xs tracking-[0.5em] text-cyan-neon/80 group-hover:text-white transition-colors duration-300">
+                                {loading ? 'CONNECTING...' : 'CONNECT'}
+                            </span>
+                        </button>
+
+                    </form>
+
+
+                </div>
+            </div>
         </div>
     );
 }
