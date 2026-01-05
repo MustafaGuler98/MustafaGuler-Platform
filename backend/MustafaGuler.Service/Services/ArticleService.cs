@@ -61,6 +61,7 @@ namespace MustafaGuler.Service.Services
             var pagedEntities = await _repository.GetPagedListAsync(
                 paginationParams, 
                 filterExpression, 
+                q => q.OrderByDescending(x => x.CreatedDate),
                 x => x.Category, 
                 x => x.User
             );

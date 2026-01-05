@@ -90,6 +90,7 @@ namespace MustafaGuler.Repository.Repositories
         public async Task<PagedResult<T>> GetPagedListAsync(
             PaginationParams paginationParams,
             Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet;
@@ -107,6 +108,12 @@ namespace MustafaGuler.Repository.Repositories
             }
 
             int totalCount = await query.CountAsync();
+
+            // Apply ordering BEFORE Skip/Take for consistent pagination
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
 
             var data = await query.AsNoTracking()
                 .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)

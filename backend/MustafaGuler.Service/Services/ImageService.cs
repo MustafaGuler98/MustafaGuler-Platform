@@ -116,11 +116,11 @@ namespace MustafaGuler.Service.Services
             var pagedResult = await _repository.GetPagedListAsync(
                 paginationParams,
                 filter,
+                q => q.OrderByDescending(x => x.CreatedDate),
                 x => x.UploadedBy!
             );
 
-            var sortedData = (pagedResult.Data ?? new List<Image>()).OrderByDescending(x => x.CreatedDate).ToList();
-            var dtos = _mapper.Map<List<ImageInfoDto>>(sortedData);
+            var dtos = _mapper.Map<List<ImageInfoDto>>(pagedResult.Data);
 
             return new PagedResult<ImageInfoDto>(dtos, pagedResult.TotalCount, pagedResult.PageNumber, pagedResult.PageSize);
         }
