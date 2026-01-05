@@ -4,7 +4,6 @@ import Image from "next/image";
 import HeaderWrapper from "@/components/header-wrapper";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/contexts/AuthContext";
 import {
   Inter,
   Orbitron,
@@ -110,15 +109,13 @@ export default function RootLayout({
         </div>
 
 
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
-            <HeaderWrapper />
-            <main className="min-h-screen bg transparent relative z-10">
-              {children}
-            </main>
-            <Footer />
-          </ThemeProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange >
+          <HeaderWrapper />
+          <main className="min-h-screen bg transparent relative z-10">
+            {children}
+          </main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

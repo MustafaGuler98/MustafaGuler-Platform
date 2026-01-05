@@ -109,7 +109,7 @@ namespace MustafaGuler.Repository.Repositories
 
             int totalCount = await query.CountAsync();
 
-            // Apply ordering BEFORE Skip/Take for consistent pagination
+            // Apply ordering before Skip/Take for consistent pagination
             if (orderBy != null)
             {
                 query = orderBy(query);
