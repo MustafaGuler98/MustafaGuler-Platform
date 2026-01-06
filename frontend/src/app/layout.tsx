@@ -70,7 +70,7 @@ const pressStart = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "Mustafa Guler",
+  title: "Mustafa Güler",
   description: "Digital Mind",
 };
 

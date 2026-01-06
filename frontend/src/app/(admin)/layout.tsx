@@ -1,11 +1,14 @@
-'use client';
+import type { Metadata } from "next";
 
-import { AuthProvider } from '@/contexts/AuthContext';
+export const metadata: Metadata = {
+    title: "Admin Panel",
+    description: "System Access - Admin Panel for MustafaGuler.com",
+};
 
-export default function AdminLayout({
+export default function AdminRootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    return <AuthProvider>{children}</AuthProvider>;
+    return <>{children}</>;
 }

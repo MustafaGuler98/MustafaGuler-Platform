@@ -1,8 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 import { authService } from '@/services/authService';
 
 export default function LoginPage() {
@@ -10,15 +8,6 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
-    const { isAuthenticated } = useAuth();
-
-    // Redirect to admin if already authenticated (handles expired access token + valid refresh token case)
-    useEffect(() => {
-        if (isAuthenticated) {
-            router.push('/admin');
-        }
-    }, [isAuthenticated, router]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
