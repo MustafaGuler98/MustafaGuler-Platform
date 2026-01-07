@@ -1,4 +1,4 @@
-# MustafaGuler.Platform 🌱
+# MustafaGuler.Platform
 
 ![Status](https://img.shields.io/badge/Status-Under_Development_-orange)
 ![.NET](https://img.shields.io/badge/.NET-10-purple)
