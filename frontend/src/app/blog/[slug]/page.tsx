@@ -6,7 +6,9 @@ import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
-import DOMPurify from "isomorphic-dompurify";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { ARTICLE_MESSAGES } from "@/lib/Messages";
 
 export const dynamic = 'force-dynamic';
 
@@ -120,8 +122,19 @@ export default async function ArticlePage({ params }: PageProps) {
             prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:py-1
             prose-li:marker:text-primary
           "
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
-        />
+        >
+          {post.content?.trim() ? (
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {post.content}
+            </ReactMarkdown>
+          ) : (
+            <div className="border border-primary/20 bg-primary/5 p-6 rounded-lg text-center">
+              <p className="text-muted-foreground italic">
+                {ARTICLE_MESSAGES.NO_CONTENT}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Navigation Buttons */}
         <BottomNavButtons
