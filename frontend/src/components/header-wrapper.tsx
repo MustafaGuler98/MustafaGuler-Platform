@@ -6,8 +6,8 @@ import Header from "@/components/header";
 export default function HeaderWrapper() {
     const pathname = usePathname();
 
-    // Hide header on portal page
-    if (pathname === "/") {
+    // Hide header on portal page and admin pages
+    if (pathname === "/" || pathname.startsWith("/admin")) {
         return null;
     }
 
@@ -18,3 +18,4 @@ export default function HeaderWrapper() {
         </div>
     );
 }
+

@@ -70,7 +70,7 @@ namespace MustafaGuler.Service.Tests
             // First check: "test-article" -> Exists (True)
             // Second check: "test-article-1" -> Does not exist (False)
             _mockRepo.SetupSequence(x => x.AnyAsync(It.IsAny<Expression<Func<Article, bool>>>()))
-                     .ReturnsAsync(true)  
+                     .ReturnsAsync(true)
                      .ReturnsAsync(false);
 
             var result = await _articleService.AddAsync(articleDto);
@@ -223,7 +223,7 @@ namespace MustafaGuler.Service.Tests
         {
             // Arrange
             var updateDto = new ArticleUpdateDto { Id = Guid.NewGuid(), Title = "Any" };
-            
+
             _mockRepo.Setup(x => x.GetByIdAsync(updateDto.Id))
                      .ReturnsAsync((Article?)null);
 
@@ -248,7 +248,7 @@ namespace MustafaGuler.Service.Tests
                 IsDeleted = true
             };
             var updateDto = new ArticleUpdateDto { Id = _testArticleId, Title = "Any" };
-            
+
             _mockRepo.Setup(x => x.GetByIdAsync(_testArticleId))
                      .ReturnsAsync(deletedArticle);
 
@@ -376,24 +376,24 @@ namespace MustafaGuler.Service.Tests
         public async Task GetPagedListAsync_WhenNoArticles_ReturnsEmptyPage()
         {
             // Arrange
-            var paginationParams = new PaginationParams 
-            { 
-                PageNumber = TestConstants.Pagination.DefaultPageNumber, 
-                PageSize = TestConstants.Pagination.DefaultPageSize 
+            var queryParams = new ArticleQueryParams
+            {
+                PageNumber = TestConstants.Pagination.DefaultPageNumber,
+                PageSize = TestConstants.Pagination.DefaultPageSize
             };
 
             _mockRepo.Setup(x => x.GetPagedListAsync(
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(new PagedResult<Article>(new List<Article>(), 0, 1, 10));
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto>());
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -405,7 +405,7 @@ namespace MustafaGuler.Service.Tests
         public async Task GetPagedListAsync_WhenSinglePage_ReturnsAllArticles()
         {
             // Arrange
-            var paginationParams = new PaginationParams { PageNumber = 1, PageSize = 10 };
+            var queryParams = new ArticleQueryParams { PageNumber = 1, PageSize = 10 };
             var articles = new List<Article> { _testArticle };
             var pagedResult = new PagedResult<Article>(articles, 1, 1, 10);
 
@@ -413,14 +413,14 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto> { new ArticleListDto { Slug = TestConstants.Article.TestSlug } });
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -434,9 +434,9 @@ namespace MustafaGuler.Service.Tests
         public async Task GetPagedListAsync_WhenMultiplePages_ReturnsSecondPageCorrectly()
         {
             // Arrange
-            var paginationParams = new PaginationParams { PageNumber = 2, PageSize = TestConstants.Pagination.SmallPageSize };
-            var articles = new List<Article> 
-            { 
+            var queryParams = new ArticleQueryParams { PageNumber = 2, PageSize = TestConstants.Pagination.SmallPageSize };
+            var articles = new List<Article>
+            {
                 new Article { Id = Guid.NewGuid(), Title = "Article 6", Slug = "article-6" }
             };
             var pagedResult = new PagedResult<Article>(articles, 10, 2, TestConstants.Pagination.SmallPageSize);
@@ -445,14 +445,14 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto> { new ArticleListDto { Slug = "article-6" } });
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -466,9 +466,9 @@ namespace MustafaGuler.Service.Tests
         public async Task GetPagedListAsync_WithLanguageFilter_ReturnsOnlyTurkishArticles()
         {
             // Arrange
-            var paginationParams = new PaginationParams();
-            var articles = new List<Article> 
-            { 
+            var queryParams = new ArticleQueryParams { LanguageCode = TestConstants.Language.Turkish };
+            var articles = new List<Article>
+            {
                 new Article { Id = Guid.NewGuid(), Title = "Türkçe Makale", Slug = "turkce-makale", LanguageCode = TestConstants.Language.Turkish }
             };
             var pagedResult = new PagedResult<Article>(articles, 1, 1, 10);
@@ -477,14 +477,14 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto> { new ArticleListDto { Slug = "turkce-makale" } });
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams, TestConstants.Language.Turkish);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -493,17 +493,17 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.Is<Expression<Func<Article, bool>>>(expr => expr != null),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()), Times.Once);
+                It.IsAny<Expression<Func<Article, object?>>[]>()), Times.Once);
         }
 
         [Fact]
         public async Task GetPagedListAsync_WithCategoryFilter_FiltersCorrectly()
         {
             // Arrange
-            var paginationParams = new PaginationParams();
             var categoryId = Guid.NewGuid();
-            var articles = new List<Article> 
-            { 
+            var queryParams = new ArticleQueryParams { CategoryId = categoryId };
+            var articles = new List<Article>
+            {
                 new Article { Id = Guid.NewGuid(), Title = "Backend Article", Slug = "backend-article", CategoryId = categoryId }
             };
             var pagedResult = new PagedResult<Article>(articles, 1, 1, 10);
@@ -512,14 +512,14 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto> { new ArticleListDto { Slug = "backend-article" } });
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams, null, categoryId);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -528,22 +528,26 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.Is<Expression<Func<Article, bool>>>(expr => expr != null),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()), Times.Once);
+                It.IsAny<Expression<Func<Article, object?>>[]>()), Times.Once);
         }
 
         [Fact]
         public async Task GetPagedListAsync_WithBothFilters_CombinesFiltersCorrectly()
         {
             // Arrange
-            var paginationParams = new PaginationParams();
             var categoryId = Guid.NewGuid();
-            var articles = new List<Article> 
-            { 
-                new Article 
-                { 
-                    Id = Guid.NewGuid(), 
-                    Title = "Türkçe Backend", 
-                    Slug = "turkce-backend", 
+            var queryParams = new ArticleQueryParams
+            {
+                LanguageCode = TestConstants.Language.Turkish,
+                CategoryId = categoryId
+            };
+            var articles = new List<Article>
+            {
+                new Article
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Türkçe Backend",
+                    Slug = "turkce-backend",
                     LanguageCode = TestConstants.Language.Turkish,
                     CategoryId = categoryId
                 }
@@ -554,14 +558,14 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
                        .Returns(new List<ArticleListDto> { new ArticleListDto { Slug = "turkce-backend" } });
 
             // Act
-            var result = await _articleService.GetPagedListAsync(paginationParams, TestConstants.Language.Turkish, categoryId);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -578,10 +582,10 @@ namespace MustafaGuler.Service.Tests
         {
             // Arrange
             // This tests SlugHelper string sanitization, NOT database SQL injection protection.
-            var articleDto = new ArticleAddDto 
-            { 
-                Title = TestConstants.EdgeCase.SqlInjectionTitle, 
-                Content = "Content" 
+            var articleDto = new ArticleAddDto
+            {
+                Title = TestConstants.EdgeCase.SqlInjectionTitle,
+                Content = "Content"
             };
             var articleEntity = new Article { Title = articleDto.Title };
 
@@ -605,8 +609,8 @@ namespace MustafaGuler.Service.Tests
         {
             // Arrange
             // Backend does NOT sanitize HTML/XSS.
-            var articleDto = new ArticleAddDto 
-            { 
+            var articleDto = new ArticleAddDto
+            {
                 Title = "Test Article",
                 Content = TestConstants.EdgeCase.XssContent // "<script>alert('xss')</script>"
             };
@@ -629,10 +633,10 @@ namespace MustafaGuler.Service.Tests
         public async Task AddAsync_WhenTitleContainsEmoji_GeneratesCleanSlug()
         {
             // Arrange
-            var articleDto = new ArticleAddDto 
-            { 
+            var articleDto = new ArticleAddDto
+            {
                 Title = TestConstants.EdgeCase.EmojiTitle,
-                Content = "Content" 
+                Content = "Content"
             };
             var articleEntity = new Article { Title = articleDto.Title };
 
@@ -655,10 +659,10 @@ namespace MustafaGuler.Service.Tests
         public async Task AddAsync_WhenTitleIsTurkishWithSpecialChars_GeneratesCorrectSlug()
         {
             // Arrange
-            var articleDto = new ArticleAddDto 
-            { 
+            var articleDto = new ArticleAddDto
+            {
                 Title = TestConstants.EdgeCase.TurkishSpecialTitle,
-                Content = "Content" 
+                Content = "Content"
             };
             var articleEntity = new Article { Title = articleDto.Title };
 
@@ -685,7 +689,7 @@ namespace MustafaGuler.Service.Tests
 
             _mockMapper.Setup(m => m.Map<Article>(articleDto)).Returns(articleEntity);
             _mockCurrentUserService.Setup(x => x.UserId).Returns(Guid.NewGuid());
-            
+
             var callCount = 0;
             _mockRepo.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<Article, bool>>>()))
                      .ReturnsAsync(() =>
@@ -733,9 +737,9 @@ namespace MustafaGuler.Service.Tests
         public async Task GetPagedListAsync_WithNullLanguageAndCategory_ReturnsAllArticles()
         {
             // Arrange
-            var paginationParams = new PaginationParams();
-            var articles = new List<Article> 
-            { 
+            var queryParams = new ArticleQueryParams();
+            var articles = new List<Article>
+            {
                 new Article { Id = Guid.NewGuid(), Title = "Article 1", Slug = "article-1", LanguageCode = "tr" },
                 new Article { Id = Guid.NewGuid(), Title = "Article 2", Slug = "article-2", LanguageCode = "en" }
             };
@@ -745,18 +749,18 @@ namespace MustafaGuler.Service.Tests
                 It.IsAny<PaginationParams>(),
                 It.IsAny<Expression<Func<Article, bool>>>(),
                 It.IsAny<Func<IQueryable<Article>, IOrderedQueryable<Article>>>(),
-                It.IsAny<Expression<Func<Article, object>>[]>()))
+                It.IsAny<Expression<Func<Article, object?>>[]>()))
                 .ReturnsAsync(pagedResult);
 
             _mockMapper.Setup(m => m.Map<List<ArticleListDto>>(It.IsAny<List<Article>>()))
-                       .Returns(new List<ArticleListDto> 
-                       { 
+                       .Returns(new List<ArticleListDto>
+                       {
                            new ArticleListDto { Slug = "article-1" },
                            new ArticleListDto { Slug = "article-2" }
                        });
 
             // Act - Both filters are NULL
-            var result = await _articleService.GetPagedListAsync(paginationParams, null, null);
+            var result = await _articleService.GetPagedListAsync(queryParams);
 
             // Assert
             Assert.NotNull(result);
@@ -779,7 +783,7 @@ namespace MustafaGuler.Service.Tests
 
             _mockRepo.Setup(x => x.GetByIdAsync(_testArticleId))
                      .ReturnsAsync(_testArticle);
-            
+
             var callCount = 0;
             _mockRepo.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<Article, bool>>>()))
                      .ReturnsAsync(() =>

@@ -1,370 +1,224 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import Link from 'next/link';
+import { FileText, FolderTree, Image, Plus, Clock, Edit, Upload } from 'lucide-react';
+import { formatTerminalDateTime } from '@/lib/date-utils';
+import { Skeleton } from '@/components/admin/ui/Skeleton';
+import { articleAdminService, categoryAdminService, imageAdminService } from '@/services/admin';
+import type { AdminArticle, Category, ImageInfo, PagedResult } from '@/types/admin';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-
-// Types
-interface Article {
-    id: string;
-    title: string;
-    slug: string;
-    categoryName: string;
-    languageCode: string;
+interface Stats {
+    articles: number;
+    categories: number;
+    images: number;
 }
 
-interface Category {
-    id: string;
-    name: string;
-    slug: string;
-    description?: string;
+async function fetchStats(): Promise<Stats> {
+    const [articlesRes, categoriesRes, imagesRes] = await Promise.all([
+        articleAdminService.getPaged(1, 1),
+        categoryAdminService.getAll(),
+        imageAdminService.getPaged(1, 1),
+    ]);
+
+    return {
+        articles: articlesRes.totalCount || 0,
+        categories: (categoriesRes.data as Category[])?.length || 0,
+        images: imagesRes.totalCount || 0,
+    };
 }
 
-interface ImageInfo {
-    id: string;
-    fileName: string;
-    url: string;
-    sizeBytes: number;
-    createdDate: string;
-    contentType: string;
-    alt?: string;
-    title?: string;
-    uploadedByName?: string;
+async function fetchRecentArticles(): Promise<AdminArticle[]> {
+    const response = await articleAdminService.getPaged(1, 5);
+    if (!response.isSuccess) return [];
+    return response.data || [];
 }
 
-export default function AdminPage() {
-    const { isAuthenticated, logout } = useAuth();
-    const [message, setMessage] = useState('');
+async function fetchRecentImages(): Promise<ImageInfo[]> {
+    const response = await imageAdminService.getPaged(1, 5);
+    if (!response.isSuccess) return [];
+    return response.data || [];
+}
 
-    // Tab state
-    const [activeTab, setActiveTab] = useState<'articles' | 'categories' | 'images'>('articles');
-
-    // Articles state
-    const [articles, setArticles] = useState<Article[]>([]);
-    const [articleForm, setArticleForm] = useState({ title: '', content: '', categoryId: '', languageCode: 'tr', mainImage: '' });
-    const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
-
-    // Categories state
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [categoryForm, setCategoryForm] = useState({ name: '', description: '' });
-    const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-
-    // Images state
-    const [images, setImages] = useState<ImageInfo[]>([]);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imageName, setImageName] = useState('');
-
-    // Styles
-    const tabStyle = (active: boolean) => ({
-        padding: '10px 20px',
-        backgroundColor: active ? '#3b82f6' : '#1a1a2e',
-        color: 'white',
-        border: 'none',
-        cursor: 'pointer',
-        borderRadius: '4px 4px 0 0'
+export default function AdminDashboard() {
+    const { data: stats, isLoading: statsLoading } = useQuery({
+        queryKey: ['admin-stats'],
+        queryFn: fetchStats,
     });
 
-    const btnStyle = { padding: '6px 12px', marginRight: '5px', cursor: 'pointer', border: 'none', borderRadius: '4px' };
-    const inputStyle = { width: '100%', padding: '8px', marginBottom: '10px', fontSize: '14px' };
+    const { data: recentArticles } = useQuery({
+        queryKey: ['recent-articles'],
+        queryFn: fetchRecentArticles,
+    });
 
-    // API calls
-    const fetchArticles = async () => {
-        try {
-            const res = await fetch(`${API_URL}/articles/paged?pageSize=20`, {
-                credentials: 'include'
-            });
-            const data = await res.json();
-            setArticles(data.data || []);
-        } catch { setMessage('Failed to fetch articles'); }
-    };
+    const { data: recentImages } = useQuery({
+        queryKey: ['recent-images'],
+        queryFn: fetchRecentImages,
+    });
 
-    const fetchCategories = async () => {
-        try {
-            const res = await fetch(`${API_URL}/categories`, { credentials: 'include' });
-            const data = await res.json();
-            setCategories(data.data || []);
-        } catch { setMessage('Failed to fetch categories'); }
-    };
+    // Merge and sort recent activity (memoized for performance)
+    const recentActivity = useMemo(
+        () =>
+            [
+                ...(recentArticles || []).map((a) => ({
+                    type: 'article' as const,
+                    id: a.id,
+                    title: a.title,
+                    date: a.createdDate,
+                })),
+                ...(recentImages || []).map((i) => ({
+                    type: 'image' as const,
+                    id: i.id,
+                    title: i.fileName,
+                    date: i.createdDate,
+                })),
+            ]
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .slice(0, 8),
+        [recentArticles, recentImages]
+    );
 
-    const fetchImages = async () => {
-        try {
-            const res = await fetch(`${API_URL}/images?pageSize=20`, {
-                credentials: 'include'
-            });
-            const data = await res.json();
-            setImages(data.data || []);
-        } catch { setMessage('Failed to fetch images'); }
-    };
-
-    // Fetch data based on active tab
-    useEffect(() => {
-        if (isAuthenticated) {
-            if (activeTab === 'articles') {
-                fetchArticles();
-                fetchCategories();
-            }
-            if (activeTab === 'categories') fetchCategories();
-            if (activeTab === 'images') fetchImages();
-        }
-    }, [isAuthenticated, activeTab]);
-
-    // Article CRUD
-    const handleArticleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = editingArticleId ? `${API_URL}/articles/${editingArticleId}` : `${API_URL}/articles`;
-        const method = editingArticleId ? 'PUT' : 'POST';
-        const body = editingArticleId ? { ...articleForm, id: editingArticleId } : articleForm;
-
-        try {
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            setMessage(data.message || (res.ok ? 'Success' : 'Error'));
-            if (res.ok) {
-                setArticleForm({ title: '', content: '', categoryId: '', languageCode: 'tr', mainImage: '' });
-                setEditingArticleId(null);
-                fetchArticles();
-            }
-        } catch { setMessage('Network error'); }
-    };
-
-    const deleteArticle = async (id: string) => {
-        if (!confirm('Delete this article?')) return;
-        try {
-            const res = await fetch(`${API_URL}/articles/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            const data = await res.json();
-            setMessage(data.message);
-            fetchArticles();
-        } catch { setMessage('Delete failed'); }
-    };
-
-    const editArticle = async (id: string) => {
-        try {
-            const res = await fetch(`${API_URL}/articles/id/${id}`, {
-                credentials: 'include'
-            });
-            const data = await res.json();
-            if (data.data) {
-                setArticleForm({
-                    title: data.data.title,
-                    content: data.data.content,
-                    categoryId: data.data.categoryId || '',
-                    languageCode: data.data.languageCode,
-                    mainImage: data.data.mainImage || ''
-                });
-                setEditingArticleId(id);
-            }
-        } catch { setMessage('Failed to load article'); }
-    };
-
-    // Category CRUD
-    const handleCategorySubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const url = editingCategoryId ? `${API_URL}/categories/${editingCategoryId}` : `${API_URL}/categories`;
-        const method = editingCategoryId ? 'PUT' : 'POST';
-        const body = editingCategoryId ? { ...categoryForm, id: editingCategoryId } : categoryForm;
-
-        try {
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
-            setMessage(data.message || (res.ok ? 'Success' : 'Error'));
-            if (res.ok) {
-                setCategoryForm({ name: '', description: '' });
-                setEditingCategoryId(null);
-                fetchCategories();
-            }
-        } catch { setMessage('Network error'); }
-    };
-
-    const deleteCategory = async (id: string) => {
-        if (!confirm('Delete this category?')) return;
-        try {
-            const res = await fetch(`${API_URL}/categories/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            const data = await res.json();
-            setMessage(data.message);
-            fetchCategories();
-        } catch { setMessage('Delete failed'); }
-    };
-
-    const editCategory = (cat: Category) => {
-        setCategoryForm({ name: cat.name, description: cat.description || '' });
-        setEditingCategoryId(cat.id);
-    };
-
-    // Image upload/delete
-    const handleImageUpload = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!imageFile) return;
-
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        formData.append('customName', imageName);
-
-        try {
-            const res = await fetch(`${API_URL}/images/upload`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formData
-            });
-            const data = await res.json();
-            setMessage(data.message || (res.ok ? 'Uploaded' : 'Error'));
-            if (res.ok) {
-                setImageFile(null);
-                setImageName('');
-                fetchImages();
-            }
-        } catch (err: any) {
-            console.error(err);
-            setMessage(`Upload failed: ${err.message || 'Unknown error'}`);
-        }
-    };
-    const deleteImage = async (id: string) => {
-        if (!confirm('Delete this image?')) return;
-        try {
-            const res = await fetch(`${API_URL}/images/${id}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            const data = await res.json();
-            setMessage(data.message);
-            fetchImages();
-        } catch { setMessage('Delete failed'); }
-    };
-
-    // If not authenticated, we don't render anything (user should be redirected by middleware or just wait)
-    // Or we can show a "Not Authorized" message if middleware failed for some reason
-    if (!isAuthenticated) {
-        return null;
-    }
-
-    // Admin panel
     return (
-        <div style={{ maxWidth: '900px', margin: '20px auto', padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h1>Admin Panel</h1>
-                <button onClick={logout} style={{ ...btnStyle, backgroundColor: '#ef4444', color: 'white' }}>Logout</button>
-            </div>
+        <div className="space-y-6">
+            {/* HUD Stats Strip */}
+            <div className="flex items-center justify-between px-6 py-4 backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg">
+                <div className="flex items-center gap-8">
+                    {/* Articles */}
+                    <div className="flex items-center gap-3">
+                        <FileText size={16} className="text-cyan-neon" />
+                        <div>
+                            <span className="font-mono text-lg font-bold text-cyan-neon">
+                                {statsLoading ? <Skeleton className="w-8 h-5" /> : stats?.articles || 0}
+                            </span>
+                            <span className="ml-2 font-mono text-[10px] text-muted-foreground tracking-widest">
+                                ARTICLES
+                            </span>
+                        </div>
+                    </div>
 
-            {message && <div style={{ padding: '10px', backgroundColor: '#1a1a2e', marginBottom: '15px', borderRadius: '4px' }}>{message}</div>}
+                    <div className="h-6 w-px bg-white/10" />
 
-            {/* Tabs */}
-            <div style={{ marginBottom: '20px' }}>
-                <button style={tabStyle(activeTab === 'articles')} onClick={() => setActiveTab('articles')}>Articles</button>
-                <button style={tabStyle(activeTab === 'categories')} onClick={() => setActiveTab('categories')}>Categories</button>
-                <button style={tabStyle(activeTab === 'images')} onClick={() => setActiveTab('images')}>Images</button>
-            </div>
+                    {/* Categories */}
+                    <div className="flex items-center gap-3">
+                        <FolderTree size={16} className="text-primary" />
+                        <div>
+                            <span className="font-mono text-lg font-bold text-primary">
+                                {statsLoading ? <Skeleton className="w-8 h-5" /> : stats?.categories || 0}
+                            </span>
+                            <span className="ml-2 font-mono text-[10px] text-muted-foreground tracking-widest">
+                                CATEGORIES
+                            </span>
+                        </div>
+                    </div>
 
-            {/* Articles Tab */}
-            {activeTab === 'articles' && (
-                <div>
-                    <h2>{editingArticleId ? 'Edit Article' : 'Add Article'}</h2>
-                    <form onSubmit={handleArticleSubmit}>
-                        <input placeholder="Title" value={articleForm.title} onChange={e => setArticleForm({ ...articleForm, title: e.target.value })} required style={inputStyle} />
-                        <textarea placeholder="Content (Markdown)" value={articleForm.content} onChange={e => setArticleForm({ ...articleForm, content: e.target.value })} required style={{ ...inputStyle, height: '100px' }} />
-                        <select value={articleForm.categoryId} onChange={e => setArticleForm({ ...articleForm, categoryId: e.target.value })} required style={inputStyle}>
-                            <option value="">Select Category</option>
-                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                        </select>
-                        <select value={articleForm.languageCode} onChange={e => setArticleForm({ ...articleForm, languageCode: e.target.value })} style={inputStyle}>
-                            <option value="tr">TR</option>
-                            <option value="en">EN</option>
-                        </select>
-                        <input placeholder="Main Image URL" value={articleForm.mainImage} onChange={e => setArticleForm({ ...articleForm, mainImage: e.target.value })} style={inputStyle} />
-                        <button type="submit" style={{ ...btnStyle, backgroundColor: '#22c55e', color: 'white' }}>{editingArticleId ? 'Update' : 'Create'}</button>
-                        {editingArticleId && <button type="button" onClick={() => { setEditingArticleId(null); setArticleForm({ title: '', content: '', categoryId: '', languageCode: 'tr', mainImage: '' }); }} style={btnStyle}>Cancel</button>}
-                    </form>
+                    <div className="h-6 w-px bg-white/10" />
 
-                    <h3 style={{ marginTop: '20px' }}>Articles List</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead><tr><th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #333' }}>Title</th><th>Slug</th><th>Category</th><th>Lang</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            {articles.map(a => (
-                                <tr key={a.id}>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{a.title}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{a.slug}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{a.categoryName}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{a.languageCode}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>
-                                        <button onClick={() => editArticle(a.id)} style={{ ...btnStyle, backgroundColor: '#3b82f6', color: 'white' }}>Edit</button>
-                                        <button onClick={() => deleteArticle(a.id)} style={{ ...btnStyle, backgroundColor: '#ef4444', color: 'white' }}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* Categories Tab */}
-            {activeTab === 'categories' && (
-                <div>
-                    <h2>{editingCategoryId ? 'Edit Category' : 'Add Category'}</h2>
-                    <form onSubmit={handleCategorySubmit}>
-                        <input placeholder="Name" value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} required style={inputStyle} />
-                        <input placeholder="Description" value={categoryForm.description} onChange={e => setCategoryForm({ ...categoryForm, description: e.target.value })} style={inputStyle} />
-                        <button type="submit" style={{ ...btnStyle, backgroundColor: '#22c55e', color: 'white' }}>{editingCategoryId ? 'Update' : 'Create'}</button>
-                        {editingCategoryId && <button type="button" onClick={() => { setEditingCategoryId(null); setCategoryForm({ name: '', description: '' }); }} style={btnStyle}>Cancel</button>}
-                    </form>
-
-                    <h3 style={{ marginTop: '20px' }}>Categories List</h3>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <thead><tr><th style={{ textAlign: 'left', padding: '8px', borderBottom: '1px solid #333' }}>Name</th><th>Slug</th><th>Description</th><th>Actions</th></tr></thead>
-                        <tbody>
-                            {categories.map(c => (
-                                <tr key={c.id}>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{c.name}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{c.slug}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>{c.description}</td>
-                                    <td style={{ padding: '8px', borderBottom: '1px solid #333' }}>
-                                        <button onClick={() => editCategory(c)} style={{ ...btnStyle, backgroundColor: '#3b82f6', color: 'white' }}>Edit</button>
-                                        <button onClick={() => deleteCategory(c.id)} style={{ ...btnStyle, backgroundColor: '#ef4444', color: 'white' }}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* Images Tab */}
-            {activeTab === 'images' && (
-                <div>
-                    <h2>Upload Image</h2>
-                    <form onSubmit={handleImageUpload}>
-                        <input type="file" accept=".jpg,.jpeg,.png" onChange={e => setImageFile(e.target.files?.[0] || null)} required style={inputStyle} />
-                        <input placeholder="Custom name (without extension)" value={imageName} onChange={e => setImageName(e.target.value)} required style={inputStyle} />
-                        <button type="submit" style={{ ...btnStyle, backgroundColor: '#22c55e', color: 'white' }}>Upload</button>
-                    </form>
-
-                    <h3 style={{ marginTop: '20px' }}>Images List</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
-                        {images.map((img) => (
-                            <div key={img.id} style={{ border: '1px solid #333', padding: '10px', borderRadius: '4px' }}>
-                                <img src={`${API_URL?.replace('/api', '')}${img.url}`} alt={img.alt || ''} style={{ width: '100%', height: '100px', objectFit: 'cover' }} />
-                                <p style={{ fontSize: '12px', wordBreak: 'break-all' }}>{img.fileName}</p>
-                                <p style={{ fontSize: '10px', color: '#888' }}>{(img.sizeBytes / 1024).toFixed(1)} KB</p>
-                                <button onClick={() => deleteImage(img.id)} style={{ ...btnStyle, backgroundColor: '#ef4444', color: 'white', width: '100%' }}>Delete</button>
-                            </div>
-                        ))}
+                    {/* Images */}
+                    <div className="flex items-center gap-3">
+                        <Image size={16} className="text-secondary" />
+                        <div>
+                            <span className="font-mono text-lg font-bold text-secondary">
+                                {statsLoading ? <Skeleton className="w-8 h-5" /> : stats?.images || 0}
+                            </span>
+                            <span className="ml-2 font-mono text-[10px] text-muted-foreground tracking-widest">
+                                MEDIA_FILES
+                            </span>
+                        </div>
                     </div>
                 </div>
-            )}
+            </div>
+
+            {/* Main Content: 2/3 + 1/3 Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left: Recent Activity (2/3) */}
+                <div className="lg:col-span-2 backdrop-blur-sm bg-black/10 border border-white/5 rounded-lg p-5">
+                    <h2 className="font-mono text-xs text-primary tracking-widest mb-4 flex items-center gap-2">
+                        <Clock size={12} />
+                        RECENT_ACTIVITY
+                    </h2>
+
+                    {recentActivity.length === 0 ? (
+                        <p className="font-mono text-xs text-muted-foreground/50 py-8 text-center">
+                            No recent activity found...
+                        </p>
+                    ) : (
+                        <div className="space-y-1">
+                            {recentActivity.map((item) => (
+                                <Link
+                                    key={`${item.type}-${item.id}`}
+                                    href={
+                                        item.type === 'article'
+                                            ? `/admin/articles/${item.id}`
+                                            : '/admin/images'
+                                    }
+                                    className="flex items-center gap-3 px-3 py-2 rounded border border-transparent hover:border-cyan-neon/20 hover:bg-cyan-neon/5 transition-all group"
+                                >
+                                    <span className="font-mono text-[10px] text-muted-foreground/60">
+                                        {formatTerminalDateTime(item.date)}
+                                    </span>
+                                    {item.type === 'article' ? (
+                                        <Edit size={12} className="text-cyan-neon/60" />
+                                    ) : (
+                                        <Upload size={12} className="text-secondary/60" />
+                                    )}
+                                    <span className="font-mono text-sm text-foreground/80 group-hover:text-cyan-neon transition-colors truncate">
+                                        {item.title}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Right: Quick Actions (1/3) */}
+                <div className="backdrop-blur-sm bg-black/10 border border-white/5 rounded-lg p-5">
+                    <h2 className="font-mono text-xs text-primary tracking-widest mb-4">
+                        QUICK_ACTIONS
+                    </h2>
+
+                    <div className="space-y-2">
+                        <Link
+                            href="/admin/articles/new"
+                            className="flex items-center gap-3 px-4 py-3 rounded border border-white/10 hover:border-cyan-neon/30 hover:bg-cyan-neon/5 transition-all group"
+                        >
+                            <Plus
+                                size={14}
+                                className="text-muted-foreground group-hover:text-cyan-neon transition-colors"
+                            />
+                            <span className="font-mono text-xs text-muted-foreground tracking-wider group-hover:text-cyan-neon transition-colors">
+                                NEW_ARTICLE
+                            </span>
+                        </Link>
+
+                        <Link
+                            href="/admin/images/upload"
+                            className="flex items-center gap-3 px-4 py-3 rounded border border-white/10 hover:border-cyan-neon/30 hover:bg-cyan-neon/5 transition-all group"
+                        >
+                            <Plus
+                                size={14}
+                                className="text-muted-foreground group-hover:text-cyan-neon transition-colors"
+                            />
+                            <span className="font-mono text-xs text-muted-foreground tracking-wider group-hover:text-cyan-neon transition-colors">
+                                UPLOAD_MEDIA
+                            </span>
+                        </Link>
+
+                        <Link
+                            href="/admin/categories/new"
+                            className="flex items-center gap-3 px-4 py-3 rounded border border-white/10 hover:border-cyan-neon/30 hover:bg-cyan-neon/5 transition-all group"
+                        >
+                            <Plus
+                                size={14}
+                                className="text-muted-foreground group-hover:text-cyan-neon transition-colors"
+                            />
+                            <span className="font-mono text-xs text-muted-foreground tracking-wider group-hover:text-cyan-neon transition-colors">
+                                ADD_CATEGORY
+                            </span>
+                        </Link>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

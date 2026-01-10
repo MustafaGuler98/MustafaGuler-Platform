@@ -103,15 +103,21 @@ namespace MustafaGuler.Service.Services
             }
         }
 
-        public async Task<PagedResult<ImageInfoDto>> GetPagedAsync(PaginationParams paginationParams, string? searchTerm = null)
+        public async Task<PagedResult<ImageInfoDto>> GetPagedAsync(ImageQueryParams queryParams)
         {
             Expression<Func<Image, bool>> filter = x => !x.IsDeleted;
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrEmpty(queryParams.Search))
             {
-                var lowerSearch = searchTerm.ToLower();
+                var lowerSearch = queryParams.Search.ToLower();
                 filter = x => !x.IsDeleted && x.FileName.ToLower().Contains(lowerSearch);
             }
+
+            var paginationParams = new PaginationParams
+            {
+                PageNumber = queryParams.PageNumber,
+                PageSize = queryParams.PageSize
+            };
 
             var pagedResult = await _repository.GetPagedListAsync(
                 paginationParams,

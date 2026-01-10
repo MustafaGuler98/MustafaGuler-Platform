@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Article } from "@/types/article";
-import { Calendar, Search, Activity, ChevronRight, Zap } from "lucide-react";
+import { Calendar, Search, Activity, ChevronRight, Zap, X } from "lucide-react";
 import { cn, formatCardDate } from "@/lib/utils";
 
 interface GroupedArticles {
@@ -78,18 +78,34 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
               placeholder="Search logs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent border border-white/100 rounded-md py-2.5 pl-10 pr-4 text-xs font-mono
+              className="w-full bg-transparent border border-white/100 rounded-md py-2.5 pl-10 pr-10 text-xs font-mono
                               text-foreground placeholder-muted-foreground/50 
                               transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(34,211,238,0.3)]"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-3 flex items-center text-muted-foreground/50 hover:text-foreground transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
 
         <div className="relative min-h-[300px]">
           <div className="absolute left-[23px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary via-purple-900/40 to-transparent opacity-80"></div>
           {years.length === 0 ? (
-            <div className="pl-16 pt-8 text-destructive font-mono text-sm">
-              [WARNING]: No logs found. Please check database connection.
+            <div className="pl-16 pt-8 font-mono text-sm">
+              {searchQuery ? (
+                <span className="text-muted-foreground">[INFO]: No logs found matching "{searchQuery}"</span>
+              ) : safeArticles.length === 0 ? (
+                <span className="text-destructive">[WARNING]: No logs found. Please check database connection.</span>
+              ) : (
+                <span className="text-muted-foreground">[INFO]: No logs match your search criteria.</span>
+              )}
             </div>
           ) : (
             years.map((year) => (

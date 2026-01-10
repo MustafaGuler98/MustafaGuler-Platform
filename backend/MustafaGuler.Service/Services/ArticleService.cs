@@ -6,6 +6,7 @@ using MustafaGuler.Core.Entities;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
+using MustafaGuler.Service.Extensions;
 using System.Linq.Expressions;
 
 namespace MustafaGuler.Service.Services
@@ -51,24 +52,33 @@ namespace MustafaGuler.Service.Services
             return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
         }
 
-        public async Task<PagedResult<ArticleListDto>> GetPagedListAsync(PaginationParams paginationParams, string? languageCode = null, Guid? categoryId = null)
+        public async Task<PagedResult<ArticleListDto>> GetPagedListAsync(ArticleQueryParams queryParams)
         {
+            // TODO: Consider migrating to the 'Specification Pattern'.
             Expression<Func<Article, bool>> filterExpression = x =>
                 !x.IsDeleted
-                && (string.IsNullOrEmpty(languageCode) || x.LanguageCode == languageCode)
-                && (!categoryId.HasValue || x.CategoryId == categoryId);
+                && (string.IsNullOrEmpty(queryParams.LanguageCode) || x.LanguageCode == queryParams.LanguageCode)
+                && (!queryParams.CategoryId.HasValue || x.CategoryId == queryParams.CategoryId)
+                && (string.IsNullOrEmpty(queryParams.SearchTerm) || x.Title.ToLower().Contains(queryParams.SearchTerm.ToLower()));
+
+            Func<IQueryable<Article>, IOrderedQueryable<Article>> orderBy = q => q.ApplySorting(queryParams);
+
+            var paginationParams = new PaginationParams
+            {
+                PageNumber = queryParams.PageNumber,
+                PageSize = queryParams.PageSize
+            };
 
             var pagedEntities = await _repository.GetPagedListAsync(
-                paginationParams, 
-                filterExpression, 
-                q => q.OrderByDescending(x => x.CreatedDate),
-                x => x.Category, 
+                paginationParams,
+                filterExpression,
+                orderBy,
+                x => x.Category,
                 x => x.User
             );
-            
-            var dtos = _mapper.Map<List<ArticleListDto>>(pagedEntities.Data);
 
-            return new PagedResult<ArticleListDto>(dtos, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            var dtoList = _mapper.Map<List<ArticleListDto>>(pagedEntities.Data);
+            return new PagedResult<ArticleListDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
         }
 
         public async Task<Result<IEnumerable<ArticleListDto>>> GetPopularAsync(int count = 9, string? languageCode = null)

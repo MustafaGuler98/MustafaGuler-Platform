@@ -10,14 +10,14 @@ namespace MustafaGuler.Service.Mapping
         {
             // CreateMap<Source, Destination>
             CreateMap<Article, ArticleListDto>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.Name))
-                .ForMember(dest => dest.Author, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.User != null ? $"{src.User.FirstName} {src.User.LastName}" : "Unknown"))
                 .ForMember(dest => dest.MainImage, opt => opt.MapFrom(src => src.MainImage ?? "/assets/images/default-article.png"));
 
 
             CreateMap<Article, ArticleDetailDto>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.Name))
-                .ForMember(dest => dest.Author, opt => opt.MapFrom(src => $"{src.User.FirstName} {src.User.LastName}"))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.User != null ? $"{src.User.FirstName} {src.User.LastName}" : "Unknown"))
                 .ForMember(dest => dest.MainImage, opt => opt.MapFrom(src => src.MainImage ?? "/assets/images/default-article.png"));
 
             // Allows converting DTO back to Entity

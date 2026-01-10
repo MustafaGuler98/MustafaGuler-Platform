@@ -44,17 +44,9 @@ namespace MustafaGuler.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> GetPaged(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20,
-            [FromQuery] string? search = null)
+        public async Task<IActionResult> GetPaged([FromQuery] ImageQueryParams queryParams)
         {
-            var paginationParams = new PaginationParams
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-            var result = await _imageService.GetPagedAsync(paginationParams, search);
+            var result = await _imageService.GetPagedAsync(queryParams);
             return CreateActionResultInstance(result);
         }
 

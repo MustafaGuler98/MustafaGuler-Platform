@@ -24,7 +24,11 @@ export async function fetchApi<T>(
     }
 
     try {
-        const response = await fetch(`${API_URL}${endpoint}`, options);
+        
+        const response = await fetch(`${API_URL}${endpoint}`, {
+            credentials: 'include',
+            ...options,
+        });
         const json = await response.json();
 
         // Backend returns standard Result<T> structure
@@ -38,6 +42,44 @@ export async function fetchApi<T>(
 export const apiClient = {
     get<T>(endpoint: string, options?: RequestInit): Promise<ServiceResponse<T>> {
         return fetchApi<T>(endpoint, { ...options, method: 'GET' });
+    },
+
+    async getPagedRaw<T>(endpoint: string, options?: RequestInit): Promise<import('@/types/admin').PagedResponse<T>> {
+        if (!API_URL) {
+            return {
+                isSuccess: false,
+                message: 'API URL is not configured',
+                statusCode: 500,
+                errors: ['API URL is not configured'],
+                data: [],
+                totalCount: 0,
+                pageNumber: 1,
+                pageSize: 10,
+                totalPages: 0,
+            };
+        }
+
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                credentials: 'include',
+                ...options,
+                method: 'GET',
+            });
+            return response.json();
+        } catch (error) {
+            console.error('[API Client Error]', error);
+            return {
+                isSuccess: false,
+                message: 'Network error or server unavailable',
+                statusCode: 500,
+                errors: ['Network error'],
+                data: [],
+                totalCount: 0,
+                pageNumber: 1,
+                pageSize: 10,
+                totalPages: 0,
+            };
+        }
     },
 
     post<T>(endpoint: string, body: unknown, options?: RequestInit): Promise<ServiceResponse<T>> {

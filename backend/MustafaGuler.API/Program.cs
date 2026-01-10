@@ -51,6 +51,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.ConfigureForwardedHeaders();
+builder.Services.ConfigureRateLimiting();
+
 var app = builder.Build();
 
 await app.SeedAdminUserAsync();
@@ -71,7 +74,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
+app.UseForwardedHeaders();
 app.UseCors("AllowFrontend");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

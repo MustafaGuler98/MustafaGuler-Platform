@@ -15,7 +15,7 @@ namespace MustafaGuler.Repository.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
-        protected readonly AppDbContext _context; 
+        protected readonly AppDbContext _context;
         private readonly DbSet<T> _dbSet;
 
         public GenericRepository(AppDbContext context)
@@ -123,6 +123,8 @@ namespace MustafaGuler.Repository.Repositories
             return new PagedResult<T>(data, totalCount, paginationParams.PageNumber, paginationParams.PageSize);
         }
 
+
+
         // Remove and Update are synchronous, they just modify the state of the entity
         public void Remove(T entity)
         {
@@ -134,9 +136,6 @@ namespace MustafaGuler.Repository.Repositories
             _dbSet.Update(entity);
         }
 
-        public IQueryable<T> Where(Expression<Func<T, bool>> expression)
-        {
-            return _dbSet.Where(expression);
-        }
+
     }
 }

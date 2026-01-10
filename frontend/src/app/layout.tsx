@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Image from "next/image";
 import HeaderWrapper from "@/components/header-wrapper";
-import Footer from "@/components/footer";
+import FooterWrapper from "@/components/footer-wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   Inter,
@@ -114,7 +114,7 @@ export default function RootLayout({
           <main className="min-h-screen bg transparent relative z-10">
             {children}
           </main>
-          <Footer />
+          <FooterWrapper />
         </ThemeProvider>
       </body>
     </html>

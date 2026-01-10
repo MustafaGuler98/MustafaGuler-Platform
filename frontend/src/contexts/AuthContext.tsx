@@ -3,8 +3,14 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface User {
+    email: string;
+    role: string;
+}
+
 interface AuthContextType {
     isAuthenticated: boolean;
+    user: User | null;
     logout: () => Promise<void>;
 }
 
@@ -25,8 +31,26 @@ function getCookie(name: string): string | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [user, setUser] = useState<User | null>(null);
     const router = useRouter();
     const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    const fetchUser = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_URL}/auth/me`, {
+                credentials: 'include',
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data);
+                setIsAuthenticated(true);
+            } else {
+                setUser(null);
+            }
+        } catch {
+            setUser(null);
+        }
+    }, []);
 
     // Refresh token and schedule next refresh
     const refreshSession = useCallback(async () => {
@@ -39,15 +63,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (response.ok) {
                 setIsAuthenticated(true);
                 scheduleRefresh();
+                fetchUser();
             } else {
                 setIsAuthenticated(false);
+                setUser(null);
                 clearScheduledRefresh();
             }
         } catch {
             setIsAuthenticated(false);
+            setUser(null);
             clearScheduledRefresh();
         }
-    }, []);
+    }, [fetchUser]);
 
     // Schedule next refresh based on tokenExpiresAt cookie
     const scheduleRefresh = useCallback(() => {
@@ -80,12 +107,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Initial session validation and timer setup
     useEffect(() => {
-        const initializeAuth = () => {
+        const initializeAuth = async () => {
             const expiresAtStr = getCookie('tokenExpiresAt');
 
             if (!expiresAtStr) {
                 // No token, try to refresh (maybe refreshToken cookie exists)
-                refreshSession();
+                await refreshSession();
                 return;
             }
 
@@ -96,15 +123,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Token still valid, just set authenticated and schedule refresh
                 setIsAuthenticated(true);
                 scheduleRefresh();
+                fetchUser(); 
             } else {
                 // Token expired, try to refresh with refreshToken
-                refreshSession();
+                await refreshSession();
             }
         };
 
         initializeAuth();
         return () => clearScheduledRefresh();
-    }, [refreshSession, scheduleRefresh]);
+    }, [refreshSession, scheduleRefresh, fetchUser]);
 
     const logout = async () => {
         clearScheduledRefresh();
@@ -117,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error('Logout error:', error);
         } finally {
             setIsAuthenticated(false);
+            setUser(null);
             router.push('/admin/login');
             router.refresh();
         }
@@ -126,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         <AuthContext.Provider
             value={{
                 isAuthenticated,
+                user,
                 logout,
             }}
         >

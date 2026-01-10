@@ -7,7 +7,8 @@ using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Parameters;
 using MustafaGuler.Core.Utilities.Results;
 
-namespace MustafaGuler.Core.Interfaces {
+namespace MustafaGuler.Core.Interfaces
+{
 
     public interface IGenericRepository<T> where T : BaseEntity
     {
@@ -23,7 +24,7 @@ namespace MustafaGuler.Core.Interfaces {
         Task<bool> AnyAsync(Expression<Func<T, bool>> expression);
         Task<T?> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object?>>[] includes);
         Task<T?> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, params Expression<Func<T, object?>>[] includes);
-        
+
         Task<PagedResult<T>> GetPagedListAsync(
             PaginationParams paginationParams,
             Expression<Func<T, bool>>? filter = null,

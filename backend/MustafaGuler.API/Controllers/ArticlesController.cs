@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Parameters;
 using MustafaGuler.Core.Entities;
@@ -28,10 +29,10 @@ namespace MustafaGuler.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet("paged")]
-        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string? languageCode = null, [FromQuery] Guid? categoryId = null)
+        [EnableRateLimiting("SearchPolicy")]
+        public async Task<IActionResult> GetPaged([FromQuery] ArticleQueryParams queryParams)
         {
-            var paginationParams = new PaginationParams { PageNumber = pageNumber, PageSize = pageSize };
-            var result = await _articleService.GetPagedListAsync(paginationParams, languageCode, categoryId);
+            var result = await _articleService.GetPagedListAsync(queryParams);
             return CreateActionResultInstance(result);
         }
 
@@ -71,7 +72,7 @@ namespace MustafaGuler.API.Controllers
         {
             if (id != articleUpdateDto.Id)
                 return BadRequest("Id mismatch");
-            
+
             var result = await _articleService.UpdateAsync(articleUpdateDto);
             return CreateActionResultInstance(result);
         }
