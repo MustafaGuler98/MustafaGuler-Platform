@@ -155,15 +155,29 @@ namespace MustafaGuler.Service.Services
             if (image == null || image.IsDeleted)
                 return Result.Failure(404, Messages.ImageNotFound);
 
-            string filePath = Path.Combine(_env.WebRootPath, "uploads", "articles", image.FileName);
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+
+            string sourcePath = Path.Combine(_env.WebRootPath, "uploads", "articles", image.FileName);
+            string deletedFolderPath = Path.Combine(_env.WebRootPath, "uploads", "deleted");
+            string destinationPath = Path.Combine(deletedFolderPath, image.FileName);
 
             image.IsDeleted = true;
             image.UpdatedDate = DateTime.UtcNow;
 
             _repository.Update(image);
             await _unitOfWork.CommitAsync();
+
+            if (File.Exists(sourcePath))
+            {
+                if (!Directory.Exists(deletedFolderPath))
+                    Directory.CreateDirectory(deletedFolderPath);
+
+                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(image.FileName);
+                var extension = Path.GetExtension(image.FileName);
+                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+                destinationPath = Path.Combine(deletedFolderPath, $"{fileNameWithoutExt}_{timestamp}{extension}");
+
+                File.Move(sourcePath, destinationPath);
+            }
 
             return Result.Success(200, Messages.ImageDeleted);
         }
