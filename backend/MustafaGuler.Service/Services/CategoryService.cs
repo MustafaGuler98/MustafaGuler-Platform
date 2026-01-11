@@ -23,9 +23,9 @@ namespace MustafaGuler.Service.Services
         private const string OtherCategorySlug = "other";
 
         public CategoryService(
-            IGenericRepository<Category> repository, 
+            IGenericRepository<Category> repository,
             IGenericRepository<Article> articleRepository,
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             IMapper mapper)
         {
             _repository = repository;
@@ -52,11 +52,22 @@ namespace MustafaGuler.Service.Services
             return Result<CategoryDto>.Success(categoryDto);
         }
 
+        public async Task<Result<CategoryDto>> GetBySlugAsync(string slug)
+        {
+            var category = await _repository.GetAsync(c => c.Slug == slug);
+            if (category == null)
+            {
+                return Result<CategoryDto>.Failure(404, Messages.CategoryNotFound);
+            }
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return Result<CategoryDto>.Success(categoryDto);
+        }
+
         public async Task<Result> AddAsync(CategoryAddDto categoryAddDto)
         {
             var category = _mapper.Map<Category>(categoryAddDto);
             category.Id = Guid.NewGuid();
-            category.Slug = SlugHelper.GenerateSlug(categoryAddDto.Name);
+            category.Slug = await GenerateUniqueSlugAsync(categoryAddDto.Name);
             category.CreatedDate = DateTime.UtcNow;
 
             await _repository.AddAsync(category);
@@ -76,7 +87,11 @@ namespace MustafaGuler.Service.Services
             category.Name = categoryUpdateDto.Name;
             category.Description = categoryUpdateDto.Description ?? category.Description;
             category.ParentId = categoryUpdateDto.ParentId;
-            category.Slug = SlugHelper.GenerateSlug(categoryUpdateDto.Name);
+
+            if (category.Slug != SlugHelper.GenerateSlug(categoryUpdateDto.Name))
+            {
+                category.Slug = await GenerateUniqueSlugAsync(categoryUpdateDto.Name, category.Id);
+            }
             category.UpdatedDate = DateTime.UtcNow;
 
             _repository.Update(category);
@@ -119,7 +134,7 @@ namespace MustafaGuler.Service.Services
         private async Task<Category> GetOrCreateOtherCategoryAsync()
         {
             var otherCategory = await _repository.GetAsync(c => c.Slug == OtherCategorySlug);
-            
+
             if (otherCategory == null)
             {
                 otherCategory = new Category
@@ -134,6 +149,20 @@ namespace MustafaGuler.Service.Services
             }
 
             return otherCategory;
+        }
+
+        private async Task<string> GenerateUniqueSlugAsync(string title, Guid? excludeId = null)
+        {
+            var baseSlug = SlugHelper.GenerateSlug(title);
+            var slug = baseSlug;
+            int counter = 1;
+
+            while (await _repository.AnyAsync(x => x.Slug == slug && (!excludeId.HasValue || x.Id != excludeId.Value)))
+            {
+                slug = $"{baseSlug}-{counter}";
+                counter++;
+            }
+            return slug;
         }
     }
 }

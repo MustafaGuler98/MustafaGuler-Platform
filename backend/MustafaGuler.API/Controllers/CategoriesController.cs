@@ -32,6 +32,13 @@ namespace MustafaGuler.API.Controllers
             return CreateActionResultInstance(result);
         }
 
+        [HttpGet("slug/{slug}")]
+        public async Task<IActionResult> GetBySlug(string slug)
+        {
+            var result = await _categoryService.GetBySlugAsync(slug);
+            return CreateActionResultInstance(result);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] CategoryAddDto categoryAddDto)
@@ -46,7 +53,7 @@ namespace MustafaGuler.API.Controllers
         {
             if (id != categoryUpdateDto.Id)
                 return BadRequest("Id mismatch");
-            
+
             var result = await _categoryService.UpdateAsync(categoryUpdateDto);
             return CreateActionResultInstance(result);
         }

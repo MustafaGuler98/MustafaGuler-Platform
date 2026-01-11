@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Save, FolderTree, Trash2 } from 'lucide-react';
 import { categoryAdminService } from '@/services/admin';
-import { useResourceById, useUpdateResource, useDeleteResource } from '@/hooks/admin';
+import { useResourceBySlug, useUpdateResource, useDeleteResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage, LoadingState } from '@/components/admin/layout';
 import { CyberButton } from '@/components/admin/ui/CyberButton';
 import { TerminalInput } from '@/components/admin/ui/TerminalInput';
@@ -14,7 +14,7 @@ import type { Category } from '@/types/admin';
 
 export default function EditCategoryPage() {
     const params = useParams();
-    const id = params.id as string;
+    const slug = params.slug as string;
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -24,10 +24,10 @@ export default function EditCategoryPage() {
         description: '',
     });
 
-    const { data: category, isLoading } = useResourceById<Category>(
+    const { data: category, isLoading } = useResourceBySlug<Category>(
         'category',
-        id,
-        (id) => categoryAdminService.getById(id)
+        slug,
+        (slug) => categoryAdminService.getBySlug(slug)
     );
 
     useEffect(() => {
@@ -62,7 +62,10 @@ export default function EditCategoryPage() {
     };
 
     const handleConfirmDelete = () => {
-        deleteMutation.mutate(id);
+        // We use ID for deletion to avoid issues with slug changes
+        if (form.id) {
+            deleteMutation.mutate(form.id);
+        }
     };
 
     if (isLoading) {
@@ -85,7 +88,7 @@ export default function EditCategoryPage() {
                 backHref="/admin/categories"
                 icon={<FolderTree size={14} className="text-primary" />}
                 title="EDIT_CATEGORY"
-                subtitle={`ID: ${id.substring(0, 8)}...`}
+                subtitle={`/${slug}`}
                 action={
                     <CyberButton
                         variant="danger"

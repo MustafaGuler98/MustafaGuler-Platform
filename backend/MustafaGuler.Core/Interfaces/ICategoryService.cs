@@ -10,6 +10,7 @@ namespace MustafaGuler.Core.Interfaces
     {
         Task<Result<IEnumerable<CategoryDto>>> GetAllAsync();
         Task<Result<CategoryDto>> GetByIdAsync(Guid id);
+        Task<Result<CategoryDto>> GetBySlugAsync(string slug);
         Task<Result> AddAsync(CategoryAddDto categoryAddDto);
         Task<Result> UpdateAsync(CategoryUpdateDto categoryUpdateDto);
         Task<Result> DeleteAsync(Guid id);

@@ -40,3 +40,23 @@ export function useResourceById<T>(
         ...options,
     });
 }
+// Generic hook for fetching a single resource by Slug
+export function useResourceBySlug<T>(
+    resourceName: string,
+    slug: string | undefined,
+    fetchFn: (slug: string) => Promise<ServiceResponse<T>>,
+    options?: Omit<UseQueryOptions<T, Error>, 'queryKey' | 'queryFn'>
+) {
+    return useQuery({
+        queryKey: [resourceName, slug],
+        queryFn: async () => {
+            const response = await fetchFn(slug!);
+            if (!response.isSuccess) {
+                throw new Error(response.message || 'Resource not found');
+            }
+            return response.data;
+        },
+        enabled: !!slug,
+        ...options,
+    });
+}

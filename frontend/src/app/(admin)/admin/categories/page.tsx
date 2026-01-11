@@ -106,9 +106,9 @@ export default function CategoriesPage() {
                     data={categories}
                     isLoading={isLoading}
                     emptyMessage="NO_CATEGORIES_FOUND"
-                    onRowClick={(row) => (window.location.href = `/admin/categories/${row.id}`)}
+                    onRowClick={(row) => (window.location.href = `/admin/categories/${row.slug}`)}
                     actions={(row) => (
-                        <Link href={`/admin/categories/${row.id}`}>
+                        <Link href={`/admin/categories/${row.slug}`}>
                             <CyberButton
                                 variant="primary"
                                 size="sm"
