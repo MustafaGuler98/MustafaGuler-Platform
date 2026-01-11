@@ -1,0 +1,210 @@
+/* Markdown Editor Styles to match the theme */
+
+.markdown-editor-wrapper .EasyMDEContainer {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* Toolbar */
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button {
+    color: var(--muted-foreground) !important;
+    border: none !important;
+    background: transparent !important;
+    transition: all 0.2s ease;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button:hover {
+    color: var(--cyan-neon) !important;
+    background: rgba(34, 211, 238, 0.1) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar button.active {
+    color: var(--primary) !important;
+    background: rgba(147, 51, 234, 0.15) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-toolbar i.separator {
+    border-left-color: var(--border) !important;
+    border-right-color: transparent !important;
+}
+
+/* Editor Area (CodeMirror) */
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror {
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+    border: none !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-cursor {
+    border-left-color: var(--cyan-neon) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-selected {
+    background: rgba(147, 51, 234, 0.3) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-header {
+    color: var(--primary) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-strong {
+    color: var(--foreground) !important;
+    font-weight: 700;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-em {
+    color: var(--secondary) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-link {
+    color: var(--cyan-neon) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-url {
+    color: var(--muted-foreground) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-code .cm-quote {
+    color: var(--muted-foreground) !important;
+    font-style: italic;
+}
+
+/* Placeholder */
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror .CodeMirror-placeholder {
+    color: var(--muted-foreground) !important;
+    opacity: 0.6;
+}
+
+/* Preview Pane */
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side {
+    background: var(--card) !important;
+    color: var(--foreground) !important;
+    border-left: 1px solid var(--border) !important;
+    padding: 2rem !important;
+    font-family: var(--font-sans);
+    line-height: 1.8;
+}
+
+/* Simulate Tailwind Typography (prose) in Preview */
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview h1,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side h1 {
+    font-size: 2.25rem;
+    margin-top: 0;
+    margin-bottom: 0.8888889em;
+    line-height: 1.1111111;
+    color: var(--foreground) !important;
+    font-family: var(--font-heading);
+    font-weight: 800;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview h2,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side h2 {
+    font-size: 1.5rem;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    line-height: 1.3333333;
+    color: var(--foreground) !important;
+    font-family: var(--font-heading);
+    font-weight: 700;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview h3,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side h3 {
+    font-size: 1.25rem;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+    line-height: 1.6;
+    color: var(--foreground) !important;
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview p,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side p {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    color: rgba(226, 232, 240, 0.85) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview a,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side a {
+    color: var(--primary) !important;
+    text-decoration: none;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview a:hover,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side a:hover {
+    color: var(--cyan-neon) !important;
+    text-decoration: underline;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview code,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side code {
+    background: rgba(147, 51, 234, 0.1) !important;
+    color: var(--cyan-neon) !important;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview pre,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side pre {
+    background: #0f0518 !important;
+    border: 1px solid rgba(147, 51, 234, 0.2) !important;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-top: 1.7142857em;
+    margin-bottom: 1.7142857em;
+    overflow-x: auto;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview blockquote,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side blockquote {
+    border-left: 4px solid var(--primary) !important;
+    background: rgba(147, 51, 234, 0.05) !important;
+    padding: 0.5rem 1.5rem;
+    margin: 1.6em 0;
+    color: var(--muted-foreground) !important;
+    font-style: italic;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview img,
+.markdown-editor-wrapper .EasyMDEContainer .editor-preview-side img {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    margin: 2em auto;
+    display: block;
+}
+
+/* Fullscreen Mode */
+.markdown-editor-wrapper .EasyMDEContainer.fullscreen {
+    z-index: 9999;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer.fullscreen .editor-toolbar {
+    background: var(--card) !important;
+}
+
+.markdown-editor-wrapper .EasyMDEContainer.fullscreen .CodeMirror {
+    background: var(--background) !important;
+}
+
+/* Scrollbar styling for editor */
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-vscrollbar,
+.markdown-editor-wrapper .EasyMDEContainer .CodeMirror-hscrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}

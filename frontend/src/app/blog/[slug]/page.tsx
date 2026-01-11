@@ -119,7 +119,7 @@ export default async function ArticlePage({ params }: PageProps) {
             prose-strong:text-foreground prose-strong:font-semibold
             prose-code:text-cyan-400 prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
             prose-pre:bg-[#0f0518] prose-pre:border prose-pre:border-primary/20
-            prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:py-1
+            prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:pl-6 prose-blockquote:py-4 prose-blockquote:italic prose-blockquote:text-muted-foreground
             prose-li:marker:text-primary
           "
         >
