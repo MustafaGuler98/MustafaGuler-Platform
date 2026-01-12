@@ -49,6 +49,14 @@ namespace MustafaGuler.API.Extensions
                     opt.Window = TimeSpan.FromMinutes(1);
                     opt.AutoReplenishment = true;
                 });
+                
+                // Contact Form Policy: 20 per day (Spam protection)
+                options.AddFixedWindowLimiter("ContactPolicy", opt =>
+                {
+                    opt.PermitLimit = 20;
+                    opt.Window = TimeSpan.FromDays(1);
+                    opt.AutoReplenishment = true;
+                });
             });
 
             return services;

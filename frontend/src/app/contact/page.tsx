@@ -21,7 +21,7 @@ export default function ContactPage() {
         allowPromo: false,
     });
     const [errors, setErrors] = useState<FormErrors>({});
-    const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
+    const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
     const [copied, setCopied] = useState(false);
 
     const validate = (): boolean => {
@@ -58,9 +58,26 @@ export default function ContactPage() {
         if (!validate()) return;
 
         setStatus("submitting");
-        setTimeout(() => {
+        
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+            const response = await fetch(`${API_URL}/contact`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                setStatus("success");
+                setFormData({ name: "", email: "", subject: "", message: "", allowPromo: false });
+            } else {
+                setStatus("error");
+            }
+        } catch {
             setStatus("error");
-        }, 2000);
+        }
     };
 
     const copyToClipboard = () => {
@@ -270,18 +287,24 @@ export default function ContactPage() {
                                 disabled={status === "submitting"}
                                 className={cn(
                                     "w-full mt-2 h-10 text-sm font-bold tracking-widest relative overflow-hidden transition-all duration-300 rounded-sm font-mono",
-                                    status === "error"
-                                        ? "bg-red-500/10 text-red-500 border-red-500 border hover:bg-red-500/20"
-                                        : status === "submitting"
-                                            ? "bg-cyan-neon text-black border-cyan-neon border shadow-[0_0_20px_rgba(34,211,238,0.4)]"
-                                            : "bg-primary text-primary-foreground hover:bg-cyan-neon hover:text-black hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] border border-transparent hover:border-cyan-neon/50"
+                                    status === "success"
+                                        ? "bg-green-500/20 text-green-400 border-green-500 border cursor-default"
+                                        : status === "error"
+                                            ? "bg-red-500/10 text-red-500 border-red-500 border hover:bg-red-500/20"
+                                            : status === "submitting"
+                                                ? "bg-cyan-neon text-black border-cyan-neon border shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+                                                : "bg-primary text-primary-foreground hover:bg-cyan-neon hover:text-black hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] border border-transparent hover:border-cyan-neon/50"
                                 )}
                             >
                                 {status === "submitting" ? (
                                     <span className="animate-pulse">TRANSMITTING...</span>
+                                ) : status === "success" ? (
+                                    <span className="flex items-center gap-2">
+                                        <CheckCircle2 className="w-4 h-4" /> MESSAGE SENT
+                                    </span>
                                 ) : status === "error" ? (
                                     <span className="flex items-center gap-2">
-                                        <AlertTriangle className="w-4 h-4" /> ERROR :: 418
+                                        <AlertTriangle className="w-4 h-4" /> TRANSMISSION FAILED
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">

@@ -22,6 +22,8 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAuthCookieService, AuthCookieService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IMailService, MailManager>();
+            services.AddScoped<IContactService, ContactService>();
 
             return services;
         }
