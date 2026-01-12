@@ -47,13 +47,11 @@ export default function ArticlesPage() {
                 sortConfig.key,
                 sortConfig.direction
             );
-            if (!response.isSuccess) {
+            if (!response.isSuccess || !response.data) {
                 throw new Error(response.message || 'Failed to fetch articles');
             }
-            return {
-                items: response.data,
-                totalPages: response.totalPages ?? 1,
-            };
+            
+            return response.data;
         },
     });
 

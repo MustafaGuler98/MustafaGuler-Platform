@@ -23,22 +23,22 @@ async function fetchStats(): Promise<Stats> {
     ]);
 
     return {
-        articles: articlesRes.totalCount || 0,
+        articles: articlesRes.data?.totalCount || 0,
         categories: (categoriesRes.data as Category[])?.length || 0,
-        images: imagesRes.totalCount || 0,
+        images: imagesRes.data?.totalCount || 0,
     };
 }
 
 async function fetchRecentArticles(): Promise<AdminArticle[]> {
     const response = await articleAdminService.getPaged(1, 5);
     if (!response.isSuccess) return [];
-    return response.data || [];
+    return response.data?.items || [];
 }
 
 async function fetchRecentImages(): Promise<ImageInfo[]> {
     const response = await imageAdminService.getPaged(1, 5);
     if (!response.isSuccess) return [];
-    return response.data || [];
+    return response.data?.items || [];
 }
 
 export default function AdminDashboard() {

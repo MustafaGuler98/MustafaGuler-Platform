@@ -32,7 +32,7 @@ namespace MustafaGuler.API.Controllers
         public async Task<IActionResult> GetPaged([FromQuery] PaginationParams paginationParams)
         {
             var result = await _contactService.GetPagedListAsync(paginationParams);
-            return Ok(result);
+            return CreateActionResultInstance(result);
         }
 
         [Authorize(Roles = "Admin")]

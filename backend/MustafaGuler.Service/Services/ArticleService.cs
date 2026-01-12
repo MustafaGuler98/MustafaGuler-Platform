@@ -52,7 +52,7 @@ namespace MustafaGuler.Service.Services
             return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
         }
 
-        public async Task<PagedResult<ArticleListDto>> GetPagedListAsync(ArticleQueryParams queryParams)
+        public async Task<Result<PagedResult<ArticleListDto>>> GetPagedListAsync(ArticleQueryParams queryParams)
         {
             // TODO: Consider migrating to the 'Specification Pattern'.
             Expression<Func<Article, bool>> filterExpression = x =>
@@ -77,8 +77,9 @@ namespace MustafaGuler.Service.Services
                 x => x.User
             );
 
-            var dtoList = _mapper.Map<List<ArticleListDto>>(pagedEntities.Data);
-            return new PagedResult<ArticleListDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            var dtoList = _mapper.Map<List<ArticleListDto>>(pagedEntities.Items);
+            var pagedResult = new PagedResult<ArticleListDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            return Result<PagedResult<ArticleListDto>>.Success(pagedResult);
         }
 
         public async Task<Result<IEnumerable<ArticleListDto>>> GetPopularAsync(int count = 9, string? languageCode = null)

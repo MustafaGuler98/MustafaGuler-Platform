@@ -397,8 +397,9 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Empty(result.Data);
-            Assert.Equal(0, result.TotalCount);
+            Assert.True(result.IsSuccess);
+            Assert.Empty(result.Data!.Items);
+            Assert.Equal(0, result.Data.TotalCount);
         }
 
         [Fact]
@@ -424,10 +425,11 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result.Data);
-            Assert.Equal(1, result.TotalCount);
-            Assert.Equal(1, result.PageNumber);
-            Assert.Equal(10, result.PageSize);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Data!.Items);
+            Assert.Equal(1, result.Data.TotalCount);
+            Assert.Equal(1, result.Data.PageNumber);
+            Assert.Equal(10, result.Data.PageSize);
         }
 
         [Fact]
@@ -456,10 +458,11 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result.Data);
-            Assert.Equal(10, result.TotalCount);
-            Assert.Equal(2, result.PageNumber);
-            Assert.Equal(TestConstants.Pagination.SmallPageSize, result.PageSize);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Data!.Items);
+            Assert.Equal(10, result.Data.TotalCount);
+            Assert.Equal(2, result.Data.PageNumber);
+            Assert.Equal(TestConstants.Pagination.SmallPageSize, result.Data.PageSize);
         }
 
         [Fact]
@@ -488,7 +491,8 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result.Data);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Data!.Items);
             _mockRepo.Verify(x => x.GetPagedListAsync(
                 It.IsAny<PaginationParams>(),
                 It.Is<Expression<Func<Article, bool>>>(expr => expr != null),
@@ -523,7 +527,8 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result.Data);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Data!.Items);
             _mockRepo.Verify(x => x.GetPagedListAsync(
                 It.IsAny<PaginationParams>(),
                 It.Is<Expression<Func<Article, bool>>>(expr => expr != null),
@@ -569,8 +574,9 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result.Data);
-            Assert.Equal("turkce-backend", result.Data[0].Slug);
+            Assert.True(result.IsSuccess);
+            Assert.Single(result.Data!.Items);
+            Assert.Equal("turkce-backend", result.Data.Items[0].Slug);
         }
 
         #endregion
@@ -764,8 +770,9 @@ namespace MustafaGuler.Service.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Data.Count);
-            Assert.Equal(2, result.TotalCount);
+            Assert.True(result.IsSuccess);
+            Assert.Equal(2, result.Data!.Items.Count);
+            Assert.Equal(2, result.Data.TotalCount);
         }
 
         [Fact]

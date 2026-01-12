@@ -17,6 +17,8 @@ import { CyberButton } from '@/components/admin/ui/CyberButton';
 import { CyberTable } from '@/components/admin/ui/CyberTable';
 import { formatTerminalDate } from '@/lib/date-utils';
 
+import { PagedResult } from '@/types/admin';
+
 interface ContactMessage {
     id: string;
     senderName: string;
@@ -35,14 +37,17 @@ export default function ContactPage() {
     const { data, isLoading, error } = useQuery({
         queryKey: ['contact-messages', page, pageSize],
         queryFn: async () => {
-            const response = await apiClient.getPagedRaw<ContactMessage>(
+            const response = await apiClient.get<PagedResult<ContactMessage>>(
                 `/contact/paged?pageNumber=${page}&pageSize=${pageSize}`
             );
-            return response;
+            if (!response.isSuccess) {
+                throw new Error(response.message || 'Failed to fetch messages');
+            }
+            return response.data;
         },
     });
 
-    const messages = data?.data ?? [];
+    const messages = data?.items ?? [];
     const totalPages = data?.totalPages ?? 1;
 
     return (

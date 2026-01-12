@@ -1,5 +1,5 @@
 import { BaseAdminService } from './baseAdminService';
-import { ImageInfo, ServiceResponse, PagedResult, PagedResponse } from '@/types/admin';
+import { ImageInfo, ServiceResponse, PagedResult } from '@/types/admin';
 import { apiClient } from '@/lib/api-client';
 
 const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || '/api';
@@ -13,8 +13,8 @@ class ImageAdminService extends BaseAdminService<ImageInfo> {
     async getPaged(
         page: number,
         pageSize: number
-    ): Promise<PagedResponse<ImageInfo>> {
-        return apiClient.getPagedRaw<ImageInfo>(
+    ): Promise<ServiceResponse<PagedResult<ImageInfo>>> {
+        return apiClient.get<PagedResult<ImageInfo>>(
             `/images?pageNumber=${page}&pageSize=${pageSize}`
         );
     }

@@ -55,7 +55,7 @@ namespace MustafaGuler.Service.Services
             return Result.Success(201, "Your message has been received. Thank you for contacting us!");
         }
 
-        public async Task<PagedResult<ContactMessageListDto>> GetPagedListAsync(PaginationParams paginationParams)
+        public async Task<Result<PagedResult<ContactMessageListDto>>> GetPagedListAsync(PaginationParams paginationParams)
         {
             var pagedEntities = await _repository.GetPagedListAsync(
                 paginationParams,
@@ -63,8 +63,9 @@ namespace MustafaGuler.Service.Services
                 orderBy: q => q.OrderByDescending(x => x.CreatedDate)
             );
 
-            var dtoList = _mapper.Map<List<ContactMessageListDto>>(pagedEntities.Data);
-            return new PagedResult<ContactMessageListDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            var dtoList = _mapper.Map<List<ContactMessageListDto>>(pagedEntities.Items);
+            var pagedResult = new PagedResult<ContactMessageListDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            return Result<PagedResult<ContactMessageListDto>>.Success(pagedResult);
         }
 
         public async Task<Result<ContactMessageDetailDto>> GetByIdAsync(Guid id)

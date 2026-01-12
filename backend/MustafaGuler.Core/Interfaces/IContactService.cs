@@ -7,7 +7,7 @@ namespace MustafaGuler.Core.Interfaces
     public interface IContactService
     {
         Task<Result> SubmitContactFormAsync(CreateContactMessageDto dto, string? clientIp);
-        Task<PagedResult<ContactMessageListDto>> GetPagedListAsync(PaginationParams paginationParams);
+        Task<Result<PagedResult<ContactMessageListDto>>> GetPagedListAsync(PaginationParams paginationParams);
         Task<Result<ContactMessageDetailDto>> GetByIdAsync(Guid id);
         Task<Result<IEnumerable<SubscriberDto>>> GetSubscribersAsync();
     }

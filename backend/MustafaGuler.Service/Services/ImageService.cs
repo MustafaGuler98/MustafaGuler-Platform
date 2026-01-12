@@ -103,7 +103,7 @@ namespace MustafaGuler.Service.Services
             }
         }
 
-        public async Task<PagedResult<ImageInfoDto>> GetPagedAsync(ImageQueryParams queryParams)
+        public async Task<Result<PagedResult<ImageInfoDto>>> GetPagedAsync(ImageQueryParams queryParams)
         {
             Expression<Func<Image, bool>> filter = x => !x.IsDeleted;
 
@@ -126,9 +126,9 @@ namespace MustafaGuler.Service.Services
                 x => x.UploadedBy!
             );
 
-            var dtos = _mapper.Map<List<ImageInfoDto>>(pagedResult.Data);
-
-            return new PagedResult<ImageInfoDto>(dtos, pagedResult.TotalCount, pagedResult.PageNumber, pagedResult.PageSize);
+            var dtos = _mapper.Map<List<ImageInfoDto>>(pagedResult.Items);
+            var result = new PagedResult<ImageInfoDto>(dtos, pagedResult.TotalCount, pagedResult.PageNumber, pagedResult.PageSize);
+            return Result<PagedResult<ImageInfoDto>>.Success(result);
         }
 
         public async Task<Result<ImageInfoDto>> UpdateAsync(Guid id, ImageUpdateDto dto)

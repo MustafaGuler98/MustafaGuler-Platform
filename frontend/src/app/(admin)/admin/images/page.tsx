@@ -36,13 +36,11 @@ export default function ImagesPage() {
         queryKey: ['images', page, pageSize],
         queryFn: async () => {
             const response = await imageAdminService.getPaged(page, pageSize);
-            if (!response.isSuccess) {
+            if (!response.isSuccess || !response.data) {
                 throw new Error(response.message || 'Failed to fetch images');
             }
-            return {
-                items: response.data,
-                totalPages: response.totalPages ?? 1,
-            };
+
+            return response.data;
         },
     });
 

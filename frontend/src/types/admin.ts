@@ -28,20 +28,17 @@ export interface ImageInfo {
     createdDate: string;
 }
 
-export interface PagedResponse<T> {
-    isSuccess: boolean;
-    message: string | null;
-    statusCode: number;
-    errors: string[] | null;
-    data: T[];  // Items array - from Result<List<T>>
+export interface PagedResult<T> {
+    items: T[];              // (renamed from 'data')
     totalCount: number;
     pageNumber: number;
     pageSize: number;
     totalPages: number;
+    hasPrevious: boolean;
+    hasNext: boolean;
 }
 
-// Legacy alias for backward compatibility
-export type PagedResult<T> = PagedResponse<T>;
+
 
 export interface SortConfig {
     key: string;

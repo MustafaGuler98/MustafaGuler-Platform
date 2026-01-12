@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { ServiceResponse, PagedResponse } from '@/types/admin';
+import { ServiceResponse, PagedResult } from '@/types/admin';
 
 export class BaseAdminService<T> {
     constructor(protected resourceName: string) { }
@@ -30,7 +30,7 @@ export class BaseAdminService<T> {
         searchTerm?: string,
         sortBy?: string,
         sortOrder: 'asc' | 'desc' = 'desc'
-    ): Promise<PagedResponse<T>> {
+    ): Promise<ServiceResponse<PagedResult<T>>> {
         const params = new URLSearchParams({
             pageNumber: page.toString(),
             pageSize: pageSize.toString(),
@@ -40,7 +40,7 @@ export class BaseAdminService<T> {
         if (sortBy) params.append('sortBy', sortBy);
         params.append('sortOrder', sortOrder);
 
-        return apiClient.getPagedRaw<T>(
+        return apiClient.get<PagedResult<T>>(
             `/${this.resourceName}/paged?${params.toString()}`
         );
     }
