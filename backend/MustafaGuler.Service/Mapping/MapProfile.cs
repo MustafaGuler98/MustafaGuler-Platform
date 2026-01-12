@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MustafaGuler.Core.DTOs;
+using MustafaGuler.Core.DTOs.Contact;
 using MustafaGuler.Core.Entities;
 
 namespace MustafaGuler.Service.Mapping
@@ -41,6 +42,15 @@ namespace MustafaGuler.Service.Mapping
                         : null));
 
             CreateMap<ImageUpdateDto, Image>();
+
+            // Contact Message mappings
+            CreateMap<ContactMessage, ContactMessageListDto>()
+                .ForMember(dest => dest.MessagePreview, opt => opt.MapFrom(src =>
+                    src.MessageBody.Length > 100 ? src.MessageBody.Substring(0, 100) + "..." : src.MessageBody));
+
+            CreateMap<ContactMessage, ContactMessageDetailDto>();
+
+            CreateMap<ContactMessage, SubscriberDto>();
         }
     }
 }

@@ -13,7 +13,9 @@ import {
     LogOut,
     ChevronRight,
     Grid,
-    Settings
+    Settings,
+    Mail,
+    Users
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -21,15 +23,17 @@ interface NavItemProps {
     icon: React.ReactNode;
     label: string;
     isActive: boolean;
+    indent?: boolean;
 }
 
-function NavItem({ href, icon, label, isActive }: NavItemProps) {
+function NavItem({ href, icon, label, isActive, indent }: NavItemProps) {
     return (
         <Link
             href={href}
             className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded transition-all duration-300',
                 'font-mono text-xs tracking-widest uppercase',
+                indent && 'ml-4 text-[10px]',
                 isActive
                     ? 'bg-cyan-neon/10 text-cyan-neon border-l-2 border-cyan-neon shadow-[0_0_15px_rgba(34,211,238,0.2)]'
                     : 'text-muted-foreground hover:text-foreground hover:bg-card/50 hover:border-l-2 hover:border-primary/50'
@@ -51,6 +55,8 @@ export function AdminSidebar() {
         { href: '/admin/articles', icon: <FileText size={16} />, label: 'ARTICLES' },
         { href: '/admin/categories', icon: <FolderTree size={16} />, label: 'CATEGORIES' },
         { href: '/admin/images', icon: <Image size={16} />, label: 'IMAGES' },
+        { href: '/admin/contact', icon: <Mail size={16} />, label: 'CONTACT' },
+        { href: '/admin/contact/subscribers', icon: <Users size={16} />, label: 'SUBSCRIBERS', indent: true },
     ];
 
     const footerItems = [
@@ -96,6 +102,7 @@ export function AdminSidebar() {
                         icon={item.icon}
                         label={item.label}
                         isActive={isActive(item.href)}
+                        indent={'indent' in item ? item.indent : undefined}
                     />
                 ))}
             </nav>
