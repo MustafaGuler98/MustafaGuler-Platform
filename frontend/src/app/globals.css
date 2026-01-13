@@ -122,6 +122,19 @@
 }
 
 
+/* UTILITIES */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+
 /* HOLOGRAPHIC TERMINAL BUTTON                  */
 .holo-terminal-btn {
   position: relative;
@@ -506,4 +519,19 @@
   50% {
     background-position: 100% center;
   }
+}
+
+/* TECH SCAN ANIMATION */
+@keyframes tech-scan {
+  0% {
+    left: -33%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+.animate-tech-scan {
+  animation: tech-scan 1.8s linear infinite;
 }

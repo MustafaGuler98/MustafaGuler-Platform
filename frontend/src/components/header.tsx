@@ -14,12 +14,17 @@ export default function Header() {
   const pathname = usePathname();
   const scrollDirection = useScrollDirection();
   const [scrolled, setScrolled] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
 
   // Check if page is scrolled to add background blur/opacity styling
+  // Also track if we're at the very top (to always show header)
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const scrollY = window.scrollY;
+      setScrolled(scrollY > 20);
+      setIsAtTop(scrollY < 50); // Consider "at top" if within first 50px
     };
+    handleScroll(); // Run once on mount to set initial state
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -58,8 +63,8 @@ export default function Header() {
     <header
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-500 border-b",
-        // Smart Scroll Logic: Hide on down (translate-y-full), Show on up (translate-y-0)
-        scrollDirection === "down" ? "-translate-y-full" : "translate-y-0",
+        // Smart Scroll Logic: Always show at top, hide on down when scrolled, show on up
+        isAtTop || scrollDirection !== "down" ? "translate-y-0" : "-translate-y-full",
         // Visual Logic: Transparent at top, Glassmorphism + Border when scrolled
         scrolled
           ? "bg-background/80 backdrop-blur-md border-primary/20 shadow-[0_4px_30px_-10px_rgba(0,0,0,0.5)]"
