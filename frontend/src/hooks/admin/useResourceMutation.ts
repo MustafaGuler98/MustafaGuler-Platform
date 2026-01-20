@@ -2,16 +2,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { ServiceResponse } from '@/types/admin';
 
-interface MutationConfig {
-    onSuccessRedirect?: string;
+interface MutationConfig<TData = any> {
+    onSuccessRedirect?: string | ((data: TData) => string);
     invalidateQueries?: string[];
+    onSuccess?: (data: TData) => void;
 }
 
 // Generic hook for creating a resource with automatic cache invalidation
 export function useCreateResource<TData, TVariables = Partial<TData>>(
     resourceName: string,
     createFn: (data: TVariables) => Promise<ServiceResponse<TData>>,
-    config?: MutationConfig
+    config?: MutationConfig<TData>
 ) {
     const router = useRouter();
     const queryClient = useQueryClient();
@@ -24,14 +25,22 @@ export function useCreateResource<TData, TVariables = Partial<TData>>(
             }
             return response.data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             const queriesToInvalidate = config?.invalidateQueries || [resourceName];
             queriesToInvalidate.forEach((query) => {
                 queryClient.invalidateQueries({ queryKey: [query] });
             });
 
+            if (config?.onSuccess) {
+                config.onSuccess(data);
+            }
+
             if (config?.onSuccessRedirect) {
-                router.push(config.onSuccessRedirect);
+                if (typeof config.onSuccessRedirect === 'function') {
+                    router.replace(config.onSuccessRedirect(data));
+                } else {
+                    router.replace(config.onSuccessRedirect);
+                }
             }
         },
     });
@@ -53,14 +62,18 @@ export function useUpdateResource<TData>(
             }
             return response.data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             const queriesToInvalidate = config?.invalidateQueries || [resourceName];
             queriesToInvalidate.forEach((query) => {
                 queryClient.invalidateQueries({ queryKey: [query] });
             });
 
             if (config?.onSuccessRedirect) {
-                router.push(config.onSuccessRedirect);
+                if (typeof config.onSuccessRedirect === 'function') {
+                    router.replace(config.onSuccessRedirect(data));
+                } else {
+                    router.replace(config.onSuccessRedirect);
+                }
             }
         },
     });
@@ -88,7 +101,11 @@ export function useDeleteResource(
             });
 
             if (config?.onSuccessRedirect) {
-                router.push(config.onSuccessRedirect);
+                if (typeof config.onSuccessRedirect === 'function') {
+                    router.replace((config.onSuccessRedirect as any)());
+                } else {
+                    router.replace(config.onSuccessRedirect);
+                }
             }
         },
     });

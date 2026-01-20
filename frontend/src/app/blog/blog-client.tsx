@@ -7,14 +7,18 @@ import { Article } from "@/types/article";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Sparkles, Calendar, ArrowRight, Zap, Database, Folder, Filter, Quote, Book, Film, Music } from "lucide-react";
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { sidebarData, getRandomItem } from "@/data/sidebar-data";
+import { BlogQuoteWidget, BlogBookWidget, BlogFilmWidget, BlogMusicWidget } from "@/components/blog/widgets/SidebarWidgets";
+import { BlogHeaderStats } from "@/components/blog/widgets/BlogHeaderStats";
+
+import type { ArchivesStats } from '@/types/archives';
 
 interface BlogClientProps {
     articles: Article[];
     popularArticles: Article[];
+    stats: ArchivesStats | null;
 }
 
-export default function BlogClient({ articles, popularArticles }: BlogClientProps) {
+export default function BlogClient({ articles, popularArticles, stats }: BlogClientProps) {
     const [mounted, setMounted] = useState(false);
 
     const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
@@ -104,49 +108,8 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                         </h1>
                     </div>
 
-                    {/* Right side stats - Horizontal 5 items */}
-                    <div className="hidden xl:flex items-end gap-6 mt-auto pt-6">
-                        <div className="flex flex-col items-center">
-                            <div className="font-mono text-[10px] text-gray-500 tracking-wider uppercase">
-                                Articles
-                            </div>
-                            <div className="text-2xl font-bold font-heading text-cyan-400/70">
-                                {articles.length}
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <div className="font-mono text-[10px] text-gray-500 tracking-wider uppercase">
-                                Movies
-                            </div>
-                            <div className="text-2xl font-bold font-heading text-purple-400/70">
-                                0
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <div className="font-mono text-[10px] text-gray-500 tracking-wider uppercase">
-                                Books
-                            </div>
-                            <div className="text-2xl font-bold font-heading text-amber-400/70">
-                                0
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <div className="font-mono text-[10px] text-gray-500 tracking-wider uppercase">
-                                Songs
-                            </div>
-                            <div className="text-2xl font-bold font-heading text-pink-400/70">
-                                0
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center">
-                            <div className="font-mono text-[10px] text-gray-500 tracking-wider uppercase">
-                                Quotes
-                            </div>
-                            <div className="text-2xl font-bold font-heading text-slate-400/70">
-                                0
-                            </div>
-                        </div>
-                    </div>
+                    {/* Right side stats - API based */}
+                    <BlogHeaderStats articleCount={articles.length} stats={stats} />
                 </div>
 
                 {/* Popular Carousel Section */}
@@ -367,77 +330,11 @@ export default function BlogClient({ articles, popularArticles }: BlogClientProp
                                 </button>
                             </div>
 
-                            {/* Quote */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-xs font-mono text-slate-400 tracking-widest uppercase">
-                                    <Quote className="w-3 h-3" />
-                                    <span>Quote</span>
-                                </div>
-                                {(() => {
-                                    const quote = getRandomItem(sidebarData.quotes);
-                                    return (
-                                        <div className="p-4 rounded-lg border border-cyan-500/30 bg-slate-900/40 backdrop-blur-sm shadow-[0_0_15px_rgba(34,211,238,0.08)]">
-                                            <p className="font-mono text-[11px] text-gray-300 leading-relaxed italic">
-                                                "{quote.text}"
-                                            </p>
-                                            <p className="font-mono text-[9px] text-slate-400/60 mt-2 text-right">
-                                                — {quote.author}
-                                            </p>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-
-                            {/* Book of the Month */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-xs font-mono text-amber-400 tracking-widest uppercase">
-                                    <Book className="w-3 h-3" />
-                                    <span>Book of the Month</span>
-                                </div>
-                                {(() => {
-                                    const book = getRandomItem(sidebarData.books);
-                                    return (
-                                        <div className="p-3 rounded-lg border border-amber-500/15 bg-amber-950/10">
-                                            <p className="font-mono text-[11px] text-gray-200 font-medium">{book.title}</p>
-                                            <p className="font-mono text-[9px] text-amber-400/60">{book.author}</p>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-
-                            {/* Film of the Week */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-xs font-mono text-purple-400 tracking-widest uppercase">
-                                    <Film className="w-3 h-3" />
-                                    <span>Film of the Week</span>
-                                </div>
-                                {(() => {
-                                    const film = getRandomItem(sidebarData.films);
-                                    return (
-                                        <div className="p-3 rounded-lg border border-purple-500/15 bg-purple-950/10">
-                                            <p className="font-mono text-[11px] text-gray-200 font-medium">{film.title}</p>
-                                            <p className="font-mono text-[9px] text-purple-400/60">{film.year}</p>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-
-                            {/* Song of the Day */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-xs font-mono text-pink-400 tracking-widest uppercase">
-                                    <Music className="w-3 h-3" />
-                                    <span>Song of the Day</span>
-                                </div>
-                                {(() => {
-                                    const song = getRandomItem(sidebarData.songs);
-                                    return (
-                                        <div className="p-3 rounded-lg border border-pink-500/15 bg-pink-950/10">
-                                            <p className="font-mono text-[11px] text-gray-200 font-medium">{song.title}</p>
-                                            <p className="font-mono text-[9px] text-pink-400/60">{song.artist}</p>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
+                            {/* API-based Widgets */}
+                            <BlogQuoteWidget />
+                            <BlogBookWidget />
+                            <BlogFilmWidget />
+                            <BlogMusicWidget />
 
                         </div>
                     </div>

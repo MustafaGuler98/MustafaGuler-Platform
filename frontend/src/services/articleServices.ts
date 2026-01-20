@@ -36,7 +36,7 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
     const query = params.toString() ? `?${params.toString()}` : '';
-    const response = await apiClient.get<Article[]>(`/articles${query}`, { cache: 'no-store' });
+    const response = await apiClient.get<Article[]>(`/articles/all${query}`, { cache: 'no-store' });
 
     if (!response.isSuccess) {
       throw new ApiError(

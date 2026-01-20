@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
+import { CyberSearchInput } from '@/components/ui/cyber/CyberSearchInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { ReactNode } from 'react';
 
 interface AdminPageHeaderProps {
     backHref?: string;
     icon: ReactNode;
     title: string;
-    subtitle: string;
+    subtitle?: string;
     action?: ReactNode;
 }
 
@@ -38,9 +39,11 @@ export function AdminPageHeader({
                         <h1 className="font-mono text-base text-foreground tracking-wide">
                             {title}
                         </h1>
-                        <p className="font-mono text-[10px] text-muted-foreground/60 tracking-widest">
-                            {subtitle}
-                        </p>
+                        {subtitle && (
+                            <p className="font-mono text-[10px] text-muted-foreground/60 tracking-widest">
+                                {subtitle}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { imageAdminService } from '@/services/admin';
 import { AdminPageHeader, ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { TerminalInput } from '@/components/admin/ui/TerminalInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberInput } from '@/components/ui/cyber/CyberInput';
 
 export default function UploadImagePage() {
     const router = useRouter();
@@ -19,6 +19,7 @@ export default function UploadImagePage() {
     const [customName, setCustomName] = useState('');
     const [preview, setPreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [validationError, setValidationError] = useState<string | null>(null);
 
     const mutation = useMutation({
         mutationFn: async (formData: FormData) => {
@@ -35,6 +36,14 @@ export default function UploadImagePage() {
     });
 
     const handleFileSelect = (selectedFile: File) => {
+        setValidationError(null);
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validTypes.includes(selectedFile.type)) {
+            setValidationError('Only JPG and PNG files are allowed.');
+            return;
+        }
+
         setFile(selectedFile);
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -89,7 +98,7 @@ export default function UploadImagePage() {
                 subtitle="ADD_TO_MEDIA"
             />
 
-            <ErrorMessage error={mutation.error} />
+            <ErrorMessage error={mutation.error || (validationError ? new Error(validationError) : null)} />
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-8">
                 {/* Drop Zone */}
@@ -111,7 +120,7 @@ export default function UploadImagePage() {
                     <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".jpg,.jpeg,.png,.gif,.webp"
+                        accept=".jpg,.jpeg,.png"
                         onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                         className="hidden"
                     />
@@ -139,7 +148,7 @@ export default function UploadImagePage() {
                                 DROP_FILE_OR_CLICK
                             </p>
                             <p className="font-mono text-[9px] text-muted-foreground/40 mt-1">
-                                JPG, PNG, GIF, WEBP
+                                JPG, PNG ONLY
                             </p>
                         </>
                     )}
@@ -147,7 +156,7 @@ export default function UploadImagePage() {
 
                 {file && (
                     <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-5">
-                        <TerminalInput
+                        <CyberInput
                             label="CUSTOM_NAME"
                             value={customName}
                             onChange={(e) => setCustomName(e.target.value)}

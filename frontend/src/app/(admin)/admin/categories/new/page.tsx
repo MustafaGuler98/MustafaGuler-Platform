@@ -6,13 +6,14 @@ import { Save, FolderTree } from 'lucide-react';
 import { categoryAdminService } from '@/services/admin';
 import { useCreateResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { TerminalInput } from '@/components/admin/ui/TerminalInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberInput } from '@/components/ui/cyber/CyberInput';
 import type { CategoryFormData } from '@/types/admin';
 
 export default function NewCategoryPage() {
     const [form, setForm] = useState<CategoryFormData>({
         name: '',
+        slug: '',
         description: '',
     });
 
@@ -33,22 +34,34 @@ export default function NewCategoryPage() {
                 backHref="/admin/categories"
                 icon={<FolderTree size={14} className="text-primary" />}
                 title="NEW_CATEGORY"
-                subtitle="CREATE_TAXONOMY"
+                subtitle="CREATE_TAXONOMY_ITEM"
             />
 
             <ErrorMessage error={mutation.error} />
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-8">
-                <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-6 space-y-6">
-                    <TerminalInput
+                <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-5 space-y-6">
+                    <CyberInput
                         label="NAME"
                         value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        placeholder="Enter category name..."
+                        onChange={(e) => {
+                            const name = e.target.value;
+                            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                            setForm({ ...form, name, slug });
+                        }}
+                        placeholder="e.g. Technology"
                         required
                     />
 
-                    <TerminalInput
+                    <CyberInput
+                        label="SLUG"
+                        value={form.slug}
+                        onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                        placeholder="e.g. technology"
+                        required
+                    />
+
+                    <CyberInput
                         label="DESCRIPTION"
                         type="textarea"
                         value={form.description}
@@ -66,7 +79,7 @@ export default function NewCategoryPage() {
                         disabled={mutation.isPending}
                     >
                         <Save size={12} />
-                        {mutation.isPending ? 'SAVING...' : 'CREATE'}
+                        {mutation.isPending ? 'CREATING...' : 'CREATE_CATEGORY'}
                     </CyberButton>
                     <Link href="/admin/categories">
                         <CyberButton type="button" variant="ghost" size="md">

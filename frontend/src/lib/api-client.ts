@@ -29,7 +29,19 @@ export async function fetchApi<T>(
             credentials: 'include',
             ...options,
         });
-        const json = await response.json();
+
+        if (response.status === 204) {
+            return {
+                data: null,
+                isSuccess: true,
+                message: 'No content',
+                statusCode: 204,
+                errors: null
+            } as ServiceResponse<T>;
+        }
+
+        const text = await response.text();
+        const json = text ? JSON.parse(text) : {};
 
         // Backend returns standard Result<T> structure
         return json as ServiceResponse<T>;

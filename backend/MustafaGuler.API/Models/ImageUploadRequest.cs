@@ -11,5 +11,7 @@ namespace MustafaGuler.API.Models
 
         [Required]
         public string CustomName { get; set; } = null!;
+
+        public string? Folder { get; set; }
     }
 }

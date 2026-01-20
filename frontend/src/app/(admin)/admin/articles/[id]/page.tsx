@@ -7,10 +7,11 @@ import { Save, Trash2, FileText } from 'lucide-react';
 import { articleAdminService, categoryAdminService } from '@/services/admin';
 import { useResourceById, useResourceList, useUpdateResource, useDeleteResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage, LoadingState } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { TerminalInput } from '@/components/admin/ui/TerminalInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberInput } from '@/components/ui/cyber/CyberInput';
+import { CyberSelect } from '@/components/ui/cyber/CyberSelect';
 import { MarkdownEditor } from '@/components/admin/ui/MarkdownEditor';
-import { CyberConfirmationModal } from '@/components/admin/ui/CyberConfirmationModal';
+import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
 import type { AdminArticle, Category } from '@/types/admin';
 
 export default function EditArticlePage() {
@@ -100,7 +101,7 @@ export default function EditArticlePage() {
 
             <AdminPageHeader
                 backHref="/admin/articles"
-                icon={<FileText size={14} className="text-primary" />}
+                icon={<FileText size={14} className="text-violet-400" />}
                 title="EDIT_ARTICLE"
                 subtitle={`ID: ${id.substring(0, 8)}...`}
                 action={
@@ -122,7 +123,7 @@ export default function EditArticlePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left: Editor (2/3) */}
                     <div className="lg:col-span-2 space-y-6">
-                        <TerminalInput
+                        <CyberInput
                             label="TITLE"
                             value={form.title}
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -138,53 +139,32 @@ export default function EditArticlePage() {
 
                     {/* Right: Settings Panel (1/3) */}
                     <div className="space-y-6">
-                        <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-5 space-y-6">
-                            <h3 className="font-mono text-[10px] text-primary tracking-widest">
+                        <div className="bg-slate-900/40 border border-white/5 rounded-lg p-5 space-y-6">
+                            <h3 className="font-mono text-[10px] text-violet-400 tracking-widest">
                                 SETTINGS
                             </h3>
 
                             {/* Category */}
-                            <div className="space-y-2">
-                                <label className="block text-[10px] text-primary font-mono uppercase tracking-widest">
-                                    CATEGORY
-                                </label>
-                                <select
-                                    value={form.categoryId}
-                                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                    required
-                                    className="w-full bg-transparent border-b border-white/20 focus:border-cyan-neon px-0 py-3 text-foreground focus:outline-none transition-colors duration-300 font-mono text-sm"
-                                >
-                                    <option value="" className="bg-[#0a0118]">
-                                        SELECT...
-                                    </option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id} className="bg-[#0a0118]">
-                                            {cat.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <CyberSelect
+                                label="CATEGORY"
+                                value={form.categoryId}
+                                onChange={(val) => setForm({ ...form, categoryId: String(val) })}
+                                options={categories.map(cat => ({ value: cat.id, label: cat.name }))}
+                                required
+                            />
 
                             {/* Language */}
-                            <div className="space-y-2">
-                                <label className="block text-[10px] text-primary font-mono uppercase tracking-widest">
-                                    LANGUAGE
-                                </label>
-                                <select
-                                    value={form.languageCode}
-                                    onChange={(e) => setForm({ ...form, languageCode: e.target.value })}
-                                    className="w-full bg-transparent border-b border-white/20 focus:border-cyan-neon px-0 py-3 text-foreground focus:outline-none transition-colors duration-300 font-mono text-sm"
-                                >
-                                    <option value="en" className="bg-[#0a0118]">
-                                        EN
-                                    </option>
-                                    <option value="tr" className="bg-[#0a0118]">
-                                        TR
-                                    </option>
-                                </select>
-                            </div>
+                            <CyberSelect
+                                label="LANGUAGE"
+                                value={form.languageCode}
+                                onChange={(val) => setForm({ ...form, languageCode: String(val) })}
+                                options={[
+                                    { value: 'en', label: 'EN' },
+                                    { value: 'tr', label: 'TR' }
+                                ]}
+                            />
 
-                            <TerminalInput
+                            <CyberInput
                                 label="COVER_IMAGE"
                                 value={form.mainImage}
                                 onChange={(e) => setForm({ ...form, mainImage: e.target.value })}
@@ -215,3 +195,4 @@ export default function EditArticlePage() {
         </div>
     );
 }
+

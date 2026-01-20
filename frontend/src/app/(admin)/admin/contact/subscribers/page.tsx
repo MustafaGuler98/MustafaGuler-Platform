@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Users, ArrowLeft, Send } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { CyberTable } from '@/components/admin/ui/CyberTable';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { AdminListHeader } from '@/components/admin/ui/AdminListHeader';
+import { CyberTable } from '@/components/ui/cyber/CyberTable';
+import { CyberBadge } from '@/components/ui/cyber/CyberBadge';
 
 interface Subscriber {
     senderName: string;

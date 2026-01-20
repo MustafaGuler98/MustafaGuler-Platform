@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Parameters;
+using MustafaGuler.Core.Constants;
+using MustafaGuler.Core.Utilities.Results;
 using MustafaGuler.Core.Entities;
 using MustafaGuler.Core.Interfaces;
 using System.Threading.Tasks;
@@ -20,7 +22,8 @@ namespace MustafaGuler.API.Controllers
             _articleService = articleService;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
+        [EnableRateLimiting("SearchPolicy")]
         public async Task<IActionResult> GetAll([FromQuery] string? languageCode, [FromQuery] Guid? categoryId)
         {
             var result = await _articleService.GetAllAsync(languageCode, categoryId);
@@ -28,9 +31,9 @@ namespace MustafaGuler.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet("paged")]
+        [HttpGet]
         [EnableRateLimiting("SearchPolicy")]
-        public async Task<IActionResult> GetPaged([FromQuery] ArticleQueryParams queryParams)
+        public async Task<IActionResult> Get([FromQuery] ArticleQueryParams queryParams)
         {
             var result = await _articleService.GetPagedListAsync(queryParams);
             return CreateActionResultInstance(result);
@@ -71,7 +74,7 @@ namespace MustafaGuler.API.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] ArticleUpdateDto articleUpdateDto)
         {
             if (id != articleUpdateDto.Id)
-                return BadRequest("Id mismatch");
+                return CreateActionResultInstance(Result.Failure(400, Messages.IdMismatch));
 
             var result = await _articleService.UpdateAsync(articleUpdateDto);
             return CreateActionResultInstance(result);
@@ -85,10 +88,5 @@ namespace MustafaGuler.API.Controllers
             return CreateActionResultInstance(result);
         }
 
-        [HttpGet("test-error")]
-        public IActionResult TestError()
-        {
-            throw new InvalidOperationException("Test log.");
-        }
     }
 }

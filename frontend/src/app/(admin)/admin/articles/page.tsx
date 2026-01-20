@@ -3,25 +3,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import {
-    Plus,
-    ChevronLeft,
-    ChevronRight,
-    FileText,
-    ExternalLink,
-    ArrowUp,
-    ArrowDown,
-} from 'lucide-react';
+import { FileText, ExternalLink, ArrowUp, ArrowDown } from 'lucide-react';
 import { articleAdminService } from '@/services/admin';
 import { useDebounce } from '@/hooks/useDebounce';
 import { ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { CyberTable } from '@/components/admin/ui/CyberTable';
-import { SearchInput } from '@/components/admin/ui/SearchInput';
+import { AdminListHeader } from '@/components/admin/ui/AdminListHeader';
+import { CyberTable } from '@/components/ui/cyber/CyberTable';
+import { CyberSearchInput } from '@/components/ui/cyber/CyberSearchInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberNewButton } from '@/components/ui/cyber/CyberNewButton';
+import { CyberActionLink } from '@/components/ui/cyber/CyberActionLink';
+import { CyberBadge } from '@/components/ui/cyber/CyberBadge';
+import { CyberPagination } from '@/components/ui/cyber/CyberPagination';
 import { formatTerminalDate } from '@/lib/date-utils';
-import type { AdminArticle, PagedResult, SortConfig } from '@/types/admin';
+import type { SortConfig } from '@/types/admin';
+import { useRouter } from 'next/navigation';
 
 export default function ArticlesPage() {
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const pageSize = 10;
     const [searchTerm, setSearchTerm] = useState('');
@@ -32,7 +31,6 @@ export default function ArticlesPage() {
 
     const debouncedSearch = useDebounce(searchTerm, 500);
 
-    // Reset page when search changes
     useEffect(() => {
         setPage(1);
     }, [debouncedSearch]);
@@ -50,7 +48,6 @@ export default function ArticlesPage() {
             if (!response.isSuccess || !response.data) {
                 throw new Error(response.message || 'Failed to fetch articles');
             }
-            
             return response.data;
         },
     });
@@ -69,38 +66,22 @@ export default function ArticlesPage() {
     const SortIndicator = ({ columnKey }: { columnKey: string }) => {
         if (sortConfig.key !== columnKey) return null;
         return sortConfig.direction === 'asc' ? (
-            <ArrowUp size={12} className="inline text-cyan-neon" />
+            <ArrowUp size={12} className="inline text-violet-400" />
         ) : (
-            <ArrowDown size={12} className="inline text-cyan-neon" />
+            <ArrowDown size={12} className="inline text-violet-400" />
         );
     };
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded border border-primary/30 flex items-center justify-center">
-                        <FileText size={18} className="text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="font-mono text-lg text-foreground tracking-wide">
-                            ARTICLES
-                        </h1>
-                        <p className="font-mono text-[10px] text-muted-foreground/60 tracking-widest">
-                            MANAGE_BLOG_CONTENT
-                        </p>
-                    </div>
-                </div>
-                <Link href="/admin/articles/new">
-                    <CyberButton variant="primary" size="sm">
-                        <Plus size={12} />
-                        NEW
-                    </CyberButton>
-                </Link>
-            </div>
+            <AdminListHeader
+                title="ARTICLES"
+                subtitle="MANAGE_BLOG_CONTENT"
+                icon={<FileText size={18} className="text-violet-400" />}
+                actionButton={<CyberNewButton href="/admin/articles/new" />}
+            />
 
-            <SearchInput
+            <CyberSearchInput
                 value={searchTerm}
                 onChange={setSearchTerm}
                 onClear={() => setSearchTerm('')}
@@ -109,7 +90,7 @@ export default function ArticlesPage() {
 
             <ErrorMessage error={error} customMessage="FAILED_TO_LOAD_ARTICLES" />
 
-            <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg overflow-hidden">
+            <div className="bg-slate-900/40 border border-white/5 rounded-lg overflow-hidden">
                 <CyberTable
                     columns={[
                         {
@@ -117,7 +98,7 @@ export default function ArticlesPage() {
                             label: (
                                 <button
                                     onClick={() => handleSort('title')}
-                                    className="flex items-center gap-1 hover:text-cyan-neon transition-colors"
+                                    className="flex items-center gap-1 hover:text-violet-300 transition-colors"
                                 >
                                     Title <SortIndicator columnKey="title" />
                                 </button>
@@ -129,7 +110,7 @@ export default function ArticlesPage() {
                                         href={`/blog/${row.slug}`}
                                         target="_blank"
                                         onClick={(e) => e.stopPropagation()}
-                                        className="opacity-0 group-hover:opacity-100 text-cyan-neon hover:text-white transition-all p-1.5 hover:bg-white/5 rounded-full"
+                                        className="opacity-0 group-hover:opacity-100 text-violet-400 hover:text-white transition-all p-1.5 hover:bg-white/5 rounded-full"
                                         title="Open in Blog"
                                     >
                                         <ExternalLink size={16} />
@@ -142,13 +123,13 @@ export default function ArticlesPage() {
                             label: (
                                 <button
                                     onClick={() => handleSort('category')}
-                                    className="flex items-center gap-1 hover:text-cyan-neon transition-colors"
+                                    className="flex items-center gap-1 hover:text-violet-300 transition-colors"
                                 >
                                     Category <SortIndicator columnKey="category" />
                                 </button>
                             ),
                             render: (row) => (
-                                <span className="text-yellow-500 text-xs">{row.categoryName}</span>
+                                <span className="text-violet-300 text-xs">{row.categoryName}</span>
                             ),
                         },
                         {
@@ -156,13 +137,13 @@ export default function ArticlesPage() {
                             label: (
                                 <button
                                     onClick={() => handleSort('language')}
-                                    className="flex items-center gap-1 hover:text-cyan-neon transition-colors"
+                                    className="flex items-center gap-1 hover:text-violet-300 transition-colors"
                                 >
                                     Lang <SortIndicator columnKey="language" />
                                 </button>
                             ),
                             render: (row) => (
-                                <span className="text-muted-foreground/50 uppercase">{row.languageCode}</span>
+                                <span className="text-slate-500 uppercase">{row.languageCode}</span>
                             ),
                         },
                         {
@@ -170,13 +151,13 @@ export default function ArticlesPage() {
                             label: (
                                 <button
                                     onClick={() => handleSort('createdDate')}
-                                    className="flex items-center gap-1 hover:text-cyan-neon transition-colors"
+                                    className="flex items-center gap-1 hover:text-violet-300 transition-colors"
                                 >
                                     Date <SortIndicator columnKey="createdDate" />
                                 </button>
                             ),
                             render: (row) => (
-                                <span className="text-muted-foreground/70 text-xs">
+                                <span className="text-slate-500 text-xs">
                                     {formatTerminalDate(row.createdDate)}
                                 </span>
                             ),
@@ -185,43 +166,21 @@ export default function ArticlesPage() {
                     data={articles}
                     isLoading={isLoading}
                     emptyMessage={debouncedSearch ? 'NO_RESULTS_FOUND' : 'NO_ARTICLES_FOUND'}
-                    onRowClick={(row) => (window.location.href = `/admin/articles/${row.id}`)}
+                    onRowClick={(row) => router.push(`/admin/articles/${row.id}`)}
                     actions={(row) => (
-                        <Link href={`/admin/articles/${row.id}`}>
-                            <CyberButton
-                                variant="primary"
-                                size="sm"
-                                className="!border-none !bg-transparent text-cyan-neon hover:text-white shadow-none hover:shadow-none p-0"
-                            >
-                                START_EDIT
-                            </CyberButton>
-                        </Link>
+                        <CyberActionLink href={`/admin/articles/${row.id}`}>
+                            START_EDIT
+                        </CyberActionLink>
                     )}
                 />
 
-                {/* Pagination  */}
                 {!isLoading && articles.length > 0 && (
-                    <div className="flex items-center justify-center gap-6 py-4 border-t border-white/5">
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="p-2 font-mono text-xs text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
-                        >
-                            <ChevronLeft size={16} className="inline" />
-                        </button>
-
-                        <span className="font-mono text-xs tracking-widest">
-                            <span className="text-cyan-neon">{page}</span>
-                            <span className="text-muted-foreground"> / {totalPages}</span>
-                        </span>
-
-                        <button
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((p) => p + 1)}
-                            className="p-2 font-mono text-xs text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
-                        >
-                            <ChevronRight size={16} className="inline" />
-                        </button>
+                    <div className="border-t border-white/5">
+                        <CyberPagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
                     </div>
                 )}
             </div>

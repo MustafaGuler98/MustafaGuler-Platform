@@ -136,6 +136,33 @@ namespace MustafaGuler.Repository.Repositories
             _dbSet.Update(entity);
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            return await query.CountAsync();
+        }
 
+        public async Task<T?> GetRandomAsync(Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            int count = await query.CountAsync();
+            if (count == 0)
+            {
+                return null;
+            }
+
+            int index = Random.Shared.Next(count);
+
+            return await query.Skip(index).Take(1).AsNoTracking().FirstOrDefaultAsync();
+        }
     }
 }

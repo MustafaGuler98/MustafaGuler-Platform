@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Mail, Send, Terminal, AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 
 interface FormErrors {
     name?: string;
@@ -58,18 +59,11 @@ export default function ContactPage() {
         if (!validate()) return;
 
         setStatus("submitting");
-        
-        try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-            const response = await fetch(`${API_URL}/contact`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
 
-            if (response.ok) {
+        try {
+            const response = await apiClient.post('/contact', formData);
+
+            if (response.isSuccess) {
                 setStatus("success");
                 setFormData({ name: "", email: "", subject: "", message: "", allowPromo: false });
             } else {

@@ -3,6 +3,7 @@
 import { AuthProvider } from '@/contexts/AuthContext';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { AdminShell } from '@/components/admin/layout/AdminShell';
+import { ToastProvider } from '@/components/ui/cyber/Toast';
 
 export default function AdminSubLayout({
     children,
@@ -12,10 +13,13 @@ export default function AdminSubLayout({
     return (
         <AuthProvider>
             <QueryProvider>
-                <AdminShell>
-                    {children}
-                </AdminShell>
+                <ToastProvider>
+                    <AdminShell>
+                        {children}
+                    </AdminShell>
+                </ToastProvider>
             </QueryProvider>
         </AuthProvider>
     );
 }
+

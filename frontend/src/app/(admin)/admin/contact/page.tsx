@@ -13,11 +13,14 @@ import {
 } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { CyberTable } from '@/components/admin/ui/CyberTable';
+import { CyberTable } from '@/components/ui/cyber/CyberTable';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberActionLink } from '@/components/ui/cyber/CyberActionLink';
+import { CyberBadge } from '@/components/ui/cyber/CyberBadge';
 import { formatTerminalDate } from '@/lib/date-utils';
 
 import { PagedResult } from '@/types/admin';
+import { useRouter } from 'next/navigation';
 
 interface ContactMessage {
     id: string;
@@ -31,6 +34,7 @@ interface ContactMessage {
 }
 
 export default function ContactPage() {
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const pageSize = 10;
 
@@ -55,8 +59,8 @@ export default function ContactPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded border border-primary/30 flex items-center justify-center">
-                        <Mail size={18} className="text-primary" />
+                    <div className="w-10 h-10 rounded border border-white/10 flex items-center justify-center">
+                        <Mail size={18} className="text-violet-400" />
                     </div>
                     <div>
                         <h1 className="font-mono text-lg text-foreground tracking-wide">
@@ -77,7 +81,7 @@ export default function ContactPage() {
 
             <ErrorMessage error={error} customMessage="FAILED_TO_LOAD_MESSAGES" />
 
-            <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg overflow-hidden">
+            <div className="bg-slate-900/40 border border-white/5 rounded-lg overflow-hidden">
                 <CyberTable
                     columns={[
                         {
@@ -86,14 +90,15 @@ export default function ContactPage() {
                             render: (row: ContactMessage) => (
                                 <div className="flex items-center gap-2">
                                     {row.isMailSent ? (
-                                        <Check size={14} className="text-green-500" />
+                                        <Check size={14} className="text-emerald-500" />
                                     ) : (
-                                        <X size={14} className="text-red-500" />
+                                        <X size={14} className="text-rose-500" />
                                     )}
                                     {row.isReplied && (
-                                        <span className="text-[10px] text-cyan-neon border border-cyan-neon/30 px-1 rounded">
-                                            REPLIED
-                                        </span>
+                                        <CyberBadge
+                                            label="REPLIED"
+                                            variant="primary"
+                                        />
                                     )}
                                 </div>
                             ),
@@ -137,13 +142,13 @@ export default function ContactPage() {
                     data={messages}
                     isLoading={isLoading}
                     emptyMessage="NO_MESSAGES_FOUND"
-                    onRowClick={(row: ContactMessage) => (window.location.href = `/admin/contact/${row.id}`)}
+                    onRowClick={(row: ContactMessage) => router.push(`/admin/contact/${row.id}`)}
                     actions={(row: ContactMessage) => (
                         <Link href={`/admin/contact/${row.id}`}>
                             <CyberButton
                                 variant="primary"
                                 size="sm"
-                                className="!border-none !bg-transparent text-cyan-neon hover:text-white shadow-none hover:shadow-none p-0"
+                                className="!border-none !bg-transparent text-violet-400 hover:text-white shadow-none hover:shadow-none p-0"
                             >
                                 VIEW
                             </CyberButton>
@@ -157,20 +162,20 @@ export default function ContactPage() {
                         <button
                             disabled={page === 1}
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="p-2 font-mono text-xs text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
+                            className="p-2 font-mono text-xs text-muted-foreground hover:text-violet-400 disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
                         >
                             <ChevronLeft size={16} className="inline" />
                         </button>
 
                         <span className="font-mono text-xs tracking-widest">
-                            <span className="text-cyan-neon">{page}</span>
+                            <span className="text-violet-400">{page}</span>
                             <span className="text-muted-foreground"> / {totalPages}</span>
                         </span>
 
                         <button
                             disabled={page >= totalPages}
                             onClick={() => setPage((p) => p + 1)}
-                            className="p-2 font-mono text-xs text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
+                            className="p-2 font-mono text-xs text-muted-foreground hover:text-violet-400 disabled:opacity-30 disabled:cursor-default transition-colors hover:bg-white/5 rounded"
                         >
                             <ChevronRight size={16} className="inline" />
                         </button>

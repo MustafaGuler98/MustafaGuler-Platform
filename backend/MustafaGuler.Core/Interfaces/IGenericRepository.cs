@@ -31,5 +31,8 @@ namespace MustafaGuler.Core.Interfaces
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             params Expression<Func<T, object?>>[] includes);
 
+        Task<int> CountAsync(Expression<Func<T, bool>>? filter = null);
+
+        Task<T?> GetRandomAsync(Expression<Func<T, bool>>? filter = null);
     }
 }

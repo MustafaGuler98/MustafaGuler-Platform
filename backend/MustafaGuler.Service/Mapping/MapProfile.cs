@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using MustafaGuler.Core.DTOs;
+using MustafaGuler.Core.DTOs.Archives;
 using MustafaGuler.Core.DTOs.Contact;
 using MustafaGuler.Core.Entities;
+using MustafaGuler.Core.Entities.Archives;
 
 namespace MustafaGuler.Service.Mapping
 {
+    // TO DO: Split into multiple profiles
     public class MapProfile : Profile
     {
         public MapProfile()
@@ -51,6 +54,39 @@ namespace MustafaGuler.Service.Mapping
             CreateMap<ContactMessage, ContactMessageDetailDto>();
 
             CreateMap<ContactMessage, SubscriberDto>();
+
+            // ARCHIVES
+            CreateMap<Movie, MovieDto>();
+            CreateMap<CreateMovieDto, Movie>();
+            CreateMap<UpdateMovieDto, Movie>();
+
+            CreateMap<Book, BookDto>();
+            CreateMap<CreateBookDto, Book>();
+            CreateMap<UpdateBookDto, Book>();
+
+            CreateMap<Quote, QuoteDto>();
+            CreateMap<CreateQuoteDto, Quote>();
+            CreateMap<UpdateQuoteDto, Quote>();
+
+            CreateMap<TvSeries, TvSeriesDto>();
+            CreateMap<CreateTvSeriesDto, TvSeries>();
+            CreateMap<UpdateTvSeriesDto, TvSeries>();
+
+            CreateMap<Anime, AnimeDto>();
+            CreateMap<CreateAnimeDto, Anime>();
+            CreateMap<UpdateAnimeDto, Anime>();
+
+            CreateMap<Game, GameDto>();
+            CreateMap<CreateGameDto, Game>();
+            CreateMap<UpdateGameDto, Game>();
+
+            CreateMap<Music, MusicDto>();
+            CreateMap<CreateMusicDto, Music>();
+            CreateMap<UpdateMusicDto, Music>();
+
+            CreateMap<TTRPG, TTRPGDto>();
+            CreateMap<CreateTTRPGDto, TTRPG>();
+            CreateMap<UpdateTTRPGDto, TTRPG>();
         }
     }
 }

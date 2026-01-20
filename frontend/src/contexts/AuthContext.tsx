@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/lib/api-client';
 
 interface User {
     email: string;
@@ -16,8 +17,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// API URL for auth requests (uses Next.js proxy)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+
 
 // Refresh 5 minutes before token expires
 const REFRESH_BUFFER_MS = 5 * 60 * 1000;
@@ -37,12 +37,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const fetchUser = useCallback(async () => {
         try {
-            const res = await fetch(`${API_URL}/auth/me`, {
-                credentials: 'include',
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data);
+            const response = await apiClient.get<User>('/auth/me');
+            if (response.isSuccess && response.data) {
+                setUser(response.data);
                 setIsAuthenticated(true);
             } else {
                 setUser(null);
@@ -55,12 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Refresh token and schedule next refresh
     const refreshSession = useCallback(async () => {
         try {
-            const response = await fetch(`${API_URL}/auth/refresh`, {
-                method: 'POST',
-                credentials: 'include',
-            });
+            const response = await apiClient.post('/auth/refresh', {});
 
-            if (response.ok) {
+            if (response.isSuccess) {
                 setIsAuthenticated(true);
                 scheduleRefresh();
                 fetchUser();
@@ -123,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 // Token still valid, just set authenticated and schedule refresh
                 setIsAuthenticated(true);
                 scheduleRefresh();
-                fetchUser(); 
+                fetchUser();
             } else {
                 // Token expired, try to refresh with refreshToken
                 await refreshSession();
@@ -137,10 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const logout = async () => {
         clearScheduledRefresh();
         try {
-            await fetch(`${API_URL}/auth/logout`, {
-                method: 'POST',
-                credentials: 'include',
-            });
+            await apiClient.post('/auth/logout', {});
         } catch (error) {
             console.error('Logout error:', error);
         } finally {

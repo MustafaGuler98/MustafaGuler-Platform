@@ -9,9 +9,9 @@ namespace MustafaGuler.Service.Validators
         {
             Include(new PaginationParamsValidator());
 
-            RuleFor(x => x.Search)
+            RuleFor(x => x.SearchTerm)
                 .MaximumLength(200)
-                .When(x => !string.IsNullOrEmpty(x.Search))
+                .When(x => !string.IsNullOrEmpty(x.SearchTerm))
                 .WithMessage("Search term cannot exceed 200 characters");
         }
     }

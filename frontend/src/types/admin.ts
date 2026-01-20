@@ -18,6 +18,7 @@ export interface AdminArticle {
     languageCode: string;
     mainImage?: string;
     createdDate: string;
+    isPublished?: boolean;
 }
 
 export interface ImageInfo {
@@ -55,6 +56,7 @@ export interface ArticleFormData {
 
 export interface CategoryFormData {
     name: string;
+    slug: string;
     description: string;
 }
 

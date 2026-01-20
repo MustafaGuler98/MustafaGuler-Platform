@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertOctagon, RefreshCw, LayoutDashboard } from 'lucide-react';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
 
 export default function AdminError({
     error,

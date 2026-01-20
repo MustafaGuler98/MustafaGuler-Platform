@@ -41,7 +41,7 @@ export class BaseAdminService<T> {
         params.append('sortOrder', sortOrder);
 
         return apiClient.get<PagedResult<T>>(
-            `/${this.resourceName}/paged?${params.toString()}`
+            `/${this.resourceName}?${params.toString()}`
         );
     }
 }

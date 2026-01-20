@@ -27,7 +27,7 @@ namespace MustafaGuler.Repository.Configurations
                 .HasMaxLength(200);
 
             // Prevent duplicate filenames
-            builder.HasIndex(x => x.FileName).IsUnique();
+            builder.HasIndex(x => x.FileName).IsUnique().HasFilter("\"IsDeleted\" = false");
 
             // Relationship with uploader
             builder.HasOne(x => x.UploadedBy)

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Mail, ArrowLeft, Reply, Check, X, Clock, Globe } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { formatTerminalDate } from '@/lib/date-utils';
 
 interface ContactMessageDetail {

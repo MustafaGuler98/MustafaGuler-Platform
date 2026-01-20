@@ -37,7 +37,7 @@ namespace MustafaGuler.Service.Services
             _currentUserService = currentUserService;
         }
 
-        public async Task<Result<ImageInfoDto>> UploadAsync(FileUploadData fileData, string customName)
+        public async Task<Result<ImageInfoDto>> UploadAsync(FileUploadData fileData, string customName, string folder = "articles")
         {
             if (fileData == null || fileData.Length == 0)
                 return Result<ImageInfoDto>.Failure(400, Messages.NoFileUploaded);
@@ -57,8 +57,11 @@ namespace MustafaGuler.Service.Services
             if (string.IsNullOrEmpty(safeName))
                 return Result<ImageInfoDto>.Failure(400, Messages.InvalidFilename);
 
+            folder = folder.ToLowerInvariant().Replace(".", "").Replace("/", "").Replace("\\", "");
+            if (string.IsNullOrWhiteSpace(folder)) folder = "articles";
+
             string fileName = $"{safeName}{extension}";
-            string folderPath = Path.Combine(_env.WebRootPath, "uploads", "articles");
+            string folderPath = Path.Combine(_env.WebRootPath, "uploads", folder);
 
             if (!Directory.Exists(folderPath))
                 Directory.CreateDirectory(folderPath);
@@ -66,10 +69,10 @@ namespace MustafaGuler.Service.Services
             string filePath = Path.Combine(folderPath, fileName);
 
             // Check if file already exists in filesystem or DB
-            if (File.Exists(filePath) || await _repository.AnyAsync(x => x.FileName == fileName))
-                return Result<ImageInfoDto>.Failure(409, string.Format(Messages.FileAlreadyExists, safeName));
+            string url = $"/uploads/{folder}/{fileName}";
 
-            string url = $"/uploads/articles/{fileName}";
+            if (File.Exists(filePath) || await _repository.AnyAsync(x => x.Url == url))
+                return Result<ImageInfoDto>.Failure(409, string.Format(Messages.FileAlreadyExists, safeName));
 
             var imageEntity = new Image
             {
@@ -107,11 +110,12 @@ namespace MustafaGuler.Service.Services
         {
             Expression<Func<Image, bool>> filter = x => !x.IsDeleted;
 
-            if (!string.IsNullOrEmpty(queryParams.Search))
-            {
-                var lowerSearch = queryParams.Search.ToLower();
-                filter = x => !x.IsDeleted && x.FileName.ToLower().Contains(lowerSearch);
-            }
+            var lowerSearch = queryParams.SearchTerm?.ToLower();
+            var folderPrefix = !string.IsNullOrEmpty(queryParams.Folder) ? $"/uploads/{queryParams.Folder}/".ToLower() : null;
+
+            filter = x => !x.IsDeleted
+                          && (string.IsNullOrEmpty(lowerSearch) || x.FileName.ToLower().Contains(lowerSearch))
+                          && (string.IsNullOrEmpty(folderPrefix) || x.Url.ToLower().StartsWith(folderPrefix));
 
             var paginationParams = new PaginationParams
             {
@@ -156,7 +160,9 @@ namespace MustafaGuler.Service.Services
                 return Result.Failure(404, Messages.ImageNotFound);
 
 
-            string sourcePath = Path.Combine(_env.WebRootPath, "uploads", "articles", image.FileName);
+            // URL format: /uploads/folder/filename.ext
+            string relativePath = image.Url.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
+            string sourcePath = Path.Combine(_env.WebRootPath, relativePath);
             string deletedFolderPath = Path.Combine(_env.WebRootPath, "uploads", "deleted");
             string destinationPath = Path.Combine(deletedFolderPath, image.FileName);
 

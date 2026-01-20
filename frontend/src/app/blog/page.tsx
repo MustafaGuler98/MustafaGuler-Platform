@@ -1,4 +1,5 @@
 import { articleService } from "@/services/articleServices";
+import { archivesService } from "@/services/archivesService";
 import BlogClient from "./blog-client";
 import { constructMetadata } from "@/lib/seo";
 
@@ -13,6 +14,7 @@ export const metadata = constructMetadata({
 export default async function BlogPage() {
     const articles = await articleService.getAllArticles('en');
     const popularArticles = await articleService.getPopularArticles(9, 'en');
+    const stats = await archivesService.getStats();
 
-    return <BlogClient articles={articles} popularArticles={popularArticles} />;
+    return <BlogClient articles={articles} popularArticles={popularArticles} stats={stats} />;
 }

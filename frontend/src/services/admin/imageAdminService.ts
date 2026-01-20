@@ -1,8 +1,6 @@
 import { BaseAdminService } from './baseAdminService';
 import { ImageInfo, ServiceResponse, PagedResult } from '@/types/admin';
-import { apiClient } from '@/lib/api-client';
-
-const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || '/api';
+import { apiClient, fetchApi } from '@/lib/api-client';
 
 class ImageAdminService extends BaseAdminService<ImageInfo> {
     constructor() {
@@ -12,34 +10,23 @@ class ImageAdminService extends BaseAdminService<ImageInfo> {
     // Override getPaged - images use different query param format
     async getPaged(
         page: number,
-        pageSize: number
+        pageSize: number,
+        searchTerm?: string
     ): Promise<ServiceResponse<PagedResult<ImageInfo>>> {
-        return apiClient.get<PagedResult<ImageInfo>>(
-            `/images?pageNumber=${page}&pageSize=${pageSize}`
-        );
+        let url = `/images?pageNumber=${page}&pageSize=${pageSize}`;
+        if (searchTerm) {
+            url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        }
+        return apiClient.get<PagedResult<ImageInfo>>(url);
     }
 
-    // Custom upload method - FormData requires raw fetch, cannot use apiClient
+    // Custom upload method - FormData requires raw fetch, cannot use apiClient.post (enforces JSON)
     async upload(formData: FormData): Promise<ServiceResponse<ImageInfo>> {
         try {
-            const res = await fetch(`${getApiUrl()}/images/upload`, {
+            return await fetchApi<ImageInfo>('/images/upload', {
                 method: 'POST',
-                credentials: 'include',
                 body: formData,
             });
-
-            if (!res.ok) {
-                const error = await res.json();
-                return {
-                    isSuccess: false,
-                    data: null as unknown as ImageInfo,
-                    message: error.message || 'Failed to upload image',
-                    statusCode: res.status,
-                    errors: [error.message],
-                };
-            }
-
-            return res.json();
         } catch {
             return {
                 isSuccess: false,

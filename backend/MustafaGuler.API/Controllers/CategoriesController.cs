@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Constants;
+using MustafaGuler.Core.Utilities.Results;
 using System;
 using System.Threading.Tasks;
 
@@ -52,7 +54,7 @@ namespace MustafaGuler.API.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] CategoryUpdateDto categoryUpdateDto)
         {
             if (id != categoryUpdateDto.Id)
-                return BadRequest("Id mismatch");
+                return CreateActionResultInstance(Result.Failure(400, Messages.IdMismatch));
 
             var result = await _categoryService.UpdateAsync(categoryUpdateDto);
             return CreateActionResultInstance(result);

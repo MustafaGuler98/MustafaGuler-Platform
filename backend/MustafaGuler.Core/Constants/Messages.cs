@@ -37,5 +37,12 @@
         // Auth Messages
         public const string Unauthorized = "Authentication required. Please login.";
         public const string Forbidden = "You do not have permission to access this resource.";
+        public const string LoginSuccessful = "Login successful.";
+        public const string LogoutSuccessful = "Logged out successfully.";
+        public const string TokenRefreshed = "Token refreshed.";
+
+        // Validation Messages
+        public const string IdMismatch = "Id mismatch.";
+        public const string ProviderNotFound = "No provider found for the specified activity type.";
     }
 }

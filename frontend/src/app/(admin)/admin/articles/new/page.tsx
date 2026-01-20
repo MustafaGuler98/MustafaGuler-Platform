@@ -6,8 +6,8 @@ import { Save, FileText } from 'lucide-react';
 import { articleAdminService, categoryAdminService } from '@/services/admin';
 import { useResourceList, useCreateResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { TerminalInput } from '@/components/admin/ui/TerminalInput';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberInput } from '@/components/ui/cyber/CyberInput';
 import { MarkdownEditor } from '@/components/admin/ui/MarkdownEditor';
 import type { Category, ArticleFormData } from '@/types/admin';
 
@@ -51,7 +51,7 @@ export default function NewArticlePage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left: Editor (2/3) */}
                     <div className="lg:col-span-2 space-y-6">
-                        <TerminalInput
+                        <CyberInput
                             label="TITLE"
                             value={form.title}
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -113,7 +113,7 @@ export default function NewArticlePage() {
                                 </select>
                             </div>
 
-                            <TerminalInput
+                            <CyberInput
                                 label="COVER_IMAGE"
                                 value={form.mainImage}
                                 onChange={(e) => setForm({ ...form, mainImage: e.target.value })}

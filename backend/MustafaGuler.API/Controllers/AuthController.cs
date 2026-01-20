@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.RateLimiting;
 using MustafaGuler.API.Extensions;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Constants;
+using MustafaGuler.Core.Utilities.Results;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,7 +15,7 @@ namespace MustafaGuler.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : CustomBaseController
     {
         private readonly IAuthService _authService;
         private readonly IAuthCookieService _authCookieService;
@@ -30,13 +32,13 @@ namespace MustafaGuler.API.Controllers
         {
             var result = await _authService.LoginAsync(loginDto);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return StatusCode(result.StatusCode, new { message = result.Message });
+                _authCookieService.SetAuthCookies(result.Data!);
+                return CreateActionResultInstance(Result.Success(200, Messages.LoginSuccessful));
             }
 
-            _authCookieService.SetAuthCookies(result.Data!);
-            return Ok(new { message = "Login successful" });
+            return CreateActionResultInstance(result);
         }
 
         [HttpPost("refresh")]
@@ -47,18 +49,18 @@ namespace MustafaGuler.API.Controllers
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                return Unauthorized(new { message = "Refresh token not found." });
+                return CreateActionResultInstance(Result<TokenDto>.Failure(401, Messages.Unauthorized));
             }
 
             var result = await _authService.RefreshTokenAsync(refreshToken);
 
-            if (!result.IsSuccess)
+            if (result.IsSuccess)
             {
-                return StatusCode(result.StatusCode, new { message = result.Message });
+                _authCookieService.SetAuthCookies(result.Data!);
+                return CreateActionResultInstance(Result.Success(200, Messages.TokenRefreshed));
             }
 
-            _authCookieService.SetAuthCookies(result.Data!);
-            return Ok(new { message = "Token refreshed." });
+            return CreateActionResultInstance(result);
         }
 
         [HttpGet("me")]
@@ -66,17 +68,17 @@ namespace MustafaGuler.API.Controllers
         {
             if (User?.Identity?.IsAuthenticated != true)
             {
-                return Unauthorized(new { message = "Not authenticated" });
+                return CreateActionResultInstance(Result<object>.Failure(401, Messages.Unauthorized));
             }
 
-            var email = User.FindFirst(ClaimTypes.Email)?.Value;
-            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value ?? User.FindFirst("email")?.Value;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? User.FindFirst("role")?.Value;
 
-            return Ok(new
+            return CreateActionResultInstance(Result<object>.Success(new
             {
                 email,
                 role
-            });
+            }));
         }
 
         [AllowAnonymous]
@@ -88,10 +90,11 @@ namespace MustafaGuler.API.Controllers
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
             {
-                await _authService.LogoutAsync(userId);
+                var result = await _authService.LogoutAsync(userId);
+                return CreateActionResultInstance(result);
             }
 
-            return Ok(new { message = "Logged out successfully." });
+            return CreateActionResultInstance(Result.Success(200, Messages.LogoutSuccessful));
         }
     }
 }

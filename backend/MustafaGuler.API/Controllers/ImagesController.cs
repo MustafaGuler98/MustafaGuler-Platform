@@ -4,6 +4,8 @@ using MustafaGuler.API.Models;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Parameters;
+using MustafaGuler.Core.Constants;
+using MustafaGuler.Core.Utilities.Results;
 using System;
 using System.Threading.Tasks;
 
@@ -27,7 +29,7 @@ namespace MustafaGuler.API.Controllers
         {
             if (request.File == null || request.File.Length == 0)
             {
-                return BadRequest(new { message = "No file uploaded." });
+                return CreateActionResultInstance(Result<ImageInfoDto>.Failure(400, Messages.NoFileUploaded));
             }
 
             var fileData = new FileUploadData
@@ -38,7 +40,7 @@ namespace MustafaGuler.API.Controllers
                 Length = request.File.Length
             };
 
-            var result = await _imageService.UploadAsync(fileData, request.CustomName);
+            var result = await _imageService.UploadAsync(fileData, request.CustomName, request.Folder ?? "articles");
             return CreateActionResultInstance(result);
         }
 

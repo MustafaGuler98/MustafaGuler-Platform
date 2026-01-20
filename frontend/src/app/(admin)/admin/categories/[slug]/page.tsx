@@ -7,9 +7,9 @@ import { Save, FolderTree, Trash2 } from 'lucide-react';
 import { categoryAdminService } from '@/services/admin';
 import { useResourceBySlug, useUpdateResource, useDeleteResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage, LoadingState } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { TerminalInput } from '@/components/admin/ui/TerminalInput';
-import { CyberConfirmationModal } from '@/components/admin/ui/CyberConfirmationModal';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberInput } from '@/components/ui/cyber/CyberInput';
+import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
 import type { Category } from '@/types/admin';
 
 export default function EditCategoryPage() {
@@ -21,6 +21,7 @@ export default function EditCategoryPage() {
     const [form, setForm] = useState({
         id: '',
         name: '',
+        slug: '',
         description: '',
     });
 
@@ -35,6 +36,7 @@ export default function EditCategoryPage() {
             setForm({
                 id: category.id,
                 name: category.name,
+                slug: category.slug,
                 description: category.description || '',
             });
         }
@@ -106,7 +108,7 @@ export default function EditCategoryPage() {
 
             <form onSubmit={handleSubmit} className="max-w-xl space-y-8">
                 <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-6 space-y-6">
-                    <TerminalInput
+                    <CyberInput
                         label="NAME"
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -114,7 +116,15 @@ export default function EditCategoryPage() {
                         required
                     />
 
-                    <TerminalInput
+                    <CyberInput
+                        label="SLUG"
+                        value={form.slug}
+                        onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                        placeholder="e.g. technology"
+                        required
+                    />
+
+                    <CyberInput
                         label="DESCRIPTION"
                         type="textarea"
                         value={form.description}

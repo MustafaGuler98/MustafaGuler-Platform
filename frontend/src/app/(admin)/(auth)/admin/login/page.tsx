@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import { authService } from '@/services/authService';
 
+import { useRouter } from 'next/navigation';
+
 export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -17,7 +20,7 @@ export default function LoginPage() {
         const result = await authService.login({ email, password });
 
         if (result.isSuccess) {
-            window.location.href = '/admin';
+            router.push('/admin');
         } else {
             setError(result.message);
         }

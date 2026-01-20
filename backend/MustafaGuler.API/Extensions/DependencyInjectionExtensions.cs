@@ -1,6 +1,12 @@
 using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Interfaces.Archives;
+using MustafaGuler.Core.Interfaces.Archives.Providers;
 using MustafaGuler.Repository.Repositories;
 using MustafaGuler.Service.Services;
+using MustafaGuler.Service.Services.Archives;
+using MustafaGuler.Service.Services.Archives.Providers;
+using MustafaGuler.Service.Services.Archives.Providers.Local;
+
 
 namespace MustafaGuler.API.Extensions
 {
@@ -25,7 +31,33 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IMailService, MailManager>();
             services.AddScoped<IContactService, ContactService>();
 
+            // Archives
+            services.AddScoped<IMovieService, MovieService>();
+            services.AddScoped<IBookService, BookService>();
+            services.AddScoped<IQuoteService, QuoteService>();
+            services.AddScoped<ITvSeriesService, TvSeriesService>();
+            services.AddScoped<IAnimeService, AnimeService>();
+            services.AddScoped<IGameService, GameService>();
+            services.AddScoped<IMusicService, MusicService>();
+            services.AddScoped<ITTRPGService, TTRPGService>();
+            services.AddScoped<IArchivesStatsService, ArchivesStatsService>();
+            services.AddScoped<IPublicActivityService, PublicActivityService>();
+            services.AddScoped<IActivityService, ActivityService>();
+
+            // Providers
+            services.AddScoped<IProviderFactory, ProviderFactory>();
+
+            services.AddScoped<IActivityProvider, LocalMovieProvider>();
+            services.AddScoped<IActivityProvider, LocalBookProvider>();
+            services.AddScoped<IActivityProvider, LocalTvSeriesProvider>();
+            services.AddScoped<IActivityProvider, LocalMusicProvider>();
+            services.AddScoped<IActivityProvider, LocalAnimeProvider>();
+            services.AddScoped<IActivityProvider, LocalGameProvider>();
+            services.AddScoped<IActivityProvider, LocalTTRPGProvider>();
+            services.AddScoped<IActivityProvider, LocalQuoteProvider>();
+
             return services;
         }
     }
 }
+

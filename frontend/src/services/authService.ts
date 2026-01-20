@@ -1,26 +1,18 @@
 import { LoginRequest, AuthResult } from '@/types/auth';
-
-// API URL for login requests (uses Next.js proxy to circumvent CORS and handle HttpOnly cookies)
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+import { apiClient } from '@/lib/api-client';
 
 export const authService = {
     async login(credentials: LoginRequest): Promise<AuthResult> {
         try {
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(credentials),
-            });
-
-            const data = await response.json();
+            const response = await apiClient.post<AuthResult>('/auth/login', credentials);
 
             return {
-                isSuccess: response.ok,
-                message: data.message || (response.ok ? 'Login successful' : 'Login failed'),
-                statusCode: response.status,
-                errors: data.errors || null,
-            };
+                isSuccess: response.isSuccess,
+                message: response.message,
+                statusCode: response.statusCode,
+                errors: response.errors,
+            } as AuthResult;
+
         } catch {
             return {
                 isSuccess: false,

@@ -14,7 +14,7 @@ namespace MustafaGuler.Repository.Configurations
             builder.Property(x => x.LanguageCode).HasMaxLength(5);
 
             builder.Property(x => x.Slug).IsRequired().HasMaxLength(250);
-            builder.HasIndex(x => x.Slug).IsUnique();
+            builder.HasIndex(x => x.Slug).IsUnique().HasFilter("\"IsDeleted\" = false");
 
             builder.HasOne(x => x.Category)
                    .WithMany(x => x.Articles)

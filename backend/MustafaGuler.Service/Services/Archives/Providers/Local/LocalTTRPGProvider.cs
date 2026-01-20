@@ -1,0 +1,64 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MustafaGuler.Core.DTOs.Archives;
+using MustafaGuler.Core.Entities.Archives;
+using MustafaGuler.Core.Interfaces;
+using MustafaGuler.Core.Interfaces.Archives.Providers;
+
+namespace MustafaGuler.Service.Services.Archives.Providers.Local
+{
+    public class LocalTTRPGProvider : IActivityProvider
+    {
+        private readonly IGenericRepository<TTRPG> _repository;
+
+        public LocalTTRPGProvider(IGenericRepository<TTRPG> repository)
+        {
+            _repository = repository;
+        }
+
+        public string ProviderType => "Local";
+        public string ActivityType => "TTRPG";
+
+        public async Task<List<ActivityOptionDto>> GetRefreshedOptionsAsync()
+        {
+            var items = await _repository.GetAllAsync(x => !x.IsDeleted);
+            return items.Select(t => new ActivityOptionDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ImageUrl = t.CoverImageUrl,
+                Subtitle = t.System,
+                CreatedDate = t.CreatedDate
+            }).ToList();
+        }
+
+        public async Task<PublicActivityDto?> GetDetailsAsync(Guid itemId)
+        {
+            var item = await _repository.GetByIdAsync(itemId);
+            if (item == null || item.IsDeleted) return null;
+
+            return new PublicActivityDto
+            {
+                Type = "TTRPG",
+                Title = item.Title,
+                Subtitle = item.System,
+                Description = item.MyReview ?? item.Description,
+                ImageUrl = item.CoverImageUrl
+            };
+        }
+
+        public async Task<(string? title, string? imageUrl)> GetItemTitleAndImageAsync(Guid itemId)
+        {
+            var item = await _repository.GetByIdAsync(itemId);
+            return (item?.Title, item?.CoverImageUrl);
+        }
+
+        public async Task<Dictionary<Guid, (string? title, string? imageUrl)>> GetItemsTitlesAndImagesAsync(IEnumerable<Guid> itemIds)
+        {
+            var items = await _repository.GetAllAsync(x => itemIds.Contains(x.Id));
+            return items.ToDictionary(k => k.Id, v => ((string?)v.Title, (string?)v.CoverImageUrl));
+        }
+    }
+}

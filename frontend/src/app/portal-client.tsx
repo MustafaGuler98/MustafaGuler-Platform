@@ -8,6 +8,7 @@ import { Article } from "@/types/article";
 import { formatDate } from "@/lib/utils";
 import NeuralNetwork from "@/components/neural-network";
 import { mindTags } from "@/data/mind-tags";
+import { ActivitySection } from "@/components/shared/ActivitySection";
 
 interface PortalClientProps {
     articles: Article[];
@@ -360,6 +361,16 @@ export default function PortalClient({ articles }: PortalClientProps) {
                             </button>
                         </div>
                     )}
+                </div>
+            </section>
+
+            {/* ACTIVITY SECTION */}
+            <section className="pb-24 px-4">
+                <div className="container max-w-5xl mx-auto">
+                    {/* DIVIDER */}
+                    <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-16" />
+
+                    <ActivitySection />
                 </div>
             </section>
 

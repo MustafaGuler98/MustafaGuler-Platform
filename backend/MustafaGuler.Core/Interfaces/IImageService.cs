@@ -8,7 +8,7 @@ namespace MustafaGuler.Core.Interfaces
 {
     public interface IImageService
     {
-        Task<Result<ImageInfoDto>> UploadAsync(FileUploadData fileData, string customName);
+        Task<Result<ImageInfoDto>> UploadAsync(FileUploadData fileData, string customName, string folder = "articles");
         Task<Result<PagedResult<ImageInfoDto>>> GetPagedAsync(ImageQueryParams queryParams);
         Task<Result<ImageInfoDto>> UpdateAsync(Guid id, ImageUpdateDto dto);
         Task<Result> DeleteAsync(Guid id);

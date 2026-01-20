@@ -2,72 +2,58 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
 import {
     Upload,
     Trash2,
-    ChevronLeft,
-    ChevronRight,
     Copy,
     Check,
     Image as ImageIcon,
 } from 'lucide-react';
 import { imageAdminService } from '@/services/admin';
 import { useDeleteResource } from '@/hooks/admin';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useResourcePagedList } from '@/hooks/admin/useResourcePagedList';
 import { ErrorMessage } from '@/components/admin/layout';
-import { CyberButton } from '@/components/admin/ui/CyberButton';
-import { SearchInput } from '@/components/admin/ui/SearchInput';
-import { CyberConfirmationModal } from '@/components/admin/ui/CyberConfirmationModal';
+
+import { CyberSearchInput } from '@/components/ui/cyber/CyberSearchInput';
+import { AdminListHeader } from '@/components/admin/ui/AdminListHeader';
+import { CyberButton } from '@/components/ui/cyber/CyberButton';
+import { CyberNewButton } from '@/components/ui/cyber/CyberNewButton';
+import { CyberActionLink } from '@/components/ui/cyber/CyberActionLink';
+import { CyberPagination } from '@/components/ui/cyber/CyberPagination';
+import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
+import { getImageUrl } from '@/lib/utils';
 import type { ImageInfo } from '@/types/admin';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-
 export default function ImagesPage() {
-    const [page, setPage] = useState(1);
     const [copiedId, setCopiedId] = useState<string | null>(null);
-    const [searchTerm, setSearchTerm] = useState('');
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const pageSize = 12;
 
-    const debouncedSearch = useDebounce(searchTerm);
-
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['images', page, pageSize],
-        queryFn: async () => {
-            const response = await imageAdminService.getPaged(page, pageSize);
-            if (!response.isSuccess || !response.data) {
-                throw new Error(response.message || 'Failed to fetch images');
-            }
-
-            return response.data;
-        },
+    const {
+        items: images,
+        page,
+        setPage,
+        totalPages,
+        isLoading,
+        error,
+        searchTerm,
+        setSearchTerm,
+        clearSearch
+    } = useResourcePagedList({
+        serviceMethod: (p, s, term) => imageAdminService.getPaged(p, s, term),
+        initialPageSize: 12,
+        queryKey: 'images'
     });
 
     const deleteMutation = useDeleteResource('images', (id) =>
         imageAdminService.delete(id)
     );
 
-    const allImages = data?.items ?? [];
-    const totalPages = data?.totalPages ?? 1;
+    const handleDeleteClick = (id: string) => setDeletingId(id);
 
-    // Client-side filtering
-    const images = allImages.filter((img) => {
-        if (!debouncedSearch) return true;
-        return img.fileName.toLowerCase().includes(debouncedSearch.toLowerCase());
-    });
-
-    const handleDeleteClick = (id: string) => {
-        setDeletingId(id);
-    };
-
-    // Confirm delete
     const handleConfirmDelete = () => {
         if (deletingId) {
             deleteMutation.mutate(deletingId, {
-                onSuccess: () => {
-                    setDeletingId(null);
-                }
+                onSuccess: () => setDeletingId(null),
             });
         }
     };
@@ -97,31 +83,23 @@ export default function ImagesPage() {
                 isLoading={deleteMutation.isPending}
             />
 
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded border border-primary/30 flex items-center justify-center">
-                        <ImageIcon size={18} className="text-primary" />
-                    </div>
-                    <div>
-                        <h1 className="font-mono text-lg text-foreground tracking-wide">MEDIA</h1>
-                        <p className="font-mono text-[10px] text-muted-foreground/60 tracking-widest">
-                            IMAGE_LIBRARY
-                        </p>
-                    </div>
-                </div>
-                <Link href="/admin/images/upload">
-                    <CyberButton variant="primary" size="sm">
-                        <Upload size={12} />
-                        UPLOAD
-                    </CyberButton>
-                </Link>
-            </div>
+            <AdminListHeader
+                title="MEDIA"
+                subtitle="IMAGE_LIBRARY"
+                icon={<ImageIcon size={18} className="text-violet-400" />}
+                actionButton={
+                    <CyberNewButton
+                        href="/admin/images/upload"
+                        label="UPLOAD"
+                        icon={<Upload size={12} />}
+                    />
+                }
+            />
 
-            <SearchInput
+            <CyberSearchInput
                 value={searchTerm}
                 onChange={setSearchTerm}
-                onClear={() => setSearchTerm('')}
+                onClear={clearSearch}
                 placeholder="SEARCH"
             />
 
@@ -155,10 +133,10 @@ export default function ImagesPage() {
                         {images.map((img) => (
                             <div
                                 key={img.id}
-                                className="group relative aspect-square rounded overflow-hidden border border-transparent hover:border-cyan-neon/30 transition-all"
+                                className="group relative aspect-square rounded overflow-hidden border border-transparent hover:border-violet-500/30 transition-all"
                             >
                                 <img
-                                    src={`${API_URL?.replace('/api', '')}${img.url}`}
+                                    src={getImageUrl(img.url)}
                                     alt={img.fileName}
                                     className="w-full h-full object-cover group-hover:opacity-40 transition-opacity"
                                 />
@@ -166,7 +144,7 @@ export default function ImagesPage() {
                                 {/* Overlay */}
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                                     <div>
-                                        <p className="font-mono text-[10px] text-cyan-neon truncate">
+                                        <p className="font-mono text-[10px] text-violet-300 truncate">
                                             {img.fileName}
                                         </p>
                                         <p className="font-mono text-[9px] text-muted-foreground/60">
@@ -176,7 +154,7 @@ export default function ImagesPage() {
                                     <div className="flex gap-1">
                                         <button
                                             onClick={() => copyUrl(img.url, img.id)}
-                                            className="flex-1 py-1 rounded bg-white/10 hover:bg-cyan-neon/20 transition-colors flex items-center justify-center"
+                                            className="flex-1 py-1 rounded bg-white/10 hover:bg-violet-500/20 transition-colors flex items-center justify-center"
                                         >
                                             {copiedId === img.id ? (
                                                 <Check size={10} className="text-green-400" />
@@ -197,29 +175,11 @@ export default function ImagesPage() {
                         ))}
                     </div>
 
-                    {/* Pagination */}
-                    <div className="flex items-center justify-center gap-6 py-4">
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="font-mono text-[10px] text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronLeft size={12} className="inline" />
-                        </button>
-
-                        <span className="font-mono text-[10px] tracking-widest">
-                            <span className="text-cyan-neon">{page}</span>
-                            <span className="text-muted-foreground"> / {totalPages}</span>
-                        </span>
-
-                        <button
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((p) => p + 1)}
-                            className="font-mono text-[10px] text-muted-foreground hover:text-cyan-neon disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                        >
-                            <ChevronRight size={12} className="inline" />
-                        </button>
-                    </div>
+                    <CyberPagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                    />
                 </>
             )}
         </div>
