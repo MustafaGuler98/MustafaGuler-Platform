@@ -64,11 +64,11 @@ export function BlogBookWidget({ className }: SidebarWidgetProps) {
     useEffect(() => {
         const fetchBook = async () => {
             try {
-                const response = await fetchApi<{ book?: { title: string; subtitle?: string } }>('/archives/featured');
-                if (response?.data?.book) {
+                const response = await fetchApi<{ title: string; subtitle?: string }>('/archives/spotlight/public/Book');
+                if (response?.isSuccess && response?.data) {
                     setBook({
-                        title: response.data.book.title,
-                        author: response.data.book.subtitle || ''
+                        title: response.data.title,
+                        author: response.data.subtitle || ''
                     });
                 }
             } catch { /* silent */ }
@@ -90,7 +90,7 @@ export function BlogBookWidget({ className }: SidebarWidgetProps) {
                         <p className="font-mono text-[9px] text-amber-400/60">{book.author}</p>
                     </>
                 ) : (
-                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'No book yet...'}</p>
+                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'Coming soon...'}</p>
                 )}
             </div>
         </div>
@@ -105,9 +105,9 @@ export function BlogFilmWidget({ className }: SidebarWidgetProps) {
     useEffect(() => {
         const fetchMovie = async () => {
             try {
-                const response = await fetchApi<{ movie?: { title: string; subtitle?: string } }>('/archives/featured');
-                if (response?.data?.movie) {
-                    setMovie({ title: response.data.movie.title, year: response.data.movie.subtitle });
+                const response = await fetchApi<{ title: string; subtitle?: string }>('/archives/spotlight/public/Movie');
+                if (response?.isSuccess && response?.data) {
+                    setMovie({ title: response.data.title, year: response.data.subtitle });
                 }
             } catch { /* silent */ }
             finally { setIsLoading(false); }
@@ -128,7 +128,7 @@ export function BlogFilmWidget({ className }: SidebarWidgetProps) {
                         {movie.year && <p className="font-mono text-[9px] text-purple-400/60">{movie.year}</p>}
                     </>
                 ) : (
-                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'No film yet...'}</p>
+                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'Coming soon...'}</p>
                 )}
             </div>
         </div>
@@ -143,9 +143,9 @@ export function BlogMusicWidget({ className }: SidebarWidgetProps) {
     useEffect(() => {
         const fetchMusic = async () => {
             try {
-                const response = await fetchApi<{ music?: { title: string; subtitle?: string } }>('/archives/featured');
-                if (response?.data?.music) {
-                    setMusic({ title: response.data.music.title, artist: response.data.music.subtitle || '' });
+                const response = await fetchApi<{ title: string; subtitle?: string }>('/archives/spotlight/public/Music');
+                if (response?.isSuccess && response?.data) {
+                    setMusic({ title: response.data.title, artist: response.data.subtitle || '' });
                 }
             } catch { /* silent */ }
             finally { setIsLoading(false); }
@@ -166,7 +166,7 @@ export function BlogMusicWidget({ className }: SidebarWidgetProps) {
                         <p className="font-mono text-[9px] text-pink-400/60">{music.artist}</p>
                     </>
                 ) : (
-                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'No song yet...'}</p>
+                    <p className="font-mono text-[11px] text-gray-500 italic">{isLoading ? 'Loading...' : 'Coming soon...'}</p>
                 )}
             </div>
         </div>

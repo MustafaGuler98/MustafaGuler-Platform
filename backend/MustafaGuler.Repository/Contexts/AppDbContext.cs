@@ -28,6 +28,7 @@ namespace MustafaGuler.Repository.Contexts
         public DbSet<Music> Musics { get; set; }
         public DbSet<TTRPG> TTRPGs { get; set; }
         public DbSet<Activity> Activities { get; set; }
+        public DbSet<SpotlightItem> SpotlightItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

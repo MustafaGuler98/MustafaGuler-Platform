@@ -25,7 +25,8 @@ import {
     Star,
     ChevronLeft,
     ChevronRight,
-    ChevronDown
+    ChevronDown,
+    Zap
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -162,6 +163,7 @@ export function AdminSidebar({ isCollapsed, toggleSidebar }: AdminSidebarProps) 
                 { href: '/admin/archives/ttrpg', icon: <Dices size={16} />, label: 'TTRPG' },
             ]
         },
+        { href: '/admin/spotlight', icon: <Zap size={16} />, label: 'SPOTLIGHT' },
         {
             href: '/admin/contact',
             icon: <Mail size={16} />,

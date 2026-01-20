@@ -19,6 +19,8 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddMemoryCache();
+
 
             services.AddScoped(typeof(IService<>), typeof(Service<>));
             services.AddScoped<IArticleService, ArticleService>();
@@ -43,6 +45,7 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IArchivesStatsService, ArchivesStatsService>();
             services.AddScoped<IPublicActivityService, PublicActivityService>();
             services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<ISpotlightService, SpotlightService>();
 
             // Providers
             services.AddScoped<IProviderFactory, ProviderFactory>();
