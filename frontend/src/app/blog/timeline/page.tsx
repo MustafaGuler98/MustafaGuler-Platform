@@ -13,7 +13,9 @@ export const metadata = constructMetadata({
 });
 
 export default async function TimelinePage() {
-  const articles = await articleService.getAllArticles('en');
+  // TODO: Implement "Load More" or Infinite Scroll in Timeline for older logs.
+  const response = await articleService.getPagedWithoutImageArticles(1, 100, 'en');
+  const articles = response.data?.items || [];
 
   return (
     <TimelineClient initialArticles={articles} />

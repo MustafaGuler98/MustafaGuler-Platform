@@ -21,17 +21,12 @@ namespace MustafaGuler.Service.Services.Archives.Providers.Local
         public string ProviderType => "Local";
         public string ActivityType => "TvSeries";
 
-        public async Task<List<ActivityOptionDto>> GetRefreshedOptionsAsync()
+
+
+        public async Task<Guid?> GetRandomItemIdAsync(IEnumerable<Guid> excludedIds)
         {
-            var items = await _repository.GetAllAsync(x => !x.IsDeleted);
-            return items.Select(t => new ActivityOptionDto
-            {
-                Id = t.Id,
-                Title = t.Title,
-                ImageUrl = t.CoverImageUrl,
-                Subtitle = $"{t.TotalSeasons} Seasons",
-                CreatedDate = t.CreatedDate
-            }).ToList();
+            var item = await _repository.GetRandomAsync(x => !x.IsDeleted && !excludedIds.Contains(x.Id));
+            return item?.Id;
         }
 
         public async Task<PublicActivityDto?> GetDetailsAsync(Guid itemId)

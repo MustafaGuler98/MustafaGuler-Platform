@@ -136,6 +136,16 @@ namespace MustafaGuler.Repository.Repositories
             _dbSet.Update(entity);
         }
 
+        public async Task<IEnumerable<TResult>> GetProjectedListAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            return await query.AsNoTracking().Select(selector).ToListAsync();
+        }
+
         public async Task<int> CountAsync(Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = _dbSet;

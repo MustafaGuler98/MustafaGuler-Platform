@@ -13,7 +13,9 @@ export const metadata = constructMetadata({
 });
 
 export default async function Home() {
-  const articles = await articleService.getAllArticles('en');
+  const result = await articleService.getPagedWithoutImageArticles(1, 3, 'en');
+  const articles = result.isSuccess && result.data ? result.data.items : [];
+  const totalCount = result.isSuccess && result.data ? result.data.totalCount : 0;
 
-  return <PortalClient articles={articles} />;
+  return <PortalClient articles={articles} totalCount={totalCount} />;
 }

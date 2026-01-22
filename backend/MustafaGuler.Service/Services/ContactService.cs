@@ -10,17 +10,20 @@ namespace MustafaGuler.Service.Services
     public class ContactService : IContactService
     {
         private readonly IGenericRepository<ContactMessage> _repository;
+        private readonly IGenericRepository<Subscriber> _subscriberRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMailService _mailService;
         private readonly IMapper _mapper;
 
         public ContactService(
             IGenericRepository<ContactMessage> repository,
+            IGenericRepository<Subscriber> subscriberRepository,
             IUnitOfWork unitOfWork,
             IMailService mailService,
             IMapper mapper)
         {
             _repository = repository;
+            _subscriberRepository = subscriberRepository; // Correctly assigned
             _unitOfWork = unitOfWork;
             _mailService = mailService;
             _mapper = mapper;
@@ -41,6 +44,26 @@ namespace MustafaGuler.Service.Services
             };
 
             await _repository.AddAsync(contactMessage);
+
+            if (dto.AllowPromo)
+            {
+                var existingSubscriber = await _subscriberRepository.GetAsync(x => x.Email == dto.Email);
+                if (existingSubscriber == null)
+                {
+                    await _subscriberRepository.AddAsync(new Subscriber
+                    {
+                        Email = dto.Email,
+                        Source = "ContactForm",
+                        IsActive = true
+                    });
+                }
+                else if (!existingSubscriber.IsActive)
+                {
+                    existingSubscriber.IsActive = true;
+                    _subscriberRepository.Update(existingSubscriber);
+                }
+            }
+
             await _unitOfWork.CommitAsync();
 
             var mailSent = await _mailService.SendContactEmailAsync(contactMessage);
@@ -81,18 +104,17 @@ namespace MustafaGuler.Service.Services
             return Result<ContactMessageDetailDto>.Success(dto);
         }
 
-        public async Task<Result<IEnumerable<SubscriberDto>>> GetSubscribersAsync()
+        public async Task<Result<PagedResult<SubscriberDto>>> GetSubscribersAsync(PaginationParams paginationParams)
         {
-            var subscribers = await _repository.GetAllAsync(
-                filter: x => x.AllowPromo && !x.IsDeleted
+            var pagedEntities = await _subscriberRepository.GetPagedListAsync(
+                paginationParams,
+                filter: x => x.IsActive && !x.IsDeleted,
+                orderBy: q => q.OrderByDescending(x => x.CreatedDate)
             );
 
-            var distinctSubscribers = subscribers
-                .GroupBy(x => x.SenderEmail)
-                .Select(g => g.First());
-
-            var dtoList = _mapper.Map<IEnumerable<SubscriberDto>>(distinctSubscribers);
-            return Result<IEnumerable<SubscriberDto>>.Success(dtoList);
+            var dtoList = _mapper.Map<List<SubscriberDto>>(pagedEntities.Items);
+            var pagedResult = new PagedResult<SubscriberDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+            return Result<PagedResult<SubscriberDto>>.Success(pagedResult);
         }
     }
 }

@@ -21,6 +21,7 @@ namespace MustafaGuler.Core.Interfaces
         void Remove(T entity);
         void Update(T entity);
 
+        Task<IEnumerable<TResult>> GetProjectedListAsync<TResult>(Expression<Func<T, TResult>> selector, Expression<Func<T, bool>>? filter = null);
         Task<bool> AnyAsync(Expression<Func<T, bool>> expression);
         Task<T?> GetAsync(Expression<Func<T, bool>> filter, params Expression<Func<T, object?>>[] includes);
         Task<T?> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, params Expression<Func<T, object?>>[] includes);

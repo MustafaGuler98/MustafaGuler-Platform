@@ -17,6 +17,7 @@ namespace MustafaGuler.Repository.Contexts
         public DbSet<Category> Categories { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<ContactMessage> ContactMessages { get; set; }
+        public DbSet<Subscriber> Subscribers { get; set; }
 
         // Archives Module
         public DbSet<Movie> Movies { get; set; }

@@ -11,7 +11,8 @@ namespace MustafaGuler.Core.Interfaces.Archives.Providers
         string ProviderType { get; } // "Local", "Spotify"
         string ActivityType { get; }
 
-        Task<List<ActivityOptionDto>> GetRefreshedOptionsAsync();
+
+        Task<Guid?> GetRandomItemIdAsync(IEnumerable<Guid> excludedIds);
         Task<PublicActivityDto?> GetDetailsAsync(Guid itemId);
         Task<(string? title, string? imageUrl)> GetItemTitleAndImageAsync(Guid itemId);
 

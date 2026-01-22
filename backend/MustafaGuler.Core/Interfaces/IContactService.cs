@@ -9,6 +9,6 @@ namespace MustafaGuler.Core.Interfaces
         Task<Result> SubmitContactFormAsync(CreateContactMessageDto dto, string? clientIp);
         Task<Result<PagedResult<ContactMessageListDto>>> GetPagedListAsync(PaginationParams paginationParams);
         Task<Result<ContactMessageDetailDto>> GetByIdAsync(Guid id);
-        Task<Result<IEnumerable<SubscriberDto>>> GetSubscribersAsync();
+        Task<Result<PagedResult<SubscriberDto>>> GetSubscribersAsync(PaginationParams paginationParams);
     }
 }

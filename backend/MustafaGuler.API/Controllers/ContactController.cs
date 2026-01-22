@@ -45,9 +45,9 @@ namespace MustafaGuler.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet("subscribers")]
-        public async Task<IActionResult> GetSubscribers()
+        public async Task<IActionResult> GetSubscribers([FromQuery] PaginationParams paginationParams)
         {
-            var result = await _contactService.GetSubscribersAsync();
+            var result = await _contactService.GetSubscribersAsync(paginationParams);
             return CreateActionResultInstance(result);
         }
     }

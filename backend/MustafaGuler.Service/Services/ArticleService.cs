@@ -52,6 +52,27 @@ namespace MustafaGuler.Service.Services
             return Result<IEnumerable<ArticleListDto>>.Success(articleDtos, 200, Messages.ArticlesListed);
         }
 
+        public async Task<Result<PagedResult<ArticleListWithoutImageDto>>> GetPagedListWithoutImageAsync(PaginationParams paginationParams, string? languageCode = null)
+        {
+            Expression<Func<Article, bool>> filterExpression = x =>
+                !x.IsDeleted
+                && (string.IsNullOrEmpty(languageCode) || x.LanguageCode == languageCode);
+
+            Func<IQueryable<Article>, IOrderedQueryable<Article>> orderBy = q => q.OrderByDescending(x => x.CreatedDate);
+
+            var pagedEntities = await _repository.GetPagedListAsync(
+                paginationParams,
+                filterExpression,
+                orderBy,
+                x => x.Category
+            );
+
+            var dtoList = _mapper.Map<List<ArticleListWithoutImageDto>>(pagedEntities.Items);
+            var pagedResult = new PagedResult<ArticleListWithoutImageDto>(dtoList, pagedEntities.TotalCount, pagedEntities.PageNumber, pagedEntities.PageSize);
+
+            return Result<PagedResult<ArticleListWithoutImageDto>>.Success(pagedResult, 200, Messages.ArticlesListed);
+        }
+
         public async Task<Result<PagedResult<ArticleListDto>>> GetPagedListAsync(ArticleQueryParams queryParams)
         {
             // TODO: Consider migrating to the 'Specification Pattern'.
@@ -59,6 +80,7 @@ namespace MustafaGuler.Service.Services
                 !x.IsDeleted
                 && (string.IsNullOrEmpty(queryParams.LanguageCode) || x.LanguageCode == queryParams.LanguageCode)
                 && (!queryParams.CategoryId.HasValue || x.CategoryId == queryParams.CategoryId)
+                && (string.IsNullOrEmpty(queryParams.CategoryName) || (x.Category != null && x.Category.Name == queryParams.CategoryName))
                 && (string.IsNullOrEmpty(queryParams.SearchTerm) || x.Title.ToLower().Contains(queryParams.SearchTerm.ToLower()));
 
             Func<IQueryable<Article>, IOrderedQueryable<Article>> orderBy = q => q.ApplySorting(queryParams);

@@ -37,7 +37,21 @@ namespace MustafaGuler.Service.Services
         public async Task<Result<IEnumerable<CategoryDto>>> GetAllAsync()
         {
             var categories = await _repository.GetAllAsync();
-            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
+            var sortedCategories = categories.OrderBy(c => c.Name);
+            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(sortedCategories);
+            return Result<IEnumerable<CategoryDto>>.Success(categoryDtos);
+        }
+
+        public async Task<Result<IEnumerable<CategoryDto>>> GetAllActiveAsync()
+        {
+            var categories = await _repository.GetAllAsync();
+
+            // Get categories that have at least one active article
+            var activeCategoryIds = (await _articleRepository.GetProjectedListAsync(x => x.CategoryId, x => !x.IsDeleted)).Distinct().ToHashSet();
+
+            var activeCategories = categories.Where(c => activeCategoryIds.Contains(c.Id)).OrderBy(c => c.Name);
+
+            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(activeCategories);
             return Result<IEnumerable<CategoryDto>>.Success(categoryDtos);
         }
 

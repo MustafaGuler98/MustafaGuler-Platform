@@ -10,7 +10,7 @@ namespace MustafaGuler.Core.Interfaces.Archives
     {
         Task EnsureDefaultActivitiesExistAsync();
         Task<Result<List<ActivityDto>>> GetAllActivitiesAsync();
-        Task<Result<List<ActivityOptionDto>>> GetOptionsForTypeAsync(string activityType);
+
         Task<Result<bool>> UpdateActivityAsync(string activityType, Guid? selectedItemId);
         Task<Result> UpdateActivitiesAsync(List<UpdateActivityDto> items);
     }

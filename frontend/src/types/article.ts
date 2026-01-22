@@ -20,6 +20,25 @@ export interface ArticleNavigation {
   slug: string;
 }
 
+export interface ArticleListWithoutImage {
+  id: string;
+  title: string;
+  slug: string;
+  languageCode: string;
+  viewCount: number;
+  createdDate: string;
+  categoryId: string;
+  categoryName: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  parentId?: string;
+}
+
 export interface ServiceResponse<T> {
   data: T;
   isSuccess: boolean;

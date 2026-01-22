@@ -21,16 +21,12 @@ namespace MustafaGuler.Service.Services.Archives.Providers.Local
         public string ProviderType => "Local";
         public string ActivityType => "Quote";
 
-        public async Task<List<ActivityOptionDto>> GetRefreshedOptionsAsync()
+
+
+        public async Task<Guid?> GetRandomItemIdAsync(IEnumerable<Guid> excludedIds)
         {
-            var items = await _repository.GetAllAsync(x => !x.IsDeleted);
-            return items.Select(q => new ActivityOptionDto
-            {
-                Id = q.Id,
-                Title = q.Content.Length > 50 ? q.Content.Substring(0, 50) + "..." : q.Content,
-                Subtitle = q.Author,
-                CreatedDate = q.CreatedDate
-            }).ToList();
+            var item = await _repository.GetRandomAsync(x => !x.IsDeleted && !excludedIds.Contains(x.Id));
+            return item?.Id;
         }
 
         public async Task<PublicActivityDto?> GetDetailsAsync(Guid itemId)

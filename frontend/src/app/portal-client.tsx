@@ -4,14 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ArrowRight, Sparkles, Github, Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
-import { Article } from "@/types/article";
+import { Article, ArticleListWithoutImage } from "@/types/article";
 import { formatDate } from "@/lib/utils";
 import NeuralNetwork from "@/components/neural-network";
 import { mindTags } from "@/data/mind-tags";
 import { ActivitySection } from "@/components/shared/ActivitySection";
+import { articleService } from "@/services/articleServices";
 
 interface PortalClientProps {
-    articles: Article[];
+    articles: ArticleListWithoutImage[];
+    totalCount: number;
 }
 
 interface CarouselSlot {
@@ -27,16 +29,19 @@ const SLOT_ANGLES = [0, 60, 120, 180, 240, 300];
 const ORBIT_RADIUS = 38;
 const ROTATION_SPEED = 0.15; // degrees per frame
 
-export default function PortalClient({ articles }: PortalClientProps) {
+export default function PortalClient({ articles, totalCount }: PortalClientProps) {
     const [mounted, setMounted] = useState(false);
     const [slots, setSlots] = useState<CarouselSlot[]>([]);
     const [rotationOffset, setRotationOffset] = useState(0);
     const [wordIndex, setWordIndex] = useState(NUM_SLOTS);
-    const [articlePage, setArticlePage] = useState(0); // Pagination for articles
+
+    // Pagination state
+    const [articlePage, setArticlePage] = useState(0);
+    const [currentArticles, setCurrentArticles] = useState<ArticleListWithoutImage[]>(articles);
+    const [isLoadingArticles, setIsLoadingArticles] = useState(false);
 
     const ARTICLES_PER_PAGE = 3;
-    const totalPages = Math.ceil(articles.length / ARTICLES_PER_PAGE);
-    const visibleArticles = articles.slice(articlePage * ARTICLES_PER_PAGE, (articlePage + 1) * ARTICLES_PER_PAGE);
+    const totalPages = Math.ceil(totalCount / ARTICLES_PER_PAGE);
 
     // Shuffled word queue
     const wordQueue = useMemo(() => {
@@ -140,6 +145,25 @@ export default function PortalClient({ articles }: PortalClientProps) {
         animate();
         return () => cancelAnimationFrame(animationFrame);
     }, [mounted, slots.length, wordQueue, wordIndex]);
+
+    // Handle Page Change
+    const handlePageChange = async (newPage: number) => {
+        if (newPage < 0 || newPage >= totalPages) return;
+
+        setIsLoadingArticles(true);
+        try {
+            // API expects 1-based page index, we use 0-based index locally
+            const result = await articleService.getPagedWithoutImageArticles(newPage + 1, ARTICLES_PER_PAGE, 'en');
+            if (result.isSuccess && result.data) {
+                setCurrentArticles(result.data.items);
+                setArticlePage(newPage);
+            }
+        } catch (error) {
+            console.error("Failed to fetch articles:", error);
+        } finally {
+            setIsLoadingArticles(false);
+        }
+    };
 
     if (!mounted) {
         return <div className="min-h-screen" />;
@@ -293,7 +317,7 @@ export default function PortalClient({ articles }: PortalClientProps) {
                         </Link>
                     </div>
 
-                    {articles.length === 0 ? (
+                    {currentArticles.length === 0 && !isLoadingArticles ? (
                         <div className="text-center py-12 border border-dashed border-border rounded-lg bg-card/20">
                             <p className="text-muted-foreground font-mono text-sm">
                                 [INFO] No logs found in the archive...
@@ -303,19 +327,19 @@ export default function PortalClient({ articles }: PortalClientProps) {
                         <div className="flex items-center gap-4">
                             {/* Left Arrow */}
                             <button
-                                onClick={() => setArticlePage(p => Math.max(0, p - 1))}
-                                className={`p-2 rounded-full transition-colors duration-300 ${articlePage > 0
+                                onClick={() => handlePageChange(articlePage - 1)}
+                                className={`p-2 rounded-full transition-colors duration-300 ${articlePage > 0 && !isLoadingArticles
                                     ? 'text-white hover:text-cyan-neon hover:shadow-[0_0_12px_var(--cyan-neon)] cursor-pointer'
                                     : 'text-white/20 pointer-events-none'
                                     }`}
-                                disabled={articlePage === 0}
+                                disabled={articlePage === 0 || isLoadingArticles}
                             >
                                 <ChevronLeft className="w-6 h-6" />
                             </button>
 
                             {/* Cards Grid */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
-                                {visibleArticles.map((article) => (
+                            <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 transition-opacity duration-300 ${isLoadingArticles ? 'opacity-50' : 'opacity-100'}`}>
+                                {currentArticles.map((article) => (
                                     <Link
                                         key={article.id}
                                         href={`/blog/${article.slug}`}
@@ -350,12 +374,12 @@ export default function PortalClient({ articles }: PortalClientProps) {
 
                             {/* Right Arrow */}
                             <button
-                                onClick={() => setArticlePage(p => Math.min(totalPages - 1, p + 1))}
-                                className={`p-2 rounded-full transition-colors duration-300 ${articlePage < totalPages - 1
+                                onClick={() => handlePageChange(articlePage + 1)}
+                                className={`p-2 rounded-full transition-colors duration-300 ${articlePage < totalPages - 1 && !isLoadingArticles
                                     ? 'text-white hover:text-cyan-neon hover:shadow-[0_0_12px_var(--cyan-neon)] cursor-pointer'
                                     : 'text-white/20 pointer-events-none'
                                     }`}
-                                disabled={articlePage >= totalPages - 1}
+                                disabled={articlePage >= totalPages - 1 || isLoadingArticles}
                             >
                                 <ChevronRight className="w-6 h-6" />
                             </button>

@@ -113,18 +113,7 @@ namespace MustafaGuler.Service.Services.Archives
             return Result<List<ActivityDto>>.Success(result);
         }
 
-        public async Task<Result<List<ActivityOptionDto>>> GetOptionsForTypeAsync(string activityType)
-        {
-            var providerResult = _providerFactory.GetProvider(activityType);
-            if (!providerResult.IsSuccess)
-            {
-                return Result<List<ActivityOptionDto>>.Failure(providerResult.StatusCode, providerResult.Message);
-            }
 
-            var provider = providerResult.Data!;
-            var options = await provider.GetRefreshedOptionsAsync();
-            return Result<List<ActivityOptionDto>>.Success(options.OrderBy(o => o.Title).ToList());
-        }
 
         public async Task<Result<bool>> UpdateActivityAsync(string activityType, Guid? selectedItemId)
         {

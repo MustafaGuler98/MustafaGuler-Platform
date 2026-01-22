@@ -1,11 +1,12 @@
 "use client";
 
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Article } from "@/types/article";
 import { formatDate, getImageUrl } from "@/lib/utils";
-import { ChevronLeft, ChevronRight, Sparkles, Calendar, ArrowRight, Zap, Database, Folder, Filter, Quote, Book, Film, Music } from "lucide-react";
+import { ChevronLeft, ChevronRight, Zap, Database, Folder, Filter, Calendar } from "lucide-react";
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { BlogQuoteWidget, BlogBookWidget, BlogFilmWidget, BlogMusicWidget } from "@/components/blog/widgets/SidebarWidgets";
 import { BlogHeaderStats } from "@/components/blog/widgets/BlogHeaderStats";
@@ -15,33 +16,31 @@ import type { ArchivesStats } from '@/types/archives';
 interface BlogClientProps {
     articles: Article[];
     popularArticles: Article[];
+    categories: string[];
     stats: ArchivesStats | null;
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+    };
 }
 
-export default function BlogClient({ articles, popularArticles, stats }: BlogClientProps) {
+export default function BlogClient({ articles, popularArticles, categories, stats, pagination }: BlogClientProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [mounted, setMounted] = useState(false);
 
-    const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+    const currentCategory = searchParams.get('category');
     const [popularPage, setPopularPage] = useState(0);
-    const [gridPage, setGridPage] = useState(0);
 
     const [gridParent] = useAutoAnimate();
 
     const POPULAR_ITEMS_PER_PAGE = 3;
-    const GRID_ITEMS_PER_PAGE = 6;
 
     useEffect(() => {
         setMounted(true);
-        const allCats = new Set(articles.map(a => a.categoryName || "Uncategorized"));
-        setSelectedCategories(allCats);
-    }, [articles]);
+    }, []);
 
-    const uniqueCategories = useMemo(() => {
-        const cats = new Set(articles.map(a => a.categoryName || "Uncategorized"));
-        return Array.from(cats).sort();
-    }, [articles]);
-
-    // (sorted by backend)
     const visiblePopularArticles = popularArticles.slice(
         popularPage * POPULAR_ITEMS_PER_PAGE,
         (popularPage + 1) * POPULAR_ITEMS_PER_PAGE
@@ -49,28 +48,24 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
 
     const maxPopularPages = Math.min(3, Math.ceil(popularArticles.length / POPULAR_ITEMS_PER_PAGE));
 
-    // Filtered Grid Logic
-    const filteredArticles = useMemo(() => {
-        return articles.filter(a => selectedCategories.has(a.categoryName || "Uncategorized"));
-    }, [articles, selectedCategories]);
+    const visibleGridArticles = articles;
 
-    const totalGridPages = Math.ceil(filteredArticles.length / GRID_ITEMS_PER_PAGE);
 
-    const visibleGridArticles = filteredArticles.slice(
-        gridPage * GRID_ITEMS_PER_PAGE,
-        (gridPage + 1) * GRID_ITEMS_PER_PAGE
-    );
+    const currentPage = pagination?.currentPage || 1;
+    const totalPages = pagination?.totalPages || 1;
 
-    // Handlers
+
     const toggleCategory = (category: string) => {
-        const next = new Set(selectedCategories);
-        if (next.has(category)) {
-            next.delete(category);
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (currentCategory === category) {
+            params.delete('category'); // Deselect
         } else {
-            next.add(category);
+            params.set('category', category); // Select
         }
-        setSelectedCategories(next);
-        setGridPage(0);
+
+        params.set('page', '1'); // Reset to page 1 on filter change
+        router.push(`/blog?${params.toString()}`, { scroll: false });
     };
 
     const handlePopularNav = (direction: 'next' | 'prev') => {
@@ -82,10 +77,17 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
     };
 
     const handleGridNav = (direction: 'next' | 'prev') => {
+        let nextPage = currentPage;
         if (direction === 'next') {
-            setGridPage(p => Math.min(totalGridPages - 1, p + 1));
+            if (currentPage < totalPages) nextPage = currentPage + 1;
         } else {
-            setGridPage(p => Math.max(0, p - 1));
+            if (currentPage > 1) nextPage = currentPage - 1;
+        }
+
+        if (nextPage !== currentPage) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set('page', nextPage.toString());
+            router.push(`/blog?${params.toString()}`);
         }
     };
 
@@ -109,7 +111,7 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                     </div>
 
                     {/* Right side stats - API based */}
-                    <BlogHeaderStats articleCount={articles.length} stats={stats} />
+                    <BlogHeaderStats articleCount={pagination?.totalCount || articles.length} stats={stats} />
                 </div>
 
                 {/* Popular Carousel Section */}
@@ -201,7 +203,7 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                                 ALL LOGS
                             </h2>
                             <span className="font-mono text-xs text-muted-foreground/60">
-                                {visibleGridArticles.length} / {filteredArticles.length}
+                                {visibleGridArticles.length} items
                             </span>
                         </div>
 
@@ -209,7 +211,6 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                             {visibleGridArticles.map((article) => (
                                 <Link href={`/blog/${article.slug}`} key={article.id} className="group flex flex-col h-full">
                                     {/* Top Border Accent - Cyan Theme */}
-
 
                                     <div className="relative overflow-hidden rounded-lg border transition-all duration-300 h-full flex flex-col
                                                 bg-[#0a0e14]/95 border-cyan-500/20 backdrop-blur-sm
@@ -256,11 +257,11 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                         </div>
 
                         {/* Grid Pagination */}
-                        {totalGridPages > 1 && (
+                        {totalPages > 1 && (
                             <div className="flex justify-center items-center gap-4 mt-12">
                                 <button
                                     onClick={() => handleGridNav('prev')}
-                                    disabled={gridPage === 0}
+                                    disabled={currentPage <= 1}
                                     className="px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest 
                                             hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon
                                             disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500
@@ -269,11 +270,11 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                                     Previous
                                 </button>
                                 <span className="font-mono text-xs text-muted-foreground">
-                                    <span className="text-primary">{gridPage + 1}</span> / {totalGridPages}
+                                    <span className="text-primary">{currentPage}</span> / {totalPages}
                                 </span>
                                 <button
                                     onClick={() => handleGridNav('next')}
-                                    disabled={gridPage >= totalGridPages - 1}
+                                    disabled={currentPage >= totalPages}
                                     className="px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest 
                                             hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon
                                             disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500
@@ -299,8 +300,22 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                                 </div>
 
                                 <div className="flex flex-wrap gap-2">
-                                    {uniqueCategories.map(cat => {
-                                        const isActive = selectedCategories.has(cat);
+                                    {/* ALL Button */}
+                                    <button
+                                        onClick={() => router.push('/blog', { scroll: false })}
+                                        className={`
+                                            text-[11px] font-mono font-bold uppercase px-3 py-1.5 rounded transition-all duration-300 border
+                                            ${!currentCategory
+                                                ? 'bg-amber-500/10 border-amber-500/40 text-amber-400 hover:shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+                                                : 'bg-transparent border-white/10 text-muted-foreground hover:border-white/30 hover:text-gray-300'
+                                            }
+                                        `}
+                                    >
+                                        ALL
+                                    </button>
+
+                                    {categories.map(cat => {
+                                        const isActive = currentCategory === cat;
                                         return (
                                             <button
                                                 key={cat}
@@ -320,10 +335,7 @@ export default function BlogClient({ articles, popularArticles, stats }: BlogCli
                                 </div>
 
                                 <button
-                                    onClick={() => {
-                                        const allCats = new Set(articles.map(a => a.categoryName || "Uncategorized"));
-                                        setSelectedCategories(allCats);
-                                    }}
+                                    onClick={() => router.push('/blog', { scroll: false })}
                                     className="w-full text-[10px] text-muted-foreground hover:text-cyan-neon transition-colors text-center uppercase tracking-widest font-mono pt-3 border-t border-white/5"
                                 >
                                     Reset Filters

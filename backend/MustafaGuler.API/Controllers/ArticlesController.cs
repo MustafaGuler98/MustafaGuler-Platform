@@ -30,7 +30,19 @@ namespace MustafaGuler.API.Controllers
             return CreateActionResultInstance(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [HttpGet("without-image")]
+        [EnableRateLimiting("SearchPolicy")]
+        public async Task<IActionResult> GetWithoutImage(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? languageCode = null)
+        {
+            var paginationParams = new PaginationParams { PageNumber = pageNumber, PageSize = pageSize };
+            var result = await _articleService.GetPagedListWithoutImageAsync(paginationParams, languageCode);
+            return CreateActionResultInstance(result);
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         [EnableRateLimiting("SearchPolicy")]
         public async Task<IActionResult> Get([FromQuery] ArticleQueryParams queryParams)

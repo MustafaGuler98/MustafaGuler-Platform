@@ -27,6 +27,13 @@ namespace MustafaGuler.API.Controllers
             return CreateActionResultInstance(result);
         }
 
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActive()
+        {
+            var result = await _categoryService.GetAllActiveAsync();
+            return CreateActionResultInstance(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

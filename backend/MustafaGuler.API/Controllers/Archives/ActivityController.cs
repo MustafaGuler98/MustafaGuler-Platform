@@ -35,13 +35,7 @@ namespace MustafaGuler.API.Controllers.Archives
             return CreateActionResultInstance(result);
         }
 
-        [HttpGet("options/{type}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetOptions(string type)
-        {
-            var result = await _activityService.GetOptionsForTypeAsync(type);
-            return CreateActionResultInstance(result);
-        }
+
 
         [HttpPut("{type}")]
         [Authorize(Roles = "Admin")]

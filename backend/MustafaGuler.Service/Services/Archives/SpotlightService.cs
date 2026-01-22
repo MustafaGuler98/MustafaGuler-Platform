@@ -165,29 +165,25 @@ namespace MustafaGuler.Service.Services.Archives
             if (!providerResult.IsSuccess) return null;
             var provider = providerResult.Data!;
 
-            var options = await provider.GetRefreshedOptionsAsync();
-            if (options == null || !options.Any()) return null;
-
-            var allCandidateIds = options.Select(x => x.Id).ToList();
-
-            var historyCountToExclude = Math.Min(allCandidateIds.Count - 1, 10);
-
+            // 1. Get recently shown items to avoid repetition
+            var historyCountToExclude = 10;
             var recentItems = await _repository.GetAllAsync(x => x.Category == category);
-            var usedItemIds = recentItems
+            var excludedIds = recentItems
                 .OrderByDescending(x => x.CreatedDate)
                 .Take(historyCountToExclude)
                 .Select(x => x.ItemId)
                 .ToHashSet();
 
-            var validCandidates = allCandidateIds.Where(id => !usedItemIds.Contains(id)).ToList();
+            // 2. Try to get a random item that is NOT in the excluded list
+            var selectedId = await provider.GetRandomItemIdAsync(excludedIds);
 
-            if (!validCandidates.Any())
+            // 3. Fallback: If all items have been shown recently, pick ANY random item
+            if (selectedId == null)
             {
-                validCandidates = allCandidateIds;
+                selectedId = await provider.GetRandomItemIdAsync(new List<Guid>());
             }
 
-            var random = new Random();
-            var selectedId = validCandidates[random.Next(validCandidates.Count)];
+            if (selectedId == null) return null; // No content exists at all
 
             var duration = category switch
             {
@@ -202,7 +198,7 @@ namespace MustafaGuler.Service.Services.Archives
             return new SpotlightItem
             {
                 Category = category,
-                ItemId = selectedId,
+                ItemId = selectedId.Value,
                 StartDate = DateTime.UtcNow,
                 EndDate = DateTime.UtcNow.Add(duration),
                 IsManualSelection = false

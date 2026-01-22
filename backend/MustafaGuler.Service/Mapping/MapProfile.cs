@@ -18,6 +18,8 @@ namespace MustafaGuler.Service.Mapping
                 .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.User != null ? $"{src.User.FirstName} {src.User.LastName}" : "Unknown"))
                 .ForMember(dest => dest.MainImage, opt => opt.MapFrom(src => src.MainImage ?? "/assets/images/default-article.png"));
 
+            CreateMap<Article, ArticleListWithoutImageDto>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null));
 
             CreateMap<Article, ArticleDetailDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
@@ -54,6 +56,7 @@ namespace MustafaGuler.Service.Mapping
             CreateMap<ContactMessage, ContactMessageDetailDto>();
 
             CreateMap<ContactMessage, SubscriberDto>();
+            CreateMap<Subscriber, SubscriberDto>();
 
             // ARCHIVES
             CreateMap<Movie, MovieDto>();

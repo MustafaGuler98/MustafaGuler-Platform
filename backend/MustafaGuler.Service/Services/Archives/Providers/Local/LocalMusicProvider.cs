@@ -21,17 +21,12 @@ namespace MustafaGuler.Service.Services.Archives.Providers.Local
         public string ProviderType => "Local";
         public string ActivityType => "Music";
 
-        public async Task<List<ActivityOptionDto>> GetRefreshedOptionsAsync()
+
+
+        public async Task<Guid?> GetRandomItemIdAsync(IEnumerable<Guid> excludedIds)
         {
-            var items = await _repository.GetAllAsync(x => !x.IsDeleted);
-            return items.Select(m => new ActivityOptionDto
-            {
-                Id = m.Id,
-                Title = m.Title,
-                ImageUrl = m.CoverImageUrl,
-                Subtitle = m.Artist,
-                CreatedDate = m.CreatedDate
-            }).ToList();
+            var item = await _repository.GetRandomAsync(x => !x.IsDeleted && !excludedIds.Contains(x.Id));
+            return item?.Id;
         }
 
         public async Task<PublicActivityDto?> GetDetailsAsync(Guid itemId)

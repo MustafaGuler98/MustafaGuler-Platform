@@ -9,6 +9,7 @@ namespace MustafaGuler.Core.Interfaces
     public interface ICategoryService
     {
         Task<Result<IEnumerable<CategoryDto>>> GetAllAsync();
+        Task<Result<IEnumerable<CategoryDto>>> GetAllActiveAsync();
         Task<Result<CategoryDto>> GetByIdAsync(Guid id);
         Task<Result<CategoryDto>> GetBySlugAsync(string slug);
         Task<Result> AddAsync(CategoryAddDto categoryAddDto);

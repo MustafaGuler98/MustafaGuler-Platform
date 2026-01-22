@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Article } from "@/types/article";
+import { Article, ArticleListWithoutImage } from "@/types/article";
 import { Calendar, Search, Activity, ChevronRight, Zap, X } from "lucide-react";
 import { cn, formatCardDate } from "@/lib/utils";
 
 interface GroupedArticles {
-  [year: string]: Article[];
+  [year: string]: ArticleListWithoutImage[];
 }
 
 interface TimelineClientProps {
-  initialArticles: Article[];
+  initialArticles: ArticleListWithoutImage[];
 }
 
 export default function TimelineClient({ initialArticles }: TimelineClientProps) {

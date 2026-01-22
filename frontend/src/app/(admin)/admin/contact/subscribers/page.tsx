@@ -1,27 +1,40 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { Users, ArrowLeft, Send } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Users, ArrowLeft, Send, ChevronLeft, ChevronRight } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { ErrorMessage } from '@/components/admin/layout';
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
-import { AdminListHeader } from '@/components/admin/ui/AdminListHeader';
 import { CyberTable } from '@/components/ui/cyber/CyberTable';
-import { CyberBadge } from '@/components/ui/cyber/CyberBadge';
 
 interface Subscriber {
-    senderName: string;
-    senderEmail: string;
+    id: string;
+    email: string;
+    source: string;
+    createdDate: string;
+    isActive: boolean;
+}
+
+interface PagedResult {
+    items: Subscriber[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
 }
 
 export default function SubscribersPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const pageMs = Number(searchParams.get('page')) || 1;
 
     const { data: response, isLoading, error } = useQuery({
-        queryKey: ['subscribers'],
+        queryKey: ['subscribers', pageMs],
         queryFn: async () => {
-            const res = await apiClient.get<Subscriber[]>('/contact/subscribers');
+            const res = await apiClient.get<PagedResult>(`/contact/subscribers?pageNumber=${pageMs}&pageSize=20`);
             if (!res.isSuccess) {
                 throw new Error(res.message || 'Failed to fetch subscribers');
             }
@@ -29,10 +42,18 @@ export default function SubscribersPage() {
         },
     });
 
-    const subscribers = response ?? [];
+    const subscribers = response?.items ?? [];
+    const totalCount = response?.totalCount ?? 0;
+    const totalPages = response?.totalPages ?? 1;
 
     const handleBulkEmail = () => {
         alert('This feature is not yet implemented.');
+    };
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage > 0 && newPage <= totalPages) {
+            router.push(`/admin/contact/subscribers?page=${newPage}`);
+        }
     };
 
     return (
@@ -70,31 +91,62 @@ export default function SubscribersPage() {
                 <CyberTable
                     columns={[
                         {
-                            key: 'senderName',
-                            label: 'Name',
+                            key: 'email',
+                            label: 'Email',
                             render: (row: Subscriber) => (
-                                <span className="text-foreground">{row.senderName}</span>
+                                <span className="text-cyan-neon font-mono">{row.email}</span>
                             ),
                         },
                         {
-                            key: 'senderEmail',
-                            label: 'Email',
+                            key: 'source',
+                            label: 'Source',
                             render: (row: Subscriber) => (
-                                <span className="text-cyan-neon">{row.senderEmail}</span>
+                                <span className="text-xs text-muted-foreground border border-white/10 px-2 py-0.5 rounded uppercase">
+                                    {row.source || 'UNKNOWN'}
+                                </span>
                             ),
                         },
+                        {
+                            key: 'createdDate',
+                            label: 'Joined',
+                            render: (row: Subscriber) => (
+                                <span className="text-xs text-muted-foreground">
+                                    {new Date(row.createdDate).toLocaleDateString()}
+                                </span>
+                            ),
+                        }
                     ]}
                     data={subscribers}
                     isLoading={isLoading}
                     emptyMessage="NO_SUBSCRIBERS_FOUND"
                 />
 
-                {/* Summary */}
-                {!isLoading && subscribers.length > 0 && (
-                    <div className="flex items-center justify-center py-4 border-t border-white/5">
+                {/* Footer / Pagination */}
+                {!isLoading && (
+                    <div className="flex items-center justify-between p-4 border-t border-white/5 bg-black/20">
                         <span className="font-mono text-xs text-muted-foreground">
-                            TOTAL: <span className="text-cyan-neon">{subscribers.length}</span> SUBSCRIBERS
+                            TOTAL: <span className="text-cyan-neon">{totalCount}</span> SUBSCRIBERS
                         </span>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handlePageChange(pageMs - 1)}
+                                disabled={pageMs <= 1}
+                                className="p-1 hover:bg-white/10 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ChevronLeft size={16} className="text-muted-foreground" />
+                            </button>
+                            <span className="font-mono text-xs text-muted-foreground">
+                                PAGE {pageMs} / {totalPages}
+                            </span>
+                            <button
+                                onClick={() => handlePageChange(pageMs + 1)}
+                                disabled={pageMs >= totalPages}
+                                className="p-1 hover:bg-white/10 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            >
+                                <ChevronRight size={16} className="text-muted-foreground" />
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

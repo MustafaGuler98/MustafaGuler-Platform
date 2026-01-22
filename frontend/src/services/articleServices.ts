@@ -1,4 +1,5 @@
-import { Article } from '@/types/article';
+import { Article, ArticleListWithoutImage, Category, ServiceResponse } from '@/types/article';
+import { PagedResult } from '@/types/admin';
 import { apiClient } from '@/lib/api-client';
 
 class ApiError extends Error {
@@ -65,6 +66,42 @@ export const articleService = {
       );
     }
 
+    return response.data || [];
+  },
+
+  async getPagedArticles(page: number, pageSize: number, languageCode?: string, categoryName?: string): Promise<ServiceResponse<PagedResult<Article>>> {
+    const params = new URLSearchParams();
+    params.append('PageNumber', page.toString());
+    params.append('PageSize', pageSize.toString());
+    if (languageCode) {
+      params.append('LanguageCode', languageCode);
+    }
+    if (categoryName) {
+      params.append('CategoryName', categoryName);
+    }
+
+    return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, { cache: 'no-store' });
+  },
+
+  async getPagedWithoutImageArticles(page: number, pageSize: number, languageCode?: string): Promise<ServiceResponse<PagedResult<ArticleListWithoutImage>>> {
+    const params = new URLSearchParams();
+    params.append('pageNumber', page.toString());
+    params.append('pageSize', pageSize.toString());
+    if (languageCode) {
+      params.append('languageCode', languageCode);
+    }
+
+    return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, { cache: 'no-store' });
+  },
+
+  async getAllCategories(): Promise<Category[]> {
+    const response = await apiClient.get<Category[]>('/categories/active', { cache: 'no-store' }); // or 1 hour cache
+
+    if (!response.isSuccess) {
+      // Log but return empty to not break page
+      console.error('Failed to fetch categories', response.message);
+      return [];
+    }
     return response.data || [];
   }
 };

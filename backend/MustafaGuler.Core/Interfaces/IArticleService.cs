@@ -11,6 +11,7 @@ namespace MustafaGuler.Core.Interfaces
     public interface IArticleService
     {
         Task<Result<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null);
+        Task<Result<PagedResult<ArticleListWithoutImageDto>>> GetPagedListWithoutImageAsync(PaginationParams paginationParams, string? languageCode = null);
         Task<Result<PagedResult<ArticleListDto>>> GetPagedListAsync(ArticleQueryParams queryParams);
         Task<Result<IEnumerable<ArticleListDto>>> GetPopularAsync(int count = 9, string? languageCode = null);
         Task<Result<ArticleDetailDto>> GetBySlugAsync(string slug);
