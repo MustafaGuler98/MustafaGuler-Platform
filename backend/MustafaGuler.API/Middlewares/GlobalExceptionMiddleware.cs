@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
 using MustafaGuler.Core.Utilities.Results;
-using Serilog;
 
 namespace MustafaGuler.API.Middlewares
 {
@@ -9,11 +8,13 @@ namespace MustafaGuler.API.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
-        public GlobalExceptionMiddleware(RequestDelegate next, IWebHostEnvironment env)
+        public GlobalExceptionMiddleware(RequestDelegate next, IWebHostEnvironment env, ILogger<GlobalExceptionMiddleware> logger)
         {
             _next = next;
             _env = env;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -30,7 +31,10 @@ namespace MustafaGuler.API.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            Log.Error(exception, "Server Error: {Message}", exception.Message);
+            _logger.LogError(exception, "Server Error: {Message} | Path: {Path} | Method: {Method}",
+                exception.Message,
+                context.Request.Path,
+                context.Request.Method);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

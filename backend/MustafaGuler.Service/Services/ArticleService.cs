@@ -8,6 +8,7 @@ using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
 using MustafaGuler.Service.Extensions;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace MustafaGuler.Service.Services
 {
@@ -17,13 +18,15 @@ namespace MustafaGuler.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ILogger<ArticleService> _logger;
 
-        public ArticleService(IGenericRepository<Article> repository, IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService)
+        public ArticleService(IGenericRepository<Article> repository, IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, ILogger<ArticleService> logger)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _logger = logger;
         }
 
         public async Task<Result<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null)
@@ -146,6 +149,7 @@ namespace MustafaGuler.Service.Services
 
             if (article == null)
             {
+                _logger.LogWarning("Article not found by slug: {Slug}", slug);
                 return Result<ArticleDetailDto>.Failure(404, Messages.ArticleNotFound);
             }
 
@@ -182,6 +186,7 @@ namespace MustafaGuler.Service.Services
 
             if (_currentUserService.UserId == null)
             {
+                _logger.LogWarning("Unauthorized article add attempt.");
                 return Result.Failure(401, "User is not authenticated (UserId not found).");
             }
             article.UserId = _currentUserService.UserId.Value;
@@ -191,6 +196,7 @@ namespace MustafaGuler.Service.Services
             await _repository.AddAsync(article);
             await _unitOfWork.CommitAsync();
 
+            _logger.LogInformation("Article created: {Title} ({Id}) by User: {UserId}", article.Title, article.Id, article.UserId);
             return Result.Success(201, Messages.ArticleAdded);
         }
 
@@ -220,6 +226,7 @@ namespace MustafaGuler.Service.Services
 
             if (article == null || article.IsDeleted)
             {
+                _logger.LogWarning("Update failed: Article not found {Id}", articleUpdateDto.Id);
                 return Result.Failure(404, Messages.ArticleNotFound);
             }
 
@@ -239,6 +246,7 @@ namespace MustafaGuler.Service.Services
             _repository.Update(article);
             await _unitOfWork.CommitAsync();
 
+            _logger.LogInformation("Article updated: {Id}", article.Id);
             return Result.Success(200, Messages.ArticleUpdated);
         }
 
@@ -248,6 +256,7 @@ namespace MustafaGuler.Service.Services
 
             if (article == null || article.IsDeleted)
             {
+                _logger.LogWarning("Delete failed: Article not found {Id}", id);
                 return Result.Failure(404, Messages.ArticleNotFound);
             }
 
@@ -258,6 +267,7 @@ namespace MustafaGuler.Service.Services
             _repository.Update(article);
             await _unitOfWork.CommitAsync();
 
+            _logger.LogWarning("Article soft-deleted: {Id}", id);
             return Result.Success(200, Messages.ArticleDeleted);
         }
         private async Task<string> GenerateUniqueSlugAsync(string title)

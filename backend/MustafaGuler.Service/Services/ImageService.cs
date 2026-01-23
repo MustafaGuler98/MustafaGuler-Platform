@@ -13,6 +13,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
+
 namespace MustafaGuler.Service.Services
 {
     public class ImageService : IImageService
@@ -22,19 +24,22 @@ namespace MustafaGuler.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly ILogger<ImageService> _logger;
 
         public ImageService(
             IWebHostEnvironment env,
             IGenericRepository<Image> repository,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            ILogger<ImageService> logger)
         {
             _env = env;
             _repository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _logger = logger;
         }
 
         public async Task<Result<ImageInfoDto>> UploadAsync(FileUploadData fileData, string customName, string folder = "articles")
@@ -44,7 +49,10 @@ namespace MustafaGuler.Service.Services
 
             long fileSizeLimit = 10 * 1024 * 1024;
             if (fileData.Length > fileSizeLimit)
+            {
+                _logger.LogWarning("File upload failed: Size limit exceeded ({Size} bytes)", fileData.Length);
                 return Result<ImageInfoDto>.Failure(400, Messages.FileSizeLimitExceeded);
+            }
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
             var extension = Path.GetExtension(fileData.FileName).ToLowerInvariant();
@@ -72,7 +80,10 @@ namespace MustafaGuler.Service.Services
             string url = $"/uploads/{folder}/{fileName}";
 
             if (File.Exists(filePath) || await _repository.AnyAsync(x => x.Url == url))
+            {
+                _logger.LogWarning("File upload failed: File already exists ({FileName})", fileName);
                 return Result<ImageInfoDto>.Failure(409, string.Format(Messages.FileAlreadyExists, safeName));
+            }
 
             var imageEntity = new Image
             {
@@ -94,11 +105,14 @@ namespace MustafaGuler.Service.Services
 
                 await _unitOfWork.CommitAsync();
 
+                _logger.LogInformation("File uploaded: {FileName}, Size: {Size} bytes, User: {UserId}", fileName, fileData.Length, _currentUserService.UserId);
+
                 var dto = _mapper.Map<ImageInfoDto>(imageEntity);
                 return Result<ImageInfoDto>.Success(dto, 201, Messages.ImageUploaded);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "File upload failed with exception: {FileName}", fileName);
                 if (File.Exists(filePath))
                     File.Delete(filePath);
 
@@ -157,7 +171,10 @@ namespace MustafaGuler.Service.Services
             var image = await _repository.GetByIdAsync(id);
 
             if (image == null || image.IsDeleted)
+            {
+                _logger.LogWarning("Delete failed: Image not found {Id}", id);
                 return Result.Failure(404, Messages.ImageNotFound);
+            }
 
 
             // URL format: /uploads/folder/filename.ext
@@ -185,6 +202,7 @@ namespace MustafaGuler.Service.Services
                 File.Move(sourcePath, destinationPath);
             }
 
+            _logger.LogWarning("Image deleted: {FileName} ({Id})", image.FileName, id);
             return Result.Success(200, Messages.ImageDeleted);
         }
 
