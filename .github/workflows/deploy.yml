@@ -47,13 +47,9 @@ jobs:
           NEXT_PUBLIC_BACKEND_URL: https://mustafaguler.me
         run: |
           ssh $USERNAME@$HOST << EOF
-            # Navigate to app directory
             mkdir -p ~/app
             cd ~/app
 
-            # 1. Pull latest code
-            # Note: We assume the repo is already cloned here. 
-            # If not, initial setup: git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git .
             git pull origin prod
 
             # 2. Create .env file from Secrets
@@ -78,15 +74,11 @@ jobs:
             echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
             echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
 
-            # 3. Restart Containers
             docker compose down
             docker compose up -d --build
 
-            # 4. Run Migrations
-            # Wait a few seconds for DB to start
             sleep 10
             docker exec mustafa-prod-api dotnet ef database update
 
-            # 5. Clean up secrets (Optional, but .env is needed for restart policies usually)
             # rm .env 
           EOF
