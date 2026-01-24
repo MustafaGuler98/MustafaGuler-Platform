@@ -43,7 +43,11 @@ jobs:
             mkdir -p ~/app
             cd ~/app
 
-            git pull origin prod
+            if [ -d ".git" ]; then
+              git pull origin prod
+            else
+              git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git .
+            fi
 
             echo "POSTGRES_USER=$POSTGRES_USER" > .env
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
@@ -66,8 +70,7 @@ jobs:
             echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
             echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
 
-            docker compose down
-            docker compose up -d --build
 
-            sleep 10
-            docker exec mustafa-prod-api dotnet ef database update
+            docker compose down || true
+            docker compose up -d --build
+        
