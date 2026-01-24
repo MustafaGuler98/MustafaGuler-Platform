@@ -3,6 +3,7 @@ import { ActivityOption } from '@/types/archives';
 import { Search, X, Calendar, Clock, Image as ImageIcon, ExternalLink, ChevronRight, Eye, RefreshCw } from 'lucide-react';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/utils';
 import { useResourcePagedList } from '@/hooks/admin/useResourcePagedList';
 import {
     movieAdminService, bookAdminService, quoteAdminService,
@@ -108,7 +109,7 @@ export function ActivitySelectorModal({
                 >
                     <div className="relative max-w-full max-h-full aspect-[2/3] h-[80vh]">
                         <Image
-                            src={previewImage}
+                            src={getImageUrl(previewImage)}
                             alt="Preview"
                             fill
                             className="object-contain"
@@ -191,7 +192,7 @@ export function ActivitySelectorModal({
                                             {item.imageUrl ? (
                                                 <>
                                                     <Image
-                                                        src={item.imageUrl}
+                                                        src={getImageUrl(item.imageUrl)}
                                                         alt={item.title}
                                                         fill
                                                         className="object-cover transition-opacity group-hover/image:opacity-50"

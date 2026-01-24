@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Tv, Star, Eye, Calendar, Layers } from 'lucide-react';
 import { tvSeriesAdminService } from '@/services/admin/archivesAdminService';
 import { useResourceById, useUpdateResource, useDeleteResource, useCreateResource } from '@/hooks/admin';
+import { getImageUrl } from '@/lib/utils';
 import { LoadingState } from '@/components/admin/layout';
 import { ArchiveDashboardLayout, DashboardStatCard } from '@/components/admin/archives';
 import { CyberInput } from '@/components/ui/cyber/CyberInput';
@@ -121,7 +122,7 @@ export default function EditTvSeriesPage() {
                     <div className="space-y-6">
                         <div className="bg-slate-900/40 border border-white/5 rounded-lg p-4 text-center space-y-4">
                             <div className="w-24 h-36 mx-auto rounded shadow-lg overflow-hidden border border-white/10 relative group bg-black">
-                                {form.coverImageUrl ? (<img src={form.coverImageUrl} className="w-full h-full object-cover" alt="TV Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><Tv /></div>)}
+                                {form.coverImageUrl ? (<img src={getImageUrl(form.coverImageUrl)} className="w-full h-full object-cover" alt="TV Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><Tv /></div>)}
                             </div>
                             <TerminalImagePicker label="COVER IMAGE" value={form.coverImageUrl || ''} onChange={(val) => setForm({ ...form, coverImageUrl: val })} />
                         </div>

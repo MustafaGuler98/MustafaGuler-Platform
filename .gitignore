@@ -17,7 +17,6 @@ Thumbs.db
 .env.*
 !.env.example
 appsettings.Development.json
-docker-compose.yml 
 
 # Backend (.NET)
 bin/

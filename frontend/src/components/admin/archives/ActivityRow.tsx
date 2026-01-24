@@ -6,6 +6,7 @@ import { CyberActionLink } from '@/components/ui/cyber/CyberActionLink';
 import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
 import { Pencil, Trash2, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/utils';
 
 interface ActivityRowProps {
     recordType: string;
@@ -67,7 +68,7 @@ export function ActivityRow({
                     <div className="relative w-12 h-16 rounded overflow-hidden border border-white/10 bg-black/40 flex-shrink-0">
                         {selectedItemImageUrl ? (
                             <Image
-                                src={selectedItemImageUrl}
+                                src={getImageUrl(selectedItemImageUrl)}
                                 alt={selectedItemTitle || recordType}
                                 fill
                                 className="object-cover"

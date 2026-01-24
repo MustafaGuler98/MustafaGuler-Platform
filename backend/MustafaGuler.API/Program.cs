@@ -56,9 +56,9 @@ builder.Services.ConfigureRateLimiting();
 
 var app = builder.Build();
 
-await app.SeedAdminUserAsync();
-
 app.ApplyMigrations();
+
+await app.SeedAdminUserAsync();
 
 if (app.Environment.IsDevelopment())
 {

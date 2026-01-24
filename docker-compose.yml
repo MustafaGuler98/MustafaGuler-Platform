@@ -1,0 +1,90 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: mustafa-prod-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/MustafaGuler.API/Dockerfile
+    container_name: mustafa-prod-api
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=${CONNECTIONSTRING_DEFAULT}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - Token__SecurityKey=${TOKEN_SECURITYKEY}
+      - Token__Issuer=${TOKEN_ISSUER}
+      - Token__Audience=${TOKEN_AUDIENCE}
+      - Cors__AllowedOrigins__0=${NEXT_PUBLIC_BACKEND_URL}
+      - MailSettings__Host=${MAILSETTINGS_HOST}
+      - MailSettings__Port=${MAILSETTINGS_PORT}
+      - MailSettings__User=${MAILSETTINGS_USER}
+      - MailSettings__Password=${MAILSETTINGS_PASSWORD}
+      - MailSettings__FromEmail=${MAILSETTINGS_FROMEMAIL}
+      - MailSettings__ToEmail=${MAILSETTINGS_TOEMAIL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./uploads:/app/wwwroot/uploads
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    container_name: mustafa-prod-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - INTERNAL_API_URL=${INTERNAL_API_URL}
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: mustafa-prod-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - api
+    restart: always
+
+  seq:
+    image: datalust/seq:2024.3
+    container_name: mustafa-seq
+    environment:
+      - ACCEPT_EULA=${SEQ_ACCEPT_EULA}
+    ports:
+      - "5341:80"
+    volumes:
+      - seq_data:/data
+    restart: always
+
+volumes:
+  postgres_data:
+  seq_data:

@@ -1,4 +1,6 @@
+'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { Archive, Film, BookOpen, Quote as QuoteIcon, Gamepad2, Music as MusicIcon, Dice6, ArrowRight, Star, Tv, MonitorPlay } from 'lucide-react';
 import { archivesStatsService } from '@/services/admin/archivesAdminService';
@@ -8,9 +10,14 @@ import { Skeleton } from '@/components/ui/cyber/Skeleton';
 import type { ArchivesStats } from '@/types/archives';
 import { RefreshStatsButton } from '@/components/admin/RefreshStatsButton';
 
-export default async function ArchivesPage() {
-    const stats = await archivesStatsService.getStats();
-    const s = stats?.data;
+export default function ArchivesPage() {
+    const { data: s, isError } = useQuery({
+        queryKey: ['admin-archives-stats'],
+        queryFn: async () => {
+            const response = await archivesStatsService.getStats();
+            return response.data;
+        }
+    });
 
     return (
         <div className="space-y-8">
@@ -30,7 +37,7 @@ export default async function ArchivesPage() {
             </div>
 
             {/* Error handling */}
-            {!s && (
+            {isError && (
                 <div className="p-4 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-mono">
                     ERROR: FAILED_TO_RETRIEVE_STATS_DATA
                 </div>

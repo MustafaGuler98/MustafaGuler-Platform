@@ -3,6 +3,7 @@
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { getImageUrl } from '@/lib/utils';
 
 interface RecordCardProps {
     recordType: string;
@@ -60,7 +61,7 @@ export function RecordCard({
             <div className="flex-1 relative aspect-[2/3] bg-black/40 border-b border-white/5 group-hover:bg-black/30 transition-colors">
                 {selectedItemImageUrl ? (
                     <Image
-                        src={selectedItemImageUrl}
+                        src={getImageUrl(selectedItemImageUrl)}
                         alt={selectedItemTitle || recordType}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
