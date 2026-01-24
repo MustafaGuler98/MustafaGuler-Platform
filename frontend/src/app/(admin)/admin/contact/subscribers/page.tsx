@@ -26,7 +26,7 @@ interface PagedResult {
     hasPreviousPage: boolean;
 }
 
-export default function SubscribersPage() {
+function SubscribersContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pageMs = Number(searchParams.get('page')) || 1;
@@ -151,5 +151,15 @@ export default function SubscribersPage() {
                 )}
             </div>
         </div>
+    );
+}
+
+import { Suspense } from 'react';
+
+export default function SubscribersPage() {
+    return (
+        <Suspense fallback={<div className="text-cyan-neon font-mono text-sm p-8">INITIALIZING_SUBSCRIBER_MODULE...</div>}>
+            <SubscribersContent />
+        </Suspense>
     );
 }
