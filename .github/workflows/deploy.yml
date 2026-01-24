@@ -76,8 +76,10 @@ jobs:
             
             docker rm -f mustafa-prod-frontend || true
             docker rm -f mustafa-prod-api || true
-            docker rm -f mustafa-prod-db || true
             docker rm -f mustafa-prod-nginx || true
             docker rm -f mustafa-seq || true
 
+            sleep 5
+            
             docker compose up -d --build
+
