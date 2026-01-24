@@ -1,0 +1,92 @@
+name: Deploy to Production (Hetzner)
+
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add Host Key
+        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          POSTGRES_USER: mustafa
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: mustafa_platform
+          CONNECTIONSTRING_DEFAULT: Host=db;Port=5432;Database=mustafa_platform;Username=mustafa;Password=${{ secrets.POSTGRES_PASSWORD }}
+          ASPNETCORE_ENVIRONMENT: Production
+          TOKEN_SECURITYKEY: ${{ secrets.JWT_KEY }}
+          TOKEN_ISSUER: mustafaguler.me
+          TOKEN_AUDIENCE: mustafaguler.me
+          ADMIN_EMAIL: mail.mustafaguler@gmail.com
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          MAILSETTINGS_HOST: smtp.resend.com
+          MAILSETTINGS_PORT: 587
+          MAILSETTINGS_USER: resend
+          MAILSETTINGS_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAILSETTINGS_FROMEMAIL: contact@mustafaguler.me
+          MAILSETTINGS_TOEMAIL: contact.mustafaguler@gmail.com
+          SEQ_ACCEPT_EULA: Y
+          NEXT_PUBLIC_API_URL: /api
+          INTERNAL_API_URL: http://api:8080
+          NEXT_PUBLIC_BACKEND_URL: https://mustafaguler.me
+        run: |
+          ssh $USERNAME@$HOST << EOF
+            # Navigate to app directory
+            mkdir -p ~/app
+            cd ~/app
+
+            # 1. Pull latest code
+            # Note: We assume the repo is already cloned here. 
+            # If not, initial setup: git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git .
+            git pull origin prod
+
+            # 2. Create .env file from Secrets
+            echo "POSTGRES_USER=$POSTGRES_USER" > .env
+            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
+            echo "POSTGRES_DB=$POSTGRES_DB" >> .env
+            echo "CONNECTIONSTRING_DEFAULT=$CONNECTIONSTRING_DEFAULT" >> .env
+            echo "ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT" >> .env
+            echo "TOKEN_SECURITYKEY=$TOKEN_SECURITYKEY" >> .env
+            echo "TOKEN_ISSUER=$TOKEN_ISSUER" >> .env
+            echo "TOKEN_AUDIENCE=$TOKEN_AUDIENCE" >> .env
+            echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> .env
+            echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+            echo "MAILSETTINGS_HOST=$MAILSETTINGS_HOST" >> .env
+            echo "MAILSETTINGS_PORT=$MAILSETTINGS_PORT" >> .env
+            echo "MAILSETTINGS_USER=$MAILSETTINGS_USER" >> .env
+            echo "MAILSETTINGS_PASSWORD=$MAILSETTINGS_PASSWORD" >> .env
+            echo "MAILSETTINGS_FROMEMAIL=$MAILSETTINGS_FROMEMAIL" >> .env
+            echo "MAILSETTINGS_TOEMAIL=$MAILSETTINGS_TOEMAIL" >> .env
+            echo "SEQ_ACCEPT_EULA=$SEQ_ACCEPT_EULA" >> .env
+            echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env
+            echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
+            echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
+
+            # 3. Restart Containers
+            docker compose down
+            docker compose up -d --build
+
+            # 4. Run Migrations
+            # Wait a few seconds for DB to start
+            sleep 10
+            docker exec mustafa-prod-api dotnet ef database update
+
+            # 5. Clean up secrets (Optional, but .env is needed for restart policies usually)
+            # rm .env 
+          EOF
