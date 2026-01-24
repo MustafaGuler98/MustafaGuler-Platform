@@ -25,7 +25,8 @@ const formatCardDate = (dateString: string) => {
 
 // Our wwwroot is in the backend folder.
 export function getImageUrl(path: string | null | undefined): string {
-  if (!path || path.includes("default-article")) return "/default-article.png";
+  if (!path) return "/default-article.png";
+  if (path.includes("default-article")) return "/default-article.png";
   if (path.startsWith("http")) return path;
 
   const baseUrl = getBackendUrl();
@@ -36,6 +37,9 @@ export function getImageUrl(path: string | null | undefined): string {
 
 function getBackendUrl(): string {
   // Static files (images) are served directly from backend
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5281';
+  }
   return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5281';
 }
 

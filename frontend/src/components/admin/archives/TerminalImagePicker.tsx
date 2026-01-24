@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, getImageUrl } from '@/lib/utils';
 import { Image, X } from 'lucide-react';
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { ImageSelectorModal } from './ImageSelectorModal';
@@ -76,7 +76,7 @@ export function TerminalImagePicker({
                 <div className="mt-2 relative w-full aspect-[21/9] rounded-md overflow-hidden border border-white/10 bg-black/20">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        src={value}
+                        src={getImageUrl(value)}
                         alt="Preview"
                         className="w-full h-full object-cover opacity-60 hover:opacity-100 transition-opacity"
                         onError={(e) => {

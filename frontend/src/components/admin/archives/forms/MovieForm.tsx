@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Film, Star, Eye, Calendar, Clock } from 'lucide-react';
 import { ArchiveDashboardLayout, DashboardStatCard } from '@/components/admin/archives';
 import { TerminalImagePicker } from '@/components/admin/archives/TerminalImagePicker';
+import { getImageUrl } from '@/lib/utils';
 import { CyberInput } from '@/components/ui/cyber/CyberInput';
 import { CyberSelect } from '@/components/ui/cyber/CyberSelect';
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
@@ -130,11 +131,13 @@ export function MovieForm({
                 <div className="space-y-6">
                     <div className="bg-slate-900/40 border border-white/5 rounded-lg p-4 text-center space-y-4">
                         <div className="w-24 h-36 mx-auto rounded shadow-lg overflow-hidden border border-white/10 relative group bg-black">
-                            {form.coverImageUrl ? (
-                                <img src={form.coverImageUrl} className="w-full h-full object-cover" alt="Movie Cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-zinc-700"><Film /></div>
-                            )}
+                            <div className="w-24 h-36 mx-auto rounded shadow-lg overflow-hidden border border-white/10 relative group bg-black">
+                                {form.coverImageUrl ? (
+                                    <img src={getImageUrl(form.coverImageUrl)} className="w-full h-full object-cover" alt="Movie Cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-zinc-700"><Film /></div>
+                                )}
+                            </div>
                         </div>
                         <TerminalImagePicker
                             label="COVER IMAGE"

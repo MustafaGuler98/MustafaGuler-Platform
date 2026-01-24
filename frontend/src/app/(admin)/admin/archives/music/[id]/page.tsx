@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Music as MusicIcon, Calendar, Star, Headphones, Tag } from 'lucide-react';
 import { musicAdminService } from '@/services/admin/archivesAdminService';
 import { LoadingState } from '@/components/admin/layout';
+import { getImageUrl } from '@/lib/utils';
 import { ArchiveDashboardLayout, DashboardStatCard } from '@/components/admin/archives';
 import { TerminalImagePicker } from '@/components/admin/archives/TerminalImagePicker';
 import { CyberInput } from '@/components/ui/cyber/CyberInput';
@@ -118,7 +119,7 @@ export default function EditMusicPage() {
                     <div className="space-y-6">
                         <div className="bg-slate-900/40 border border-white/5 rounded-lg p-4 text-center space-y-4">
                             <div className="w-24 h-24 mx-auto rounded shadow-lg overflow-hidden border border-white/10 relative group bg-black">
-                                {form.coverImageUrl ? (<img src={form.coverImageUrl} className="w-full h-full object-cover" alt="Album Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><MusicIcon /></div>)}
+                                {form.coverImageUrl ? (<img src={getImageUrl(form.coverImageUrl)} className="w-full h-full object-cover" alt="Album Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><MusicIcon /></div>)}
                             </div>
                             <TerminalImagePicker label="COVER IMAGE" value={form.coverImageUrl || ''} onChange={(val) => setForm({ ...form, coverImageUrl: val })} />
                         </div>

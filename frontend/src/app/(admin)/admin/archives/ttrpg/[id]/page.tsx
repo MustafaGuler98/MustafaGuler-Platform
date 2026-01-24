@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Dice6, Activity, User, Star, Scroll } from 'lucide-react';
 import { ttrpgAdminService } from '@/services/admin/archivesAdminService';
 import { useResourceById, useUpdateResource, useDeleteResource, useCreateResource } from '@/hooks/admin';
+import { getImageUrl } from '@/lib/utils';
 import { ArchiveDashboardLayout, DashboardStatCard } from '@/components/admin/archives';
 import { TerminalImagePicker } from '@/components/admin/archives/TerminalImagePicker';
 import { LoadingState } from '@/components/admin/layout';
@@ -121,7 +122,7 @@ export default function EditTTRPGPage() {
                     <div className="space-y-6">
                         <div className="bg-slate-900/40 border border-white/5 rounded-lg p-4 text-center space-y-4">
                             <div className="w-24 h-24 mx-auto rounded shadow-lg overflow-hidden border border-white/10 relative group bg-black">
-                                {form.coverImageUrl ? (<img src={form.coverImageUrl} className="w-full h-full object-cover" alt="Campaign Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><Dice6 /></div>)}
+                                {form.coverImageUrl ? (<img src={getImageUrl(form.coverImageUrl)} className="w-full h-full object-cover" alt="Campaign Cover" />) : (<div className="w-full h-full flex items-center justify-center text-zinc-700"><Dice6 /></div>)}
                             </div>
                             <TerminalImagePicker label="COVER IMAGE" value={form.coverImageUrl || ''} onChange={(val) => setForm({ ...form, coverImageUrl: val })} />
                         </div>

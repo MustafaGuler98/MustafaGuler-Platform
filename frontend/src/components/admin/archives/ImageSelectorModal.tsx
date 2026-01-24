@@ -7,7 +7,7 @@ import { CyberPagination } from '@/components/ui/cyber/CyberPagination';
 import { LoadingOverlay } from '@/components/ui/cyber/LoadingOverlay';
 import { X, Search, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { cn, getImageUrl } from '@/lib/utils';
 
 interface ImageInfoDto {
     id: string;
@@ -167,7 +167,7 @@ export function ImageSelectorModal({ isOpen, onClose, onSelect, initialFolder }:
                                             className="group relative aspect-[2/3] w-full rounded-md overflow-hidden border border-white/10 hover:border-cyan-500 transition-all text-left bg-black/50"
                                         >
                                             <Image
-                                                src={img.url}
+                                                src={getImageUrl(img.url)}
                                                 alt={img.alt || img.fileName}
                                                 fill
                                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
