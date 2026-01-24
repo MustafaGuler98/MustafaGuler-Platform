@@ -51,6 +51,8 @@ jobs:
             cd app
             git pull origin prod
             chmod +x ./scripts/backup_db.sh
+            mkdir -p logs
+            chmod 777 logs
 
             echo "POSTGRES_USER=$POSTGRES_USER" > .env
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
