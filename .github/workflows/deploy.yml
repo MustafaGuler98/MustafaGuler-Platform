@@ -40,14 +40,16 @@ jobs:
           port: 22
           envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,CONNECTIONSTRING_DEFAULT,ASPNETCORE_ENVIRONMENT,TOKEN_SECURITYKEY,TOKEN_ISSUER,TOKEN_AUDIENCE,ADMIN_EMAIL,ADMIN_PASSWORD,MAILSETTINGS_HOST,MAILSETTINGS_PORT,MAILSETTINGS_USER,MAILSETTINGS_PASSWORD,MAILSETTINGS_FROMEMAIL,MAILSETTINGS_TOEMAIL,SEQ_ACCEPT_EULA,NEXT_PUBLIC_API_URL,INTERNAL_API_URL,NEXT_PUBLIC_BACKEND_URL
           script: |
-            mkdir -p ~/app
-            cd ~/app
-
-            if [ -d ".git" ]; then
-              git pull origin prod
-            else
-              git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git .
+            if [ -d "app" ] && [ ! -d "app/.git" ]; then
+              rm -rf app
             fi
+
+            if [ ! -d "app" ]; then
+              git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
+            fi
+
+            cd app
+            git pull origin prod
 
             echo "POSTGRES_USER=$POSTGRES_USER" > .env
             echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
@@ -70,7 +72,5 @@ jobs:
             echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
             echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
 
-
             docker compose down || true
             docker compose up -d --build
-        
