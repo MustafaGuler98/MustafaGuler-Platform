@@ -73,4 +73,11 @@ jobs:
             echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
 
             docker compose down || true
+            
+            docker rm -f mustafa-prod-frontend || true
+            docker rm -f mustafa-prod-api || true
+            docker rm -f mustafa-prod-db || true
+            docker rm -f mustafa-prod-nginx || true
+            docker rm -f mustafa-seq || true
+
             docker compose up -d --build
