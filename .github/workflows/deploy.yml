@@ -72,7 +72,7 @@ jobs:
             echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
             echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
 
-            docker compose down -v || true
+            docker compose down || true
             
             docker rm -f mustafa-prod-frontend || true
             docker rm -f mustafa-prod-api || true
