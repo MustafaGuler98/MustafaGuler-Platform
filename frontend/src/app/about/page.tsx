@@ -25,7 +25,7 @@ export default function AboutPage() {
 
                     {/* Header Title */}
                     <div className="mb-8 text-center md:text-left">
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white mb-2">
+                        <h1 className="text-4xl md:text-8xl font-black tracking-tighter text-white mb-2">
                             MUSTAFA GULER
                         </h1>
                         <div className="flex items-center justify-center md:justify-start gap-3">

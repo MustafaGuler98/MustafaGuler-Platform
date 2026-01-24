@@ -193,7 +193,7 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                 </section>
 
                 {/* Main Content Split */}
-                <div className="flex flex-col lg:flex-row gap-12 relative">
+                <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 relative">
 
                     {/* Left: Article Grid (75%) */}
                     <div className="flex-1 w-full lg:w-3/4">
@@ -288,7 +288,7 @@ export default function BlogClient({ articles, popularArticles, categories, stat
 
                     {/* Right: Sidebar (25%) */}
                     <div className="w-full lg:w-1/4">
-                        <div className="lg:sticky lg:top-32 space-y-8">
+                        <div className="lg:sticky lg:top-32 flex flex-col-reverse lg:flex-col gap-8">
 
                             {/* Categories Widget */}
                             <div className="space-y-4">

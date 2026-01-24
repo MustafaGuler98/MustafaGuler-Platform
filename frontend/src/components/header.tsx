@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Globe, Menu, Sparkles, Github, Linkedin } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
+import { MobileNav } from "./mobile-nav";
 import { useScrollDirection } from "@/hooks/use-scroll-direction";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -157,9 +158,7 @@ export default function Header() {
             </Link>
           </div>
 
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
+          <MobileNav />
         </div>
 
       </div>

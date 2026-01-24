@@ -10,6 +10,7 @@ import NeuralNetwork from "@/components/neural-network";
 import { mindTags } from "@/data/mind-tags";
 import { ActivitySection } from "@/components/shared/ActivitySection";
 import { articleService } from "@/services/articleServices";
+import { MobileNav } from "@/components/mobile-nav";
 
 interface PortalClientProps {
     articles: ArticleListWithoutImage[];
@@ -176,10 +177,10 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
             <section className="relative flex flex-col items-center px-4 pt-6 pb-2 overflow-hidden">
 
                 {/* Header */}
-                <div className="w-full px-6 relative flex items-start justify-between mb-4 h-36">
+                <div className="w-full px-6 relative flex items-start justify-between mb-4 h-24 md:h-36">
 
                     {/* Left: Navigation Links */}
-                    <nav className="flex items-center gap-8 pt-8">
+                    <nav className="hidden md:flex items-center gap-8 pt-8">
                         <Link href="/" className="relative group px-1 py-2 text-sm font-medium font-heading tracking-wide text-cyan-neon">
                             <span className="flex items-center gap-2">
                                 <Sparkles className="w-3 h-3 animate-pulse" />
@@ -205,9 +206,9 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                     </nav>
 
                     {/* Center: Logo + Title - Absolute centered */}
-                    <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 group">
+                    <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 group mt-4 md:mt-0">
                         {/* Avatar Container with orbital effect */}
-                        <div className="logo-orbital relative w-24 h-24 rounded-full overflow-visible transition-all duration-300">
+                        <div className="logo-orbital relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-visible transition-all duration-300">
                             <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
                                 <Image
                                     src="/logo1.png"
@@ -232,7 +233,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                     </Link>
 
                     {/* Right: Social + Contact */}
-                    <div className="flex flex-col items-end gap-5 pt-8">
+                    <div className="hidden md:flex flex-col items-end gap-5 pt-8">
                         {/* Social Icons */}
                         <div className="flex items-center gap-9">
                             <a href="https://www.linkedin.com/in/mustafaguler98" target="_blank" rel="noopener noreferrer"
@@ -249,10 +250,15 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                             <span className="blink-cursor">CONTACT</span>
                         </Link>
                     </div>
+
+                    {/* Mobile Navigation Trigger */}
+                    <div className="md:hidden pt-8">
+                        <MobileNav />
+                    </div>
                 </div>
 
                 {/* Role Text */}
-                <div className="text-center mb-3 z-20 relative">
+                <div className="text-center mb-3 z-20 relative mt-16 md:mt-0">
                     <p className="role-text font-heading text-sm md:text-base font-medium tracking-widest text-muted-foreground">
                         Software Developer / Storyteller / Digital Nomad
                     </p>

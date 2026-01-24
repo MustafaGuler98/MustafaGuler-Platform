@@ -62,7 +62,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
               <span>System_Ready</span>
             </div>
             <Link href="/blog/timeline" className="group/title w-fit no-underline">
-              <h1 className="text-5xl md:text-6xl font-bold font-[family-name:var(--font-michroma)] text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300">
+              <h1 className="text-3xl md:text-6xl font-bold font-[family-name:var(--font-michroma)] text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300">
                 TIMELINE
               </h1>
             </Link>
