@@ -3,7 +3,7 @@ name: Deploy to Production (Hetzner)
 on:
   push:
     branches:
-      - prod
+      - main
 
 jobs:
   deploy:
@@ -45,11 +45,11 @@ jobs:
             fi
 
             if [ ! -d "app" ]; then
-              git clone -b prod https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
+              git clone -b main https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
             fi
 
             cd app
-            git pull origin prod
+            git pull origin main
             chmod +x ./scripts/backup_db.sh
             mkdir -p logs
             chmod 777 logs
