@@ -54,26 +54,30 @@ jobs:
             mkdir -p logs
             chmod 777 logs
 
-            echo "POSTGRES_USER=$POSTGRES_USER" > .env
-            echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
-            echo "POSTGRES_DB=$POSTGRES_DB" >> .env
-            echo "CONNECTIONSTRING_DEFAULT=$CONNECTIONSTRING_DEFAULT" >> .env
-            echo "ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT" >> .env
-            echo "TOKEN_SECURITYKEY=$TOKEN_SECURITYKEY" >> .env
-            echo "TOKEN_ISSUER=$TOKEN_ISSUER" >> .env
-            echo "TOKEN_AUDIENCE=$TOKEN_AUDIENCE" >> .env
-            echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> .env
-            echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
-            echo "MAILSETTINGS_HOST=$MAILSETTINGS_HOST" >> .env
-            echo "MAILSETTINGS_PORT=$MAILSETTINGS_PORT" >> .env
-            echo "MAILSETTINGS_USER=$MAILSETTINGS_USER" >> .env
-            echo "MAILSETTINGS_PASSWORD=$MAILSETTINGS_PASSWORD" >> .env
-            echo "MAILSETTINGS_FROMEMAIL=$MAILSETTINGS_FROMEMAIL" >> .env
-            echo "MAILSETTINGS_TOEMAIL=$MAILSETTINGS_TOEMAIL" >> .env
-            echo "SEQ_ACCEPT_EULA=$SEQ_ACCEPT_EULA" >> .env
-            echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env
-            echo "INTERNAL_API_URL=$INTERNAL_API_URL" >> .env
-            echo "NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL" >> .env
+            rm -f .env
+            touch .env
+            chmod 600 .env
+
+            printf "POSTGRES_USER='%s'\n" "$POSTGRES_USER" >> .env
+            printf "POSTGRES_PASSWORD='%s'\n" "$POSTGRES_PASSWORD" >> .env
+            printf "POSTGRES_DB='%s'\n" "$POSTGRES_DB" >> .env
+            printf "CONNECTIONSTRING_DEFAULT='%s'\n" "$CONNECTIONSTRING_DEFAULT" >> .env
+            printf "ASPNETCORE_ENVIRONMENT='%s'\n" "$ASPNETCORE_ENVIRONMENT" >> .env
+            printf "TOKEN_SECURITYKEY='%s'\n" "$TOKEN_SECURITYKEY" >> .env
+            printf "TOKEN_ISSUER='%s'\n" "$TOKEN_ISSUER" >> .env
+            printf "TOKEN_AUDIENCE='%s'\n" "$TOKEN_AUDIENCE" >> .env
+            printf "ADMIN_EMAIL='%s'\n" "$ADMIN_EMAIL" >> .env
+            printf "ADMIN_PASSWORD='%s'\n" "$ADMIN_PASSWORD" >> .env
+            printf "MAILSETTINGS_HOST='%s'\n" "$MAILSETTINGS_HOST" >> .env
+            printf "MAILSETTINGS_PORT='%s'\n" "$MAILSETTINGS_PORT" >> .env
+            printf "MAILSETTINGS_USER='%s'\n" "$MAILSETTINGS_USER" >> .env
+            printf "MAILSETTINGS_PASSWORD='%s'\n" "$MAILSETTINGS_PASSWORD" >> .env
+            printf "MAILSETTINGS_FROMEMAIL='%s'\n" "$MAILSETTINGS_FROMEMAIL" >> .env
+            printf "MAILSETTINGS_TOEMAIL='%s'\n" "$MAILSETTINGS_TOEMAIL" >> .env
+            printf "SEQ_ACCEPT_EULA='%s'\n" "$SEQ_ACCEPT_EULA" >> .env
+            printf "NEXT_PUBLIC_API_URL='%s'\n" "$NEXT_PUBLIC_API_URL" >> .env
+            printf "INTERNAL_API_URL='%s'\n" "$INTERNAL_API_URL" >> .env
+            printf "NEXT_PUBLIC_BACKEND_URL='%s'\n" "$NEXT_PUBLIC_BACKEND_URL" >> .env
 
             docker compose down || true
             
