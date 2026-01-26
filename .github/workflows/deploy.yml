@@ -78,8 +78,7 @@ jobs:
             printf "NEXT_PUBLIC_API_URL='%s'\n" "$NEXT_PUBLIC_API_URL" >> .env
             printf "INTERNAL_API_URL='%s'\n" "$INTERNAL_API_URL" >> .env
             printf "NEXT_PUBLIC_BACKEND_URL='%s'\n" "$NEXT_PUBLIC_BACKEND_URL" >> .env
-            printf "UID='%s'\n" "$(id -u)" >> .env
-            printf "GID='%s'\n" "$(id -g)" >> .env
+
 
             docker compose down || true
             
