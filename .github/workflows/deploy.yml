@@ -87,6 +87,9 @@ jobs:
             
             sleep 3
 
+            echo "Pruning build cache..."
+            docker builder prune -f
+
             echo "Starting build..."
             docker compose up -d --build --force-recreate
 
