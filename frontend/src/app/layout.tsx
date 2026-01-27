@@ -71,6 +71,7 @@ const pressStart = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://mustafaguler.me"),
   title: "Mustafa Güler",
   description: "The central hub of my digital footprint. A living archive of my work, thoughts, and personal interests. Curating experiences in software, TTRPGs, philosophy, culinary arts, travel, and more.",
   verification: {
