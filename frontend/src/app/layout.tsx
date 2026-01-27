@@ -72,7 +72,17 @@ const pressStart = Press_Start_2P({
 
 export const metadata: Metadata = {
   title: "Mustafa Güler",
-  description: "Digital Mind",
+  description: "The central hub of my digital footprint. A living archive of my work, thoughts, and personal interests. Curating experiences in software, TTRPGs, philosophy, culinary arts, travel, and more.",
+  verification: {
+    google: "V-c8EJyAeGGs7coLDY0vhF4Y5OrcYfT3cB_uvoyMQY4",
+  },
+  openGraph: {
+    images: ["/logo1.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/logo1.png"],
+  },
 };
 
 export default function RootLayout({
@@ -117,7 +127,7 @@ export default function RootLayout({
           </main>
           <FooterWrapper />
         </ThemeProvider>
-        
+
         {/* Cloudflare Web Analytics */}
         <Script
           defer
