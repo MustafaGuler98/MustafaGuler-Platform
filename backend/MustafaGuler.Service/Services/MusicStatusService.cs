@@ -30,23 +30,58 @@ namespace MustafaGuler.Service.Services
                     return Result.Success(); // Nothing to update
                 }
 
-                bool isNowPlaying = track.Attributes?.NowPlaying == "true";
+                // Prevent the widget from reverting to an old track when the current song is paused.
 
-                var status = new MusicListeningStatusDto
+                const string CACHE_KEY = "StickyMusicStatus";
+                bool incomingIsPlaying = track.Attributes?.NowPlaying == "true";
+                MusicListeningStatusDto finalStatus;
+
+                if (incomingIsPlaying)
                 {
-                    IsPlaying = isNowPlaying,
-                    Title = track.Name,
-                    Artist = track.Artist.Text,
-                    LastPlayedAt = !isNowPlaying && track.Date != null && long.TryParse(track.Date.Uts, out var uts)
-                        ? DateTimeOffset.FromUnixTimeSeconds(uts).UtcDateTime
-                        : DateTime.UtcNow
-                };
+                    finalStatus = new MusicListeningStatusDto
+                    {
+                        IsPlaying = true,
+                        Title = track.Name,
+                        Artist = track.Artist.Text,
+                        LastPlayedAt = DateTime.UtcNow // Placeholder, not used when playing
+                    };
+                }
+                else
+                {
+                    // We need to decide: Is this song finished) or a pause?
 
-                _memoryCache.Set("CurrentMusicStatus", status, TimeSpan.FromMinutes(2));
+                    var cachedStatus = _memoryCache.Get<MusicListeningStatusDto>(CACHE_KEY);
+
+                    if (cachedStatus != null && cachedStatus.Title != track.Name)
+                    {
+                        finalStatus = cachedStatus;
+                        if (finalStatus.IsPlaying)
+                        {
+                            finalStatus.IsPlaying = false;
+                            finalStatus.LastPlayedAt = DateTime.UtcNow; // "Just now"
+                        }
+                    }
+                    else
+                    {
+                        finalStatus = new MusicListeningStatusDto
+                        {
+                            IsPlaying = false,
+                            Title = track.Name,
+                            Artist = track.Artist.Text,
+                            LastPlayedAt = track.Date != null && long.TryParse(track.Date.Uts, out var uts)
+                                ? DateTimeOffset.FromUnixTimeSeconds(uts).UtcDateTime
+                                : DateTime.UtcNow
+                        };
+                    }
+                }
+
+                _memoryCache.Set(CACHE_KEY, finalStatus, TimeSpan.FromDays(1));
+
+                _memoryCache.Set("CurrentMusicStatus", finalStatus, TimeSpan.FromMinutes(2));
 
                 // Write to file for Nginx to serve
                 var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-                var jsonString = JsonSerializer.Serialize(status, jsonOptions);
+                var jsonString = JsonSerializer.Serialize(finalStatus, jsonOptions);
                 var liveStatusPath = Path.Combine(_env.WebRootPath, "live-status");
                 var filePath = Path.Combine(liveStatusPath, "music-status.json");
                 var tempPath = Path.Combine(liveStatusPath, "music-status.json.tmp");

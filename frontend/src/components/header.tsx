@@ -117,7 +117,7 @@ export default function Header() {
           <div className="hidden md:flex flex-col items-end gap-5">
 
             {/* Row 1: Last.fm Widget & Social Icons */}
-            <div className="flex items-center gap-6 pr-0">
+            <div className="flex items-center gap-12 pr-0">
               <LastFmWidget />
 
               <div className="flex items-center gap-9">

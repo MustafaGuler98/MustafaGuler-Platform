@@ -52,7 +52,18 @@ namespace MustafaGuler.Service.BackgroundServices
 
                 if (stoppingToken.IsCancellationRequested) return;
 
-                // Determine Sync Range
+                // Prevent the widget from reverting to an old track when the current song is paused.
+                var liveResult = await lastFmService.GetRecentTracksAsync(limit: 1, from: null);
+
+                if (liveResult.IsSuccess && liveResult.Data?.RecentTracks?.Track != null)
+                {
+                    var currentTrack = liveResult.Data.RecentTracks.Track.FirstOrDefault();
+                    await musicStatusService.UpdateLiveStatusAsync(currentTrack);
+                }
+
+                if (stoppingToken.IsCancellationRequested) return;
+
+                // We pick up from where we left off in the database.
                 var latestMusic = await musicRepository.GetAsync(
                                       m => !m.IsDeleted,
                                       orderBy: q => q.OrderByDescending(m => m.UpdatedDate ?? m.CreatedDate));
@@ -64,27 +75,19 @@ namespace MustafaGuler.Service.BackgroundServices
                     fromTimestamp = ((DateTimeOffset)lastSyncDate).ToUnixTimeSeconds();
                 }
 
-                // Fetch Data
                 int limit = 20;
-                var lastFmResult = await lastFmService.GetRecentTracksAsync(limit, fromTimestamp);
+                var archiveResult = await lastFmService.GetRecentTracksAsync(limit, fromTimestamp);
 
-                if (!lastFmResult.IsSuccess || lastFmResult.Data?.RecentTracks?.Track == null)
+                if (!archiveResult.IsSuccess || archiveResult.Data?.RecentTracks?.Track == null)
                 {
-                    _logger.LogWarning($"Last.fm Sync Failed: {lastFmResult.Message}");
+                    _logger.LogWarning($"Last.fm Archive Sync Failed: {archiveResult.Message}");
                     return;
                 }
 
-                var tracks = lastFmResult.Data.RecentTracks.Track;
-                if (!tracks.Any()) return;
+                var detailedTracks = archiveResult.Data.RecentTracks.Track;
+                if (!detailedTracks.Any()) return;
 
-                // Update Live Status
-                var currentTrack = tracks.FirstOrDefault();
-                await musicStatusService.UpdateLiveStatusAsync(currentTrack);
-
-                if (stoppingToken.IsCancellationRequested) return;
-
-                // Archive History
-                var syncResult = await musicService.SyncBatchAsync(tracks);
+                var syncResult = await musicService.SyncBatchAsync(detailedTracks);
 
                 if (stoppingToken.IsCancellationRequested) return;
 
