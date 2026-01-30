@@ -141,7 +141,7 @@ export function ActivitySection() {
                         className="flex gap-6 overflow-x-auto py-8 px-4 md:px-8 snap-x snap-mandatory scrollbar-none"
                     >
                         {/* Dynamic Featured Items from API */}
-                        <FeaturedActivityCards onItemCountChange={setTotalItems} />
+                        <FeaturedActivityCards />
                     </div>
 
                     {/* Right Fade Gradient */}

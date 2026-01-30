@@ -20,6 +20,7 @@ namespace MustafaGuler.Service.Tests
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ICurrentUserService> _mockCurrentUserService;
+        private readonly Mock<Microsoft.Extensions.Logging.ILogger<ArticleService>> _mockLogger;
         private readonly ArticleService _articleService;
 
         private readonly Guid _testArticleId = Guid.NewGuid();
@@ -33,6 +34,7 @@ namespace MustafaGuler.Service.Tests
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
             _mockCurrentUserService = new Mock<ICurrentUserService>();
+            _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<ArticleService>>();
 
             _testArticle = new Article
             {
@@ -53,7 +55,7 @@ namespace MustafaGuler.Service.Tests
                 Slug = TestConstants.Article.TestSlug
             };
 
-            _articleService = new ArticleService(_mockRepo.Object, _mockUnitOfWork.Object, _mockMapper.Object, _mockCurrentUserService.Object);
+            _articleService = new ArticleService(_mockRepo.Object, _mockUnitOfWork.Object, _mockMapper.Object, _mockCurrentUserService.Object, _mockLogger.Object);
         }
 
         #region AddAsync Tests

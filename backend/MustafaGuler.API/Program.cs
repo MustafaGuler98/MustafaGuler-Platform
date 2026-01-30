@@ -24,7 +24,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentityConfiguration();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
-builder.Services.AddApplicationServices(); // Register application dependencies. /Extensions/DependencyInjectionExtensions.cs
+builder.Services.AddApplicationServices(builder.Configuration); // Register application dependencies. /Extensions/DependencyInjectionExtensions.cs
 
 builder.Services.AddAutoMapper(typeof(MapProfile));
 

@@ -21,6 +21,8 @@ namespace MustafaGuler.Service.Tests
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ICurrentUserService> _mockCurrentUserService;
+        private readonly Mock<System.Net.Http.IHttpClientFactory> _mockHttpClientFactory;
+        private readonly Mock<Microsoft.Extensions.Logging.ILogger<ImageService>> _mockLogger;
         private readonly ImageService _imageService;
 
         public ImageServiceTests()
@@ -32,13 +34,17 @@ namespace MustafaGuler.Service.Tests
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
             _mockCurrentUserService = new Mock<ICurrentUserService>();
+            _mockHttpClientFactory = new Mock<System.Net.Http.IHttpClientFactory>();
+            _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<ImageService>>();
 
             _imageService = new ImageService(
                 _mockEnvironment.Object,
                 _mockRepository.Object,
                 _mockUnitOfWork.Object,
                 _mockMapper.Object,
-                _mockCurrentUserService.Object);
+                _mockCurrentUserService.Object,
+                _mockHttpClientFactory.Object,
+                _mockLogger.Object);
         }
 
         #region Null/Empty File Tests
@@ -84,7 +90,7 @@ namespace MustafaGuler.Service.Tests
                 Content = new MemoryStream(),
                 FileName = TestConstants.File.ValidJpgName,
                 ContentType = TestConstants.File.JpegContentType,
-                Length = 11 * 1024 * 1024  
+                Length = 11 * 1024 * 1024
             };
 
             var result = await _imageService.UploadAsync(fileData, "some-name");
@@ -101,7 +107,7 @@ namespace MustafaGuler.Service.Tests
                 Content = new MemoryStream(),
                 FileName = TestConstants.File.ValidJpgName,
                 ContentType = TestConstants.File.JpegContentType,
-                Length = 10 * 1024 * 1024 
+                Length = 10 * 1024 * 1024
             };
 
             // Act

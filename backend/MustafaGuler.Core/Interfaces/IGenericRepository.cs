@@ -18,6 +18,7 @@ namespace MustafaGuler.Core.Interfaces
            params Expression<Func<T, object?>>[] includes);
 
         Task AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entities);
         void Remove(T entity);
         void Update(T entity);
 

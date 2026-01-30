@@ -14,8 +14,9 @@ namespace MustafaGuler.Service.Tests
     {
         private readonly Mock<IUserRepository> _mockUserRepo;
         private readonly Mock<ITokenService> _mockTokenService;
+        private readonly Mock<Microsoft.Extensions.Logging.ILogger<AuthService>> _mockLogger;
         private readonly AuthService _authService;
-        
+
         private readonly Guid _testUserId = Guid.NewGuid();
         private readonly AppUser _testUser;
         private readonly TokenDto _testTokenDto;
@@ -24,6 +25,7 @@ namespace MustafaGuler.Service.Tests
         {
             _mockUserRepo = new Mock<IUserRepository>();
             _mockTokenService = new Mock<ITokenService>();
+            _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<AuthService>>();
 
             _testUser = new AppUser
             {
@@ -42,7 +44,7 @@ namespace MustafaGuler.Service.Tests
                 Expiration = DateTime.UtcNow.AddDays(1)
             };
 
-            _authService = new AuthService(_mockUserRepo.Object, _mockTokenService.Object);
+            _authService = new AuthService(_mockUserRepo.Object, _mockTokenService.Object, _mockLogger.Object);
         }
 
         #region LoginAsync Tests
@@ -50,15 +52,15 @@ namespace MustafaGuler.Service.Tests
         private void ConfigureLoginMocks(string email, string password, AppUser? user, bool isPasswordValid, TokenDto? token = null)
         {
             _mockUserRepo.Setup(x => x.GetUserByEmailAsync(email)).ReturnsAsync(user);
-            
+
             if (user != null)
             {
                 _mockUserRepo.Setup(x => x.CheckPasswordAsync(user, password)).ReturnsAsync(isPasswordValid);
-                
+
                 if (isPasswordValid)
                 {
                     _mockUserRepo.Setup(x => x.GetRolesAsync(user)).ReturnsAsync(new List<string> { "Admin" });
-                    
+
                     if (token != null)
                     {
                         _mockTokenService.Setup(x => x.GenerateToken(user, It.IsAny<IList<string>>()))
@@ -84,10 +86,10 @@ namespace MustafaGuler.Service.Tests
             Assert.True(result.IsSuccess);
             Assert.NotNull(result.Data);
             Assert.Equal(_testTokenDto.AccessToken, result.Data.AccessToken);
-            
+
             _mockUserRepo.Verify(x => x.UpdateRefreshTokenAsync(
-                _testUser, 
-                It.IsAny<string>(), 
+                _testUser,
+                It.IsAny<string>(),
                 It.IsAny<DateTime>()), Times.Once);
         }
 
@@ -105,7 +107,7 @@ namespace MustafaGuler.Service.Tests
             Assert.False(result.IsSuccess);
             Assert.Equal(401, result.StatusCode);
             Assert.Contains("Invalid email or password", result.Message);
-            
+
             _mockUserRepo.Verify(x => x.CheckPasswordAsync(It.IsAny<AppUser>(), It.IsAny<string>()), Times.Never);
         }
 
@@ -122,7 +124,7 @@ namespace MustafaGuler.Service.Tests
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(401, result.StatusCode);
-            
+
             _mockTokenService.Verify(x => x.GenerateToken(It.IsAny<AppUser>(), It.IsAny<IList<string>>()), Times.Never);
         }
 
@@ -237,7 +239,7 @@ namespace MustafaGuler.Service.Tests
             // Assert
             Assert.False(result.IsSuccess);
             Assert.Equal(404, result.StatusCode);
-            
+
             _mockUserRepo.Verify(x => x.ClearRefreshTokenAsync(It.IsAny<AppUser>()), Times.Never);
         }
 

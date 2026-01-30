@@ -24,6 +24,8 @@ obj/
 TestResults/
 *.log
 **/wwwroot/uploads/
+**/wwwroot/live-status/
+/wwwroot/archives/
 
 # Frontend (Next.js)
 node_modules/

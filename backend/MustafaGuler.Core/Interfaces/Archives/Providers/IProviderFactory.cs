@@ -6,6 +6,6 @@ namespace MustafaGuler.Core.Interfaces.Archives.Providers
 {
     public interface IProviderFactory
     {
-        Result<IActivityProvider> GetProvider(string activityType);
+        Result<IActivityProvider> GetProvider(string activityType, string providerType = "Local");
     }
 }

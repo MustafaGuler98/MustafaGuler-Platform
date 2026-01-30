@@ -7,6 +7,7 @@ using MustafaGuler.Core.Interfaces;
 using MustafaGuler.Core.Parameters;
 using MustafaGuler.Core.Utilities.Helpers;
 using MustafaGuler.Core.Utilities.Results;
+using MustafaGuler.Core.Utilities.Security;
 using System;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace MustafaGuler.Service.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
+        private readonly System.Net.Http.IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ImageService> _logger;
 
         public ImageService(
@@ -32,6 +34,7 @@ namespace MustafaGuler.Service.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             ICurrentUserService currentUserService,
+            System.Net.Http.IHttpClientFactory httpClientFactory,
             ILogger<ImageService> logger)
         {
             _env = env;
@@ -39,6 +42,7 @@ namespace MustafaGuler.Service.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
+            _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
@@ -65,8 +69,13 @@ namespace MustafaGuler.Service.Services
             if (string.IsNullOrEmpty(safeName))
                 return Result<ImageInfoDto>.Failure(400, Messages.InvalidFilename);
 
-            folder = folder.ToLowerInvariant().Replace(".", "").Replace("/", "").Replace("\\", "");
-            if (string.IsNullOrWhiteSpace(folder)) folder = "articles";
+            folder = folder.ToLowerInvariant()
+               .Replace("..", "")
+               .Replace("\\", "/")
+               .Trim('/');
+
+            if (string.IsNullOrWhiteSpace(folder) || folder.Contains(".."))
+                folder = "articles";
 
             string fileName = $"{safeName}{extension}";
             string folderPath = Path.Combine(_env.WebRootPath, "uploads", folder);
@@ -90,7 +99,7 @@ namespace MustafaGuler.Service.Services
                 FileName = fileName,
                 Url = url,
                 SizeBytes = fileData.Length,
-                ContentType = fileData.ContentType ?? GetContentType(extension),
+                ContentType = fileData.ContentType,
                 UploadedById = _currentUserService.UserId
             };
 
@@ -206,14 +215,121 @@ namespace MustafaGuler.Service.Services
             return Result.Success(200, Messages.ImageDeleted);
         }
 
-        private static string GetContentType(string extension)
+        public async Task<Result<string>> DownloadAndUploadAsync(string imageUrl, string folder = "uploads")
         {
-            return extension switch
+            folder = folder.ToLowerInvariant()
+               .Replace("..", "")
+               .Replace("\\", "/")
+               .Trim('/');
+
+            if (string.IsNullOrWhiteSpace(folder) || folder.Contains(".."))
+                folder = "uploads";
+
+            if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
             {
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".png" => "image/png",
-                _ => "application/octet-stream"
-            };
+                return Result<string>.Failure(400, "Security Violation: Only HTTPS URLs are allowed.");
+            }
+
+            if (NetworkValidator.IsPrivateOrLocalhost(uri.Host))
+            {
+                _logger.LogWarning("SSRF Attempt blocked for host: {Host}", uri.Host);
+                return Result<string>.Failure(403, "Security Violation: Access to private networks is denied.");
+            }
+
+            try
+            {
+                using var httpClient = _httpClientFactory.CreateClient("ImageDownloader");
+
+                // We check headers first before downloading certain body content to fail fast on large files or wrong types.
+                using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+                using var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                if (!response.IsSuccessStatusCode)
+                    return Result<string>.Failure((int)response.StatusCode, $"Remote server returned {response.StatusCode}");
+
+                var contentLength = response.Content.Headers.ContentLength;
+                if (contentLength > 10 * 1024 * 1024) // 10 MB Limit
+                    return Result<string>.Failure(413, "Image too large (Max 10MB)");
+
+                var contentType = response.Content.Headers.ContentType?.MediaType;
+                if (contentType == null || !contentType.StartsWith("image/"))
+                    return Result<string>.Failure(400, "URL does not point to a valid image");
+
+                // Instead of loading the whole file into RAM, we read it as a stream.
+                using var stream = await response.Content.ReadAsStreamAsync();
+                using var memoryStream = new MemoryStream();
+
+                var buffer = new byte[8192];
+                int bytesRead;
+                long totalRead = 0;
+                bool signatureChecked = false;
+
+                bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead > 0)
+                {
+                    totalRead += bytesRead;
+                    await memoryStream.WriteAsync(buffer, 0, bytesRead);
+
+                    var extension = Path.GetExtension(uri.LocalPath)?.ToLowerInvariant().Split('?')[0];
+                    if (string.IsNullOrEmpty(extension))
+                    {
+                        extension = contentType switch
+                        {
+                            "image/jpeg" => ".jpg",
+                            "image/png" => ".png",
+                            "image/gif" => ".gif",
+                            "image/webp" => ".webp",
+                            _ => null
+                        };
+                    }
+
+                    if (string.IsNullOrEmpty(extension))
+                        return Result<string>.Failure(400, "Missing extension and unknown content type.");
+
+                    memoryStream.Position = 0;
+                    if (!FileSignatureValidator.IsValidSignature(memoryStream, extension))
+                    {
+                        return Result<string>.Failure(400, "Invalid file signature (File content does not match extension).");
+                    }
+                    memoryStream.Position = memoryStream.Length;
+                    signatureChecked = true;
+                }
+
+                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    totalRead += bytesRead;
+
+                    if (totalRead > 10 * 1024 * 1024)
+                        return Result<string>.Failure(413, "Image exceeded size limit during download");
+
+                    await memoryStream.WriteAsync(buffer, 0, bytesRead);
+                }
+
+                if (!signatureChecked) return Result<string>.Failure(400, "Empty file.");
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(uri.LocalPath)?.Split('?')[0] ?? ".jpg"}";
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", folder);
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                memoryStream.Position = 0;
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await memoryStream.CopyToAsync(fileStream);
+                }
+
+                return Result<string>.Success($"/uploads/{folder}/{fileName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to download image from {Url}", imageUrl);
+                return Result<string>.Failure(500, $"Image download failed: {ex.Message}");
+            }
         }
     }
 }
