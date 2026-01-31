@@ -535,3 +535,45 @@
 .animate-tech-scan {
   animation: tech-scan 1.8s linear infinite;
 }
+
+/* MUSIC WIDGET ANIMATIONS */
+@keyframes music-bar {
+
+  0%,
+  100% {
+    height: 4px;
+  }
+
+  50% {
+    height: 16px;
+  }
+}
+
+.animate-music-bar {
+  animation: music-bar 0.5s ease-in-out infinite alternate;
+}
+
+.animate-spin-slow {
+  animation: spin 3s linear infinite;
+}
+
+
+@keyframes marquee-seamless {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+.animate-marquee-seamless {
+  display: flex;
+  width: max-content;
+  animation: marquee-seamless 8s linear infinite;
+}
+
+.pause-on-hover:hover .animate-marquee-seamless {
+  animation-play-state: paused;
+}

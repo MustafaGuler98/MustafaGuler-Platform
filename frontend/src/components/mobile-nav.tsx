@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { Button } from "@/components/ui/button";
 import { Menu, Github, Linkedin, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { LastFmWidget } from "@/components/shared/LastFmWidget";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -67,6 +68,11 @@ export function MobileNav() {
 
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-white/5 flex flex-col gap-6">
+                    {/* Music Widget */}
+                    <div className="flex justify-center scale-90">
+                        <LastFmWidget />
+                    </div>
+
                     {/* Socials */}
                     <div className="flex items-center justify-center gap-8">
                         <Link

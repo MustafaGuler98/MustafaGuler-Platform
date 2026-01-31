@@ -12,5 +12,6 @@ namespace MustafaGuler.Core.Interfaces
         Task<Result<PagedResult<ImageInfoDto>>> GetPagedAsync(ImageQueryParams queryParams);
         Task<Result<ImageInfoDto>> UpdateAsync(Guid id, ImageUpdateDto dto);
         Task<Result> DeleteAsync(Guid id);
+        Task<Result<string>> DownloadAndUploadAsync(string imageUrl, string folder = "uploads");
     }
 }

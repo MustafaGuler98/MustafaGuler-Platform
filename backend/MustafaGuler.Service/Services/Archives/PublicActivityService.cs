@@ -8,6 +8,7 @@ using MustafaGuler.Core.Interfaces.Archives;
 using MustafaGuler.Core.Interfaces.Archives.Providers;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace MustafaGuler.Service.Services.Archives
 {
@@ -15,14 +16,16 @@ namespace MustafaGuler.Service.Services.Archives
     {
         private readonly IGenericRepository<Activity> _activityRepository;
         private readonly IProviderFactory _providerFactory;
-
+        private readonly ILogger<PublicActivityService> _logger;
 
         public PublicActivityService(
             IGenericRepository<Activity> activityRepository,
-            IProviderFactory providerFactory)
+            IProviderFactory providerFactory,
+            ILogger<PublicActivityService> logger)
         {
             _activityRepository = activityRepository;
             _providerFactory = providerFactory;
+            _logger = logger;
         }
 
 

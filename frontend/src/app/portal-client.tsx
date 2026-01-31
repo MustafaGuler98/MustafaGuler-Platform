@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/utils";
 import NeuralNetwork from "@/components/neural-network";
 import { mindTags } from "@/data/mind-tags";
 import { ActivitySection } from "@/components/shared/ActivitySection";
+import { LastFmWidget } from "@/components/shared/LastFmWidget";
 import { articleService } from "@/services/articleServices";
 import { MobileNav } from "@/components/mobile-nav";
 
@@ -235,15 +236,21 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                     {/* Right: Social + Contact */}
                     <div className="hidden md:flex flex-col items-end gap-5 pt-8">
                         {/* Social Icons */}
-                        <div className="flex items-center gap-9">
-                            <a href="https://www.linkedin.com/in/mustafaguler98" target="_blank" rel="noopener noreferrer"
-                                className="glitch-icon text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">
-                                <Linkedin className="w-6 h-6" />
-                            </a>
-                            <a href="https://github.com/MustafaGuler98" target="_blank" rel="noopener noreferrer"
-                                className="glitch-icon-delayed text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]">
-                                <Github className="w-6 h-6" />
-                            </a>
+                        {/* Row 1: Last.fm Widget & Social Icons */}
+                        <div className="flex items-center gap-12 pr-0">
+                            <LastFmWidget />
+
+                            {/* Social Icons */}
+                            <div className="flex items-center gap-9">
+                                <a href="https://www.linkedin.com/in/mustafaguler98" target="_blank" rel="noopener noreferrer"
+                                    className="glitch-icon text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">
+                                    <Linkedin className="w-6 h-6" />
+                                </a>
+                                <a href="https://github.com/MustafaGuler98" target="_blank" rel="noopener noreferrer"
+                                    className="glitch-icon-delayed text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]">
+                                    <Github className="w-6 h-6" />
+                                </a>
+                            </div>
                         </div>
                         {/* Contact Button */}
                         <Link href="/contact" className="holo-terminal-btn rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase px-4 py-2 border border-primary/50">

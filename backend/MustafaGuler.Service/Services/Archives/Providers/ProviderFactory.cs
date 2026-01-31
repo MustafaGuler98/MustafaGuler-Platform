@@ -16,10 +16,9 @@ namespace MustafaGuler.Service.Services.Archives.Providers
             _providers = providers;
         }
 
-        public Result<IActivityProvider> GetProvider(string activityType)
+        public Result<IActivityProvider> GetProvider(string activityType, string providerType = "Local")
         {
-            // Eventually, we may have multiple providers for the same activity type like Spotify, YouTube, etc.
-            var provider = _providers.FirstOrDefault(p => p.ActivityType == activityType && p.ProviderType == "Local");
+            var provider = _providers.FirstOrDefault(p => p.ActivityType == activityType && p.ProviderType == providerType);
 
             if (provider == null)
             {

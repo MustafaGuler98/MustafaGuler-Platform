@@ -17,16 +17,20 @@ namespace MustafaGuler.Service.Services.Archives
         private readonly IUnitOfWork _unitOfWork;
         private readonly IProviderFactory _providerFactory;
 
-        private static readonly string[] ActivityTypes = { "Book", "Movie", "TvSeries", "Music", "Anime", "Game", "TTRPG" };
+        private readonly Microsoft.Extensions.Logging.ILogger<ActivityService> _logger;
+
+        private static readonly string[] ActivityTypes = { "Book", "Movie", "Music", "TvSeries", "Anime", "Game", "TTRPG" };
 
         public ActivityService(
             IGenericRepository<Activity> activityRepository,
             IUnitOfWork unitOfWork,
-            IProviderFactory providerFactory)
+            IProviderFactory providerFactory,
+            Microsoft.Extensions.Logging.ILogger<ActivityService> logger)
         {
             _activityRepository = activityRepository;
             _unitOfWork = unitOfWork;
             _providerFactory = providerFactory;
+            _logger = logger;
         }
 
         // There was a bug here where default activities were not created if none selected.

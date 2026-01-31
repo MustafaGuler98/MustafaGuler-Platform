@@ -5,30 +5,22 @@ import { ActivityCard } from '@/components/content/activity-card';
 import { Film, Gamepad2, Headphones, BookOpen, MonitorPlay, Dices, Tv, type LucideIcon } from 'lucide-react';
 import type { PublicActivities, PublicActivity } from '@/types/archives';
 import { apiClient } from '@/lib/api-client';
+import { getImageUrl } from '@/lib/utils';
 
 // Default empty cards
 const defaultSlots: Array<{ type: string; icon: LucideIcon; color: string }> = [
     { type: 'Book', icon: BookOpen, color: 'text-amber-400' },
     { type: 'Movie', icon: Film, color: 'text-purple-400' },
-    { type: 'TvSeries', icon: Tv, color: 'text-blue-500' },
     { type: 'Music', icon: Headphones, color: 'text-pink-400' },
+    { type: 'TvSeries', icon: Tv, color: 'text-blue-500' },
     { type: 'Anime', icon: MonitorPlay, color: 'text-rose-500' },
     { type: 'Game', icon: Gamepad2, color: 'text-cyan-400' },
     { type: 'TTRPG', icon: Dices, color: 'text-emerald-400' },
 ];
 
-interface FeaturedActivityCardsProps {
-    onItemCountChange?: (count: number) => void;
-}
-
-export function FeaturedActivityCards({ onItemCountChange }: FeaturedActivityCardsProps) {
+export function FeaturedActivityCards() {
     const [data, setData] = useState<PublicActivities | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
-    const stableOnItemCountChange = useCallback(
-        (count: number) => onItemCountChange?.(count),
-        [onItemCountChange]
-    );
 
     useEffect(() => {
         const fetchFeatured = async () => {
@@ -41,11 +33,10 @@ export function FeaturedActivityCards({ onItemCountChange }: FeaturedActivityCar
                 // silent
             } finally {
                 setIsLoading(false);
-                stableOnItemCountChange(defaultSlots.length);
             }
         };
         fetchFeatured();
-    }, [stableOnItemCountChange]);
+    }, []);
 
     // Map type to data
     const getItemForType = (type: string): PublicActivity | null => {
@@ -71,10 +62,10 @@ export function FeaturedActivityCards({ onItemCountChange }: FeaturedActivityCar
                         <ActivityCard
                             title={slot.type === 'TvSeries' ? 'TV SERIES' : slot.type.toUpperCase()}
                             name={item?.title || (isLoading ? 'Loading...' : 'No data yet')}
-                            description={item ? (item.subtitle ? `${item.subtitle}. ${item.description || ''}` : item.description || '') : ''}
+                            description={item ? (item.subtitle ? (item.description ? `${item.subtitle}. ${item.description}` : item.subtitle) : item.description || '') : ''}
                             Icon={slot.icon}
                             colorClass={slot.color}
-                            imageUrl={item?.imageUrl || ''}
+                            imageUrl={getImageUrl(item?.imageUrl)}
                             fontClass="font-[family-name:var(--font-rajdhani)] font-bold uppercase tracking-wide text-base md:text-lg"
                         />
                     </div>

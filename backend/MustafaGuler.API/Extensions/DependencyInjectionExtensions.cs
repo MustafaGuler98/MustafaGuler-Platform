@@ -6,6 +6,7 @@ using MustafaGuler.Service.Services;
 using MustafaGuler.Service.Services.Archives;
 using MustafaGuler.Service.Services.Archives.Providers;
 using MustafaGuler.Service.Services.Archives.Providers.Local;
+using MustafaGuler.Service.BackgroundServices;
 
 
 namespace MustafaGuler.API.Extensions
@@ -14,7 +15,7 @@ namespace MustafaGuler.API.Extensions
     {
         // Encapsulates service registrations to keep Program.cs clean
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -45,7 +46,26 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IArchivesStatsService, ArchivesStatsService>();
             services.AddScoped<IPublicActivityService, PublicActivityService>();
             services.AddScoped<IActivityService, ActivityService>();
+            services.AddScoped<IMusicStatusService, MusicStatusService>();
             services.AddScoped<ISpotlightService, SpotlightService>();
+
+            // Last Fm
+            services.Configure<MustafaGuler.Core.DTOs.Settings.LastFmSettings>(configuration.GetSection("LastFm"));
+            services.AddHttpClient<ILastFmService, LastFmService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+
+            services.AddHttpClient("ImageDownloader", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("MustafaGuler.Platform/1.0");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+                UseCookies = false
+            });
 
             // Providers
             services.AddScoped<IProviderFactory, ProviderFactory>();
@@ -58,6 +78,9 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IActivityProvider, LocalGameProvider>();
             services.AddScoped<IActivityProvider, LocalTTRPGProvider>();
             services.AddScoped<IActivityProvider, LocalQuoteProvider>();
+
+            // Background Services
+            services.AddHostedService<MusicSyncBackgroundService>();
 
             return services;
         }

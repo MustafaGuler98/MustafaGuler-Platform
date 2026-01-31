@@ -34,6 +34,10 @@ const nextConfig: NextConfig = {
         source: '/uploads/:path*',
         destination: `${BACKEND_URL}/uploads/:path*`,
       },
+      {
+        source: '/music-status.json',
+        destination: `${BACKEND_URL}/live-status/music-status.json`,
+      },
     ];
   },
 };
