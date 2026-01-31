@@ -81,15 +81,15 @@ export function ActivityCard({
             {/* Background Image OR Fallback Gradient */}
             {imageUrl ? (
                 <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                     style={{ backgroundImage: `url(${imageUrl})` }}
                 />
             ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-80" />
             )}
 
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent opacity-90 transition-opacity duration-300" />
+            {/* Gradient Overlay - Only at bottom for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
 
             {/* Content Container */}
             <div className="absolute inset-0 p-5 flex flex-col justify-end">
