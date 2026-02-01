@@ -164,6 +164,7 @@ export function AdminSidebar({ isCollapsed, toggleSidebar }: AdminSidebarProps) 
             ]
         },
         { href: '/admin/spotlight', icon: <Zap size={16} />, label: 'SPOTLIGHT' },
+        { href: '/admin/mindmap', icon: <Archive size={16} />, label: 'MINDMAP' },
         {
             href: '/admin/contact',
             icon: <Mail size={16} />,

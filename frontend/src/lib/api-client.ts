@@ -40,11 +40,23 @@ export async function fetchApi<T>(
             } as ServiceResponse<T>;
         }
 
+        if (response.status === 304) {
+            return {
+                data: null,
+                isSuccess: true,
+                message: 'Not Modified',
+                statusCode: 304,
+                errors: null
+            } as ServiceResponse<T>;
+        }
+
         const text = await response.text();
         const json = text ? JSON.parse(text) : {};
 
         // Backend returns standard Result<T> structure
-        return json as ServiceResponse<T>;
+        const result = json as ServiceResponse<T>;
+        result.headers = response.headers;
+        return result;
     } catch (error) {
         console.error('[API Client Error]', error);
         return createErrorResponse<T>(500, 'Network error or server unavailable');

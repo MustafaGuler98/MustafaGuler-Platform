@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ArrowRight, Sparkles, Github, Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Article, ArticleListWithoutImage } from "@/types/article";
 import { formatDate } from "@/lib/utils";
 import NeuralNetwork from "@/components/neural-network";
-import { mindTags } from "@/data/mind-tags";
 import { ActivitySection } from "@/components/shared/ActivitySection";
 import { LastFmWidget } from "@/components/shared/LastFmWidget";
 import { articleService } from "@/services/articleServices";
+import { mindmapService } from "@/services/mindmapService";
 import { MobileNav } from "@/components/mobile-nav";
 
 interface PortalClientProps {
@@ -31,24 +31,60 @@ const SLOT_ANGLES = [0, 60, 120, 180, 240, 300];
 const ORBIT_RADIUS = 38;
 const ROTATION_SPEED = 0.15; // degrees per frame
 
+// Fisher-Yates Shuffle
+function shuffleArray<T>(array: T[]): T[] {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
 export default function PortalClient({ articles, totalCount }: PortalClientProps) {
     const [mounted, setMounted] = useState(false);
     const [slots, setSlots] = useState<CarouselSlot[]>([]);
     const [rotationOffset, setRotationOffset] = useState(0);
-    const [wordIndex, setWordIndex] = useState(NUM_SLOTS);
 
     // Pagination state
     const [articlePage, setArticlePage] = useState(0);
     const [currentArticles, setCurrentArticles] = useState<ArticleListWithoutImage[]>(articles);
     const [isLoadingArticles, setIsLoadingArticles] = useState(false);
 
+    // Mindmap state
+    const [mindmapItems, setMindmapItems] = useState<string[]>([]);
+
+
     const ARTICLES_PER_PAGE = 3;
     const totalPages = Math.ceil(totalCount / ARTICLES_PER_PAGE);
 
-    // Shuffled word queue
-    const wordQueue = useMemo(() => {
-        return [...mindTags].sort(() => Math.random() - 0.5);
+
+
+    // Fetch Mindmap items
+    useEffect(() => {
+        const fetchMindmapItems = async () => {
+            try {
+                const items = await mindmapService.getAllActive();
+                if (items && items.length > 0) {
+                    // Local Shuffle
+                    const shuffled = shuffleArray(items);
+                    setMindmapItems(shuffled);
+                } else {
+                    setMindmapItems([]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch mindmap items", error);
+                setMindmapItems([]);
+            }
+        };
+
+        fetchMindmapItems();
     }, []);
+
+    const wordQueue = useMemo(() => {
+        if (mindmapItems.length === 0) return [];
+        return mindmapItems;
+    }, [mindmapItems]);
 
     // Get position from angle
     const getPosition = useCallback((slotAngle: number) => {
@@ -60,9 +96,18 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
         };
     }, [rotationOffset]);
 
-    // Initialize slots
+    // Initialize mounted state
     useEffect(() => {
         setMounted(true);
+    }, []);
+
+    // Initialize slots when wordQueue changes
+    useEffect(() => {
+        if (wordQueue.length === 0) {
+            setSlots([]);
+            return;
+        }
+
         setSlots(SLOT_ANGLES.map((angle, i) => ({
             word: wordQueue[i % wordQueue.length],
             angle,
@@ -72,14 +117,16 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
         })));
     }, [wordQueue]);
 
+    // Animation reference
+    const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     // Animation
     useEffect(() => {
-        if (!mounted || slots.length === 0) return;
+        if (!mounted || slots.length === 0 || wordQueue.length === 0) return;
 
         let animationFrame: number;
         let lastSwapTime = Date.now();
-        let nextSlot = 0;
-        let currentWordIndex = wordIndex;
+        let currentWordIndex = NUM_SLOTS;
 
         const animate = () => {
             const now = Date.now();
@@ -92,7 +139,6 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                 lastSwapTime = now;
                 // Random slot selection instead of sequential
                 const slotToSwap = Math.floor(Math.random() * NUM_SLOTS);
-                nextSlot = (nextSlot + 1) % NUM_SLOTS;
 
                 // Start swap - mark slot for fading out
                 setSlots(prev => {
@@ -106,7 +152,10 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                 const capturedWord = wordQueue[currentWordIndex % wordQueue.length];
                 currentWordIndex++;
 
-                setTimeout(() => {
+                // Clear any existing timeout before setting a new one
+                if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+
+                animationTimeoutRef.current = setTimeout(() => {
                     setSlots(prev => {
                         const updated = [...prev];
                         updated[capturedSlot] = {
@@ -117,6 +166,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                         };
                         return updated;
                     });
+                    animationTimeoutRef.current = null;
                 }, 800);
             }
 
@@ -145,8 +195,14 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
         };
 
         animate();
-        return () => cancelAnimationFrame(animationFrame);
-    }, [mounted, slots.length, wordQueue, wordIndex]);
+
+        return () => {
+            cancelAnimationFrame(animationFrame);
+            if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+            }
+        };
+    }, [mounted, slots.length, wordQueue]);
 
     // Handle Page Change
     const handlePageChange = async (newPage: number) => {
@@ -279,7 +335,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                     </div>
 
                     {/* Carousel Slots */}
-                    {slots.map((slot, idx) => {
+                    {slots.length > 0 && slots.map((slot, idx) => {
                         const pos = getPosition(slot.angle);
                         const scale = 0.85 + slot.opacity * 0.25;
                         const glowSize = 8 + slot.glow * 12; // 8-20px glow
