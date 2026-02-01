@@ -3,7 +3,7 @@ name: Deploy to Production (Hetzner)
 on:
   push:
     branches:
-      - mindmapv2
+      - main
 
 jobs:
   deploy:
@@ -47,12 +47,12 @@ jobs:
             fi
 
             if [ ! -d "app" ]; then
-              git clone -b mindmapv2 https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
+              git clone -b main https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
             fi
 
             cd app
             git fetch --all
-            git reset --hard origin/mindmapv2
+            git reset --hard origin/main
             
             chmod +x ./scripts/backup_db.sh
             mkdir -p logs
