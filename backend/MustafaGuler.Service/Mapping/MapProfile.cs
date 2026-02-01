@@ -90,6 +90,11 @@ namespace MustafaGuler.Service.Mapping
             CreateMap<TTRPG, TTRPGDto>();
             CreateMap<CreateTTRPGDto, TTRPG>();
             CreateMap<UpdateTTRPGDto, TTRPG>();
+
+            // MINDMAP
+            CreateMap<MindmapItem, MindmapItemDto>();
+            CreateMap<MindmapItemAddDto, MindmapItem>();
+            CreateMap<MindmapItemUpdateDto, MindmapItem>();
         }
     }
 }

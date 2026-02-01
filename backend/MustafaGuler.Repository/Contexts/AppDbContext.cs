@@ -30,6 +30,7 @@ namespace MustafaGuler.Repository.Contexts
         public DbSet<TTRPG> TTRPGs { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<SpotlightItem> SpotlightItems { get; set; }
+        public DbSet<MindmapItem> MindmapItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

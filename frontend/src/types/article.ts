@@ -45,4 +45,5 @@ export interface ServiceResponse<T> {
   message: string;
   statusCode: number;
   errors: string[] | null;
+  headers?: Headers;
 }

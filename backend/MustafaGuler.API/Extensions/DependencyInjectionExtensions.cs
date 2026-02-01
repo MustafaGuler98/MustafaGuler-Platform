@@ -48,6 +48,7 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IActivityService, ActivityService>();
             services.AddScoped<IMusicStatusService, MusicStatusService>();
             services.AddScoped<ISpotlightService, SpotlightService>();
+            services.AddScoped<IMindmapService, MindmapService>();
 
             // Last Fm
             services.Configure<MustafaGuler.Core.DTOs.Settings.LastFmSettings>(configuration.GetSection("LastFm"));
