@@ -5,7 +5,7 @@ import { AdminPageHeader } from '@/components/admin/layout/AdminPageHeader';
 import { CyberSaveButton } from '@/components/ui/cyber/CyberSaveButton';
 import { LoadingOverlay } from '@/components/ui/cyber/LoadingOverlay';
 import { useToast } from '@/components/ui/cyber/Toast';
-import { Star, RefreshCw, BookOpen, Film, Tv, Headphones, MonitorPlay, Gamepad2, Dices, RotateCcw } from 'lucide-react';
+import { Star, RefreshCw, BookOpen, Film, Tv, Headphones, Gamepad2, Dices, RotateCcw, Eye } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { Activity } from '@/types/archives';
 import { ActivityRow } from '@/components/admin/archives/ActivityRow';
@@ -18,8 +18,8 @@ const typeConfig: Record<string, { label: string; icon: React.ReactNode; color: 
     Movie: { label: 'MOVIE', icon: <Film size={16} />, color: 'text-purple-400 border-purple-500/30' },
     TvSeries: { label: 'TV SERIES', icon: <Tv size={16} />, color: 'text-blue-500 border-blue-500/30' },
     Music: { label: 'MUSIC', icon: <Headphones size={16} />, color: 'text-pink-400 border-pink-500/30' },
-    Anime: { label: 'ANIME', icon: <MonitorPlay size={16} />, color: 'text-rose-500 border-rose-500/30' },
-    Game: { label: 'GAME', icon: <Gamepad2 size={16} />, color: 'text-indigo-400 border-indigo-500/30' },
+    Anime: { label: 'ANIME', icon: <Eye size={16} />, color: 'text-rose-500 border-rose-500/30' },
+    Game: { label: 'GAME', icon: <Gamepad2 size={16} />, color: 'text-cyan-400 border-cyan-500/30' },
     TTRPG: { label: 'TTRPG', icon: <Dices size={16} />, color: 'text-emerald-400 border-emerald-500/30' },
 };
 

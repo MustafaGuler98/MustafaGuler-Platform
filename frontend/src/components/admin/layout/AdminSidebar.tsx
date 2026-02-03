@@ -18,7 +18,6 @@ import {
     BookOpen,
     Quote,
     Tv,
-    MonitorPlay,
     Gamepad2,
     Headphones,
     Dices,
@@ -26,7 +25,8 @@ import {
     ChevronLeft,
     ChevronRight,
     ChevronDown,
-    Zap
+    Zap,
+    Eye
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -156,10 +156,10 @@ export function AdminSidebar({ isCollapsed, toggleSidebar }: AdminSidebarProps) 
                 { href: '/admin/archives/movies', icon: <Film size={16} />, label: 'MOVIES' },
                 { href: '/admin/archives/books', icon: <BookOpen size={16} />, label: 'BOOKS' },
                 { href: '/admin/archives/quotes', icon: <Quote size={16} />, label: 'QUOTES' },
-                { href: '/admin/archives/tvseries', icon: <Tv size={16} />, label: 'TV SERIES' },
-                { href: '/admin/archives/anime', icon: <MonitorPlay size={16} />, label: 'ANIME' },
-                { href: '/admin/archives/games', icon: <Gamepad2 size={16} />, label: 'GAMES' },
                 { href: '/admin/archives/music', icon: <Headphones size={16} />, label: 'MUSIC' },
+                { href: '/admin/archives/tvseries', icon: <Tv size={16} />, label: 'TV SERIES' },
+                { href: '/admin/archives/anime', icon: <Eye size={16} />, label: 'ANIME' }, // Eye icon
+                { href: '/admin/archives/games', icon: <Gamepad2 size={16} />, label: 'GAMES' },
                 { href: '/admin/archives/ttrpg', icon: <Dices size={16} />, label: 'TTRPG' },
             ]
         },

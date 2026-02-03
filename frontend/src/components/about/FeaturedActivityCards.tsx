@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { ActivityCard } from '@/components/content/activity-card';
-import { Film, Gamepad2, Headphones, BookOpen, MonitorPlay, Dices, Tv, type LucideIcon } from 'lucide-react';
+import { Film, Gamepad2, Headphones, BookOpen, Eye, Dices, Tv, type LucideIcon } from 'lucide-react';
 import type { PublicActivities, PublicActivity } from '@/types/archives';
 import { apiClient } from '@/lib/api-client';
 import { getImageUrl } from '@/lib/utils';
@@ -13,7 +13,7 @@ const defaultSlots: Array<{ type: string; icon: LucideIcon; color: string }> = [
     { type: 'Movie', icon: Film, color: 'text-purple-400' },
     { type: 'Music', icon: Headphones, color: 'text-pink-400' },
     { type: 'TvSeries', icon: Tv, color: 'text-blue-500' },
-    { type: 'Anime', icon: MonitorPlay, color: 'text-rose-500' },
+    { type: 'Anime', icon: Eye, color: 'text-rose-500' },
     { type: 'Game', icon: Gamepad2, color: 'text-cyan-400' },
     { type: 'TTRPG', icon: Dices, color: 'text-emerald-400' },
 ];
