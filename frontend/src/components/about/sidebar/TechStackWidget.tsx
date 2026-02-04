@@ -8,14 +8,14 @@ interface TechItem {
 
 export function TechStackWidget() {
     const technologies: TechItem[] = [
-        { name: "C#", iconUrl: "https://skillicons.dev/icons?i=cs" },
-        { name: ".NET", iconUrl: "https://skillicons.dev/icons?i=dotnet" },
-        { name: "Python", iconUrl: "https://skillicons.dev/icons?i=python" },
-        { name: "JS", iconUrl: "https://skillicons.dev/icons?i=js" },
-        { name: "TS", iconUrl: "https://skillicons.dev/icons?i=ts" },
-        { name: "Next.js", iconUrl: "https://skillicons.dev/icons?i=nextjs" },
-        { name: "React", iconUrl: "https://skillicons.dev/icons?i=react" },
-        { name: "Docker", iconUrl: "https://skillicons.dev/icons?i=docker" },
+        { name: "C#", iconUrl: "/icons/csharp.svg" },
+        { name: ".NET", iconUrl: "/icons/dotnet.svg" },
+        { name: "Python", iconUrl: "/icons/python.svg" },
+        { name: "JS", iconUrl: "/icons/js.svg" },
+        { name: "TS", iconUrl: "/icons/ts.svg" },
+        { name: "Next.js", iconUrl: "/icons/nextjs.svg" },
+        { name: "React", iconUrl: "/icons/react.svg" },
+        { name: "Docker", iconUrl: "/icons/docker.svg" },
     ];
 
     return (

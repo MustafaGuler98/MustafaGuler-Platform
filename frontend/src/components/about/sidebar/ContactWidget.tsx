@@ -9,9 +9,9 @@ interface ContactItem {
 
 export function ContactWidget() {
     const contacts: ContactItem[] = [
-        { name: "GitHub", iconUrl: "https://skillicons.dev/icons?i=github", href: "https://github.com/mustafaguler98" },
-        { name: "LinkedIn", iconUrl: "https://skillicons.dev/icons?i=linkedin", href: "https://www.linkedin.com/in/mustafaguler98/" },
-        { name: "Email", iconUrl: "https://skillicons.dev/icons?i=gmail", href: "mailto:contact.mustafaguler@gmail.com" },
+        { name: "GitHub", iconUrl: "/icons/github.svg", href: "https://github.com/mustafaguler98" },
+        { name: "LinkedIn", iconUrl: "/icons/linkedin.svg", href: "https://www.linkedin.com/in/mustafaguler98/" },
+        { name: "Email", iconUrl: "/icons/email.svg", href: "mailto:contact.mustafaguler@gmail.com" },
     ];
 
     return (
