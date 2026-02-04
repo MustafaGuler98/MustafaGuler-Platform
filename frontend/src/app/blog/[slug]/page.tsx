@@ -6,9 +6,8 @@ import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { ARTICLE_MESSAGES } from "@/lib/Messages";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 export const dynamic = 'force-dynamic';
 
@@ -113,7 +112,6 @@ export default async function ArticlePage({ params }: PageProps) {
           className="
             prose prose-lg dark:prose-invert max-w-none 
             prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline hover:prose-a:text-cyan-400
             prose-img:rounded-xl prose-img:shadow-md prose-img:border prose-img:border-primary/20
             prose-p:leading-8 prose-p:text-foreground/85
             prose-strong:text-foreground prose-strong:font-semibold
@@ -124,9 +122,7 @@ export default async function ArticlePage({ params }: PageProps) {
           "
         >
           {post.content?.trim() ? (
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {post.content}
-            </ReactMarkdown>
+            <MarkdownRenderer content={post.content} />
           ) : (
             <div className="border border-primary/20 bg-primary/5 p-6 rounded-lg text-center">
               <p className="text-muted-foreground italic">
