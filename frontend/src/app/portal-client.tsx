@@ -274,6 +274,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                                     height={256}
                                     priority
                                     className="object-cover w-full h-full"
+                                    sizes="96px"
                                 />
                             </div>
                         </div>

@@ -89,7 +89,7 @@ export function ActivityCard({
                     alt={name}
                     fill
                     className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, 300px"
+                    sizes="280px"
                 />
             ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-80" />

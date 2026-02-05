@@ -87,6 +87,7 @@ export default function Header() {
                 height={256}
                 priority
                 className="object-cover h-full w-full"
+                sizes="120px"
               />
             </div>
           </div>

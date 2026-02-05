@@ -3,7 +3,7 @@ name: Deploy to Production (Hetzner)
 on:
   push:
     branches:
-      - main
+      - mobileperformance
 
 jobs:
   deploy:
@@ -47,12 +47,12 @@ jobs:
             fi
 
             if [ ! -d "app" ]; then
-              git clone -b main https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
+              git clone -b mobileperformance https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
             fi
 
             cd app
             git fetch --all
-            git reset --hard origin/main
+            git reset --hard origin/mobileperformance
             
             chmod +x ./scripts/backup_db.sh
             mkdir -p logs
