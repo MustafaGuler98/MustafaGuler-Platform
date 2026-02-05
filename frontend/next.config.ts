@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
   images: {
-    unoptimized: isDev,
+    unoptimized: isDev && process.env.NEXT_PUBLIC_OPTIMIZE_IMAGES !== 'true',
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: 'http',

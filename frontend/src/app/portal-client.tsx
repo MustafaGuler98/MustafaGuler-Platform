@@ -270,8 +270,8 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                                 <Image
                                     src="/logo1.png"
                                     alt="Mustafa Guler"
-                                    width={1024}
-                                    height={1024}
+                                    width={256}
+                                    height={256}
                                     priority
                                     className="object-cover w-full h-full"
                                 />

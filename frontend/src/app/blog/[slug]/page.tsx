@@ -57,6 +57,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 fill
                 className="object-cover opacity-80"
                 priority
+                sizes="(max-width: 768px) 100vw, 768px"
               />
               {/* Gradient overlays */}
               <div className="absolute inset-0 bg-gradient-to-t from-[#020103] via-transparent to-transparent opacity-60" />

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { type LucideIcon } from "lucide-react";
+import Image from "next/image";
 
 interface ActivityCardProps {
     title: string;
@@ -29,9 +30,12 @@ export function ActivityCard({
                 {/* Left: Image */}
                 <div className="w-28 h-full shrink-0 relative overflow-hidden">
                     {imageUrl ? (
-                        <div
-                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                            style={{ backgroundImage: `url(${imageUrl})` }}
+                        <Image
+                            src={imageUrl}
+                            alt={name}
+                            fill
+                            className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                            sizes="112px"
                         />
                     ) : (
                         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
@@ -80,9 +84,12 @@ export function ActivityCard({
         <div className="group relative w-full aspect-[3/4] overflow-hidden rounded-sm border border-white/10 bg-black/40">
             {/* Background Image OR Fallback Gradient */}
             {imageUrl ? (
-                <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ backgroundImage: `url(${imageUrl})` }}
+                <Image
+                    src={imageUrl}
+                    alt={name}
+                    fill
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 768px) 100vw, 300px"
                 />
             ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-80" />
