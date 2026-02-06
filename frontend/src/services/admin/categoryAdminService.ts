@@ -8,7 +8,7 @@ class CategoryAdminService extends BaseAdminService<Category> {
     }
 
     async getBySlug(slug: string): Promise<ServiceResponse<Category>> {
-        return apiClient.get<Category>(`/categories/slug/${slug}`);
+        return apiClient.get<Category>(`/categories/slug/${slug}`, { credentials: 'include' });
     }
 }
 

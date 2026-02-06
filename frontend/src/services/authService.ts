@@ -4,7 +4,7 @@ import { apiClient } from '@/lib/api-client';
 export const authService = {
     async login(credentials: LoginRequest): Promise<AuthResult> {
         try {
-            const response = await apiClient.post<AuthResult>('/auth/login', credentials);
+            const response = await apiClient.post<AuthResult>('/auth/login', credentials, { credentials: 'include' });
 
             return {
                 isSuccess: response.isSuccess,

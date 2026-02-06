@@ -37,7 +37,9 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
     const query = params.toString() ? `?${params.toString()}` : '';
-    const response = await apiClient.get<Article[]>(`/articles/all${query}`, { cache: 'no-store' });
+    const response = await apiClient.get<Article[]>(`/articles/all${query}`, {
+      next: { revalidate: 60 }
+    });
 
     if (!response.isSuccess) {
       throw new ApiError(
@@ -56,7 +58,9 @@ export const articleService = {
     if (languageCode) {
       params.append('languageCode', languageCode);
     }
-    const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, { cache: 'no-store' });
+    const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, {
+      next: { revalidate: 60 }
+    });
 
     if (!response.isSuccess) {
       throw new ApiError(
@@ -80,7 +84,9 @@ export const articleService = {
       params.append('CategoryName', categoryName);
     }
 
-    return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, { cache: 'no-store' });
+    return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, {
+      next: { revalidate: 60 }
+    });
   },
 
   async getPagedWithoutImageArticles(page: number, pageSize: number, languageCode?: string): Promise<ServiceResponse<PagedResult<ArticleListWithoutImage>>> {
@@ -91,11 +97,15 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
 
-    return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, { cache: 'no-store' });
+    return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, {
+      next: { revalidate: 60 }
+    });
   },
 
   async getAllCategories(): Promise<Category[]> {
-    const response = await apiClient.get<Category[]>('/categories/active', { cache: 'no-store' }); // or 1 hour cache
+    const response = await apiClient.get<Category[]>('/categories/active', {
+      next: { revalidate: 3600 },
+    });
 
     if (!response.isSuccess) {
       // Log but return empty to not break page
