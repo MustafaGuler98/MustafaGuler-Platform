@@ -78,11 +78,11 @@ export const metadata: Metadata = {
     google: "V-c8EJyAeGGs7coLDY0vhF4Y5OrcYfT3cB_uvoyMQY4",
   },
   openGraph: {
-    images: ["/logo1.png"],
+    images: ["/logo1.webp"],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/logo1.png"],
+    images: ["/logo1.webp"],
   },
 };
 
@@ -108,7 +108,7 @@ export default function RootLayout({
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
 
           <Image
-            src="/bg-magic.png"
+            src="/bg-magic.webp"
             alt="background"
             width={1024}
             height={1024}

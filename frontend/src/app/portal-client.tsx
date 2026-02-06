@@ -261,7 +261,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                         <div className="logo-orbital relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-visible transition-all duration-300">
                             <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
                                 <Image
-                                    src="/logo1.png"
+                                    src="/logo1.webp"
                                     alt="Mustafa Guler"
                                     width={96}
                                     height={96}

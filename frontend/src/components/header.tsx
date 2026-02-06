@@ -81,7 +81,7 @@ export default function Header() {
           <div className="logo-orbital relative w-30 h-30 rounded-full overflow-visible transition-all duration-300">
             <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
               <Image
-                src="/logo1.png"
+                src="/logo1.webp"
                 alt="Mustafa Guler"
                 width={120}
                 height={120}
