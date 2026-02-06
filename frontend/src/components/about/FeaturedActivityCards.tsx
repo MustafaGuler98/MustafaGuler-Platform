@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
 import { ActivityCard } from '@/components/content/activity-card';
 import { Film, Gamepad2, Headphones, BookOpen, Eye, Dices, Tv, type LucideIcon } from 'lucide-react';
 import type { PublicActivities, PublicActivity } from '@/types/archives';
-import { apiClient } from '@/lib/api-client';
 import { getImageUrl } from '@/lib/utils';
+
+interface FeaturedActivityCardsProps {
+    data: PublicActivities | null;
+}
 
 // Default empty cards
 const defaultSlots: Array<{ type: string; icon: LucideIcon; color: string }> = [
@@ -18,25 +20,8 @@ const defaultSlots: Array<{ type: string; icon: LucideIcon; color: string }> = [
     { type: 'TTRPG', icon: Dices, color: 'text-emerald-400' },
 ];
 
-export function FeaturedActivityCards() {
-    const [data, setData] = useState<PublicActivities | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchFeatured = async () => {
-            try {
-                const response = await apiClient.get<PublicActivities>('/archives/activity');
-                if (response.isSuccess && response.data) {
-                    setData(response.data);
-                }
-            } catch {
-                // silent
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchFeatured();
-    }, []);
+export function FeaturedActivityCards({ data }: FeaturedActivityCardsProps) {
+    const isLoading = !data;
 
     // Map type to data
     const getItemForType = (type: string): PublicActivity | null => {
@@ -74,3 +59,4 @@ export function FeaturedActivityCards() {
         </>
     );
 }
+

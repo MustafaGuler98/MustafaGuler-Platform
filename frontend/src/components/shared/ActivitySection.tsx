@@ -3,6 +3,11 @@
 import { useState, useRef, useCallback } from "react";
 import { NeonStreamNav } from "@/components/ui/neon-stream-nav";
 import { FeaturedActivityCards } from "@/components/about/FeaturedActivityCards";
+import type { PublicActivities } from "@/types/archives";
+
+interface ActivitySectionProps {
+    activities: PublicActivities | null;
+}
 
 const CARD_WIDTH = 280;
 const CARD_GAP = 24;
@@ -10,7 +15,7 @@ const CARD_ITEM_WIDTH = CARD_WIDTH + CARD_GAP;
 const DEFAULT_TOTAL_ITEMS = 7;
 const SCROLL_INTERVAL_MS = 150;
 
-export function ActivitySection() {
+export function ActivitySection({ activities }: ActivitySectionProps) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [totalItems, setTotalItems] = useState(DEFAULT_TOTAL_ITEMS);
     const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -141,7 +146,7 @@ export function ActivitySection() {
                         className="flex gap-6 overflow-x-auto py-8 px-4 md:px-8 snap-x snap-mandatory scrollbar-none"
                     >
                         {/* Dynamic Featured Items from API */}
-                        <FeaturedActivityCards />
+                        <FeaturedActivityCards data={activities} />
                     </div>
 
                     {/* Right Fade Gradient */}

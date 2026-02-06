@@ -1,12 +1,15 @@
 import AboutClient from "./about-client";
 import { archivesService } from "@/services/archivesService";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export default async function AboutPage() {
-    const stats = await archivesService.getStats();
+    const [stats, activities] = await Promise.all([
+        archivesService.getStats(),
+        archivesService.getActivity(),
+    ]);
 
     return (
-        <AboutClient stats={stats} />
+        <AboutClient stats={stats} activities={activities} />
     );
 }
