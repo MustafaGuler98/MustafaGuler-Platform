@@ -42,7 +42,7 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export default function PortalClient({ articles, totalCount }: PortalClientProps) {
-    const [mounted, setMounted] = useState(false);
+
     const [slots, setSlots] = useState<CarouselSlot[]>([]);
     const [rotationOffset, setRotationOffset] = useState(0);
 
@@ -96,10 +96,6 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
         };
     }, [rotationOffset]);
 
-    // Initialize mounted state
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     // Initialize slots when wordQueue changes
     useEffect(() => {
@@ -122,7 +118,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
 
     // Animation
     useEffect(() => {
-        if (!mounted || slots.length === 0 || wordQueue.length === 0) return;
+        if (slots.length === 0 || wordQueue.length === 0) return;
 
         let animationFrame: number;
         let lastSwapTime = Date.now();
@@ -202,7 +198,7 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
                 clearTimeout(animationTimeoutRef.current);
             }
         };
-    }, [mounted, slots.length, wordQueue]);
+    }, [slots.length, wordQueue]);
 
     // Handle Page Change
     const handlePageChange = async (newPage: number) => {
@@ -223,9 +219,6 @@ export default function PortalClient({ articles, totalCount }: PortalClientProps
         }
     };
 
-    if (!mounted) {
-        return <div className="min-h-screen" />;
-    }
 
     return (
         <div className="flex flex-col min-h-screen bg-transparent text-foreground">

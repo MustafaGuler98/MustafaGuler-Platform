@@ -16,14 +16,10 @@ interface TimelineClientProps {
 
 export default function TimelineClient({ initialArticles }: TimelineClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
 
   // Using this to understand publish date of hovered article
   const [hoveredYear, setHoveredYear] = useState<string | null>(null);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const safeArticles = initialArticles || [];
   const filteredArticles = safeArticles.filter((article) => {
@@ -47,7 +43,6 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
 
   const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
 
-  if (!isMounted) return <div className="min-h-screen bg-transparent" />;
 
   let globalIndex = 0;
 
