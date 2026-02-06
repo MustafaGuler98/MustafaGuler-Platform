@@ -83,11 +83,10 @@ export default function Header() {
               <Image
                 src="/logo1.png"
                 alt="Mustafa Guler"
-                width={256}
-                height={256}
+                width={120}
+                height={120}
                 priority
                 className="object-cover h-full w-full"
-                sizes="120px"
               />
             </div>
           </div>

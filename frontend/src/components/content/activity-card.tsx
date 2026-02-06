@@ -33,9 +33,9 @@ export function ActivityCard({
                         <Image
                             src={imageUrl}
                             alt={name}
-                            fill
-                            className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                            sizes="112px"
+                            width={112}
+                            height={112}
+                            className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
                         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black" />
@@ -87,9 +87,9 @@ export function ActivityCard({
                 <Image
                     src={imageUrl}
                     alt={name}
-                    fill
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                    sizes="280px"
+                    width={280}
+                    height={374}
+                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                 />
             ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-80" />
