@@ -120,10 +120,16 @@ jobs:
             echo "Revalidating activities..."
             curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=activities&secret=$REVALIDATE_SECRET" && echo " [OK]" || echo " [FAILED]"
             
-            # Visit pages to populate cache with fresh data
-            echo "Visiting homepage to populate cache..."
+            # Visit pages to populate cache with fresh data (ISR needs 2 visits)
+            echo "First visit (triggers background revalidation)..."
             curl -s https://mustafaguler.me/ > /dev/null && echo " [OK]" || echo " [FAILED]"
-            echo "Visiting about page to populate cache..."
+            curl -s https://mustafaguler.me/about > /dev/null && echo " [OK]" || echo " [FAILED]"
+            
+            echo "Waiting for background revalidation to complete..."
+            sleep 5
+            
+            echo "Second visit (populates cache with fresh data)..."
+            curl -s https://mustafaguler.me/ > /dev/null && echo " [OK]" || echo " [FAILED]"
             curl -s https://mustafaguler.me/about > /dev/null && echo " [OK]" || echo " [FAILED]"
             
             echo "Cache warm-up complete!"
