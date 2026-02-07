@@ -42,11 +42,8 @@ export const articleService = {
     });
 
     if (!response.isSuccess) {
-      throw new ApiError(
-        response.message || 'Failed to fetch articles',
-        response.statusCode,
-        response.errors
-      );
+      console.error(`[Build/Runtime Error] Failed to fetch articles: ${response.message}`);
+      return [];
     }
 
     return response.data || [];
@@ -63,11 +60,8 @@ export const articleService = {
     });
 
     if (!response.isSuccess) {
-      throw new ApiError(
-        response.message || 'Failed to fetch popular articles',
-        response.statusCode,
-        response.errors
-      );
+      console.error(`[Build/Runtime Error] Failed to fetch popular articles: ${response.message}`);
+      return [];
     }
 
     return response.data || [];
@@ -89,7 +83,22 @@ export const articleService = {
     });
 
     if (!response.isSuccess) {
-      throw new ApiError(response.message || 'Failed to fetch paged articles', response.statusCode, response.errors);
+      console.error(`[Build/Runtime Error] Failed to fetch paged articles: ${response.message}`);
+      return {
+        isSuccess: false,
+        message: response.message,
+        statusCode: response.statusCode,
+        data: {
+          items: [],
+          totalCount: 0,
+          pageNumber: page,
+          pageSize: pageSize,
+          totalPages: 0,
+          hasPrevious: false,
+          hasNext: false
+        } as PagedResult<Article>,
+        errors: response.errors
+      };
     }
     return response;
   },
@@ -107,7 +116,22 @@ export const articleService = {
     });
 
     if (!response.isSuccess) {
-      throw new ApiError(response.message || 'Failed to fetch paged list', response.statusCode, response.errors);
+      console.error(`[Build/Runtime Error] Failed to fetch paged list: ${response.message}`);
+      return {
+        isSuccess: false,
+        message: response.message,
+        statusCode: response.statusCode,
+        data: {
+          items: [],
+          totalCount: 0,
+          pageNumber: page,
+          pageSize: pageSize,
+          totalPages: 0,
+          hasPrevious: false,
+          hasNext: false
+        } as PagedResult<ArticleListWithoutImage>,
+        errors: response.errors
+      };
     }
     return response;
   },

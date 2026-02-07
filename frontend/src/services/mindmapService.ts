@@ -67,7 +67,8 @@ export const mindmapService = {
         });
 
         if (!response.isSuccess || !response.data) {
-            throw new Error("Failed to fetch mindmap data: " + response.message);
+            console.error(`[Build/Runtime Error] Failed to fetch mindmap data: ${response.message}`);
+            return [];
         }
 
         return response.data;
