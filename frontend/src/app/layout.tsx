@@ -59,7 +59,7 @@ export default function RootLayout({
             alt="background"
             width={1024}
             height={1024}
-            priority
+            loading="eager"
             sizes="100vw"
             className="object-cover opacity-30 h-full w-full"
             quality={75}
