@@ -12,7 +12,8 @@ namespace MustafaGuler.Service.Services.Archives
         public TvSeriesService(
             IGenericRepository<TvSeries> repository,
             IUnitOfWork unitOfWork,
-            IMapper mapper) : base(repository, unitOfWork, mapper)
+            IMapper mapper,
+            ICacheInvalidationService cacheInvalidation) : base(repository, unitOfWork, mapper, cacheInvalidation)
         {
         }
 

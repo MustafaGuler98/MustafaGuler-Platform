@@ -32,6 +32,7 @@ jobs:
           SEQ_ACCEPT_EULA: Y
           LASTFM_APIKEY: ${{ secrets.LASTFM_APIKEY }}
           LASTFM_USERNAME: ${{ secrets.LASTFM_USERNAME }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
           NEXT_PUBLIC_API_URL: /api
           INTERNAL_API_URL: http://api:8080
           NEXT_PUBLIC_BACKEND_URL: https://mustafaguler.me
@@ -40,19 +41,25 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,CONNECTIONSTRING_DEFAULT,ASPNETCORE_ENVIRONMENT,TOKEN_SECURITYKEY,TOKEN_ISSUER,TOKEN_AUDIENCE,ADMIN_EMAIL,ADMIN_PASSWORD,MAILSETTINGS_HOST,MAILSETTINGS_PORT,MAILSETTINGS_USER,MAILSETTINGS_PASSWORD,MAILSETTINGS_FROMEMAIL,MAILSETTINGS_TOEMAIL,SEQ_ACCEPT_EULA,NEXT_PUBLIC_API_URL,INTERNAL_API_URL,NEXT_PUBLIC_BACKEND_URL,LASTFM_APIKEY,LASTFM_USERNAME
+          envs: POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,CONNECTIONSTRING_DEFAULT,ASPNETCORE_ENVIRONMENT,TOKEN_SECURITYKEY,TOKEN_ISSUER,TOKEN_AUDIENCE,ADMIN_EMAIL,ADMIN_PASSWORD,MAILSETTINGS_HOST,MAILSETTINGS_PORT,MAILSETTINGS_USER,MAILSETTINGS_PASSWORD,MAILSETTINGS_FROMEMAIL,MAILSETTINGS_TOEMAIL,SEQ_ACCEPT_EULA,NEXT_PUBLIC_API_URL,INTERNAL_API_URL,NEXT_PUBLIC_BACKEND_URL,LASTFM_APIKEY,LASTFM_USERNAME,REVALIDATE_SECRET
           script: |
+            set -Eeuo pipefail
+
+            APP_DIR="app"
+            BRANCH="main"
+            WARMUP_BASE_URL="https://localhost"
+
             if [ -d "app" ] && [ ! -d "app/.git" ]; then
               rm -rf app
             fi
 
             if [ ! -d "app" ]; then
-              git clone -b main https://github.com/MustafaGuler98/MustafaGuler-Platform.git app
+              git clone -b "$BRANCH" https://github.com/MustafaGuler98/MustafaGuler-Platform.git "$APP_DIR"
             fi
 
-            cd app
-            git fetch --all
-            git reset --hard origin/main
+            cd "$APP_DIR"
+            git fetch --all --prune
+            git reset --hard "origin/$BRANCH"
             
             chmod +x ./scripts/backup_db.sh
             mkdir -p logs
@@ -84,17 +91,70 @@ jobs:
             printf "NEXT_PUBLIC_API_URL='%s'\n" "$NEXT_PUBLIC_API_URL" >> .env
             printf "INTERNAL_API_URL='%s'\n" "$INTERNAL_API_URL" >> .env
             printf "NEXT_PUBLIC_BACKEND_URL='%s'\n" "$NEXT_PUBLIC_BACKEND_URL" >> .env
+            printf "REVALIDATE_SECRET='%s'\n" "$REVALIDATE_SECRET" >> .env
+            printf "FRONTEND_INTERNAL_URL='http://frontend:3000'\n" >> .env
             
             
-            echo "Stopping containers..."
-            docker compose down --remove-orphans || true
+            echo "Building images (attempt 1)..."
+            if ! docker compose build --pull; then
+              echo "Build failed. Running one-time builder cleanup and retry..."
+              docker builder prune -af
+              docker compose build --pull --no-cache
+            fi
+
+            echo "Recreating containers with new images..."
+            docker compose up -d --force-recreate --remove-orphans
+
+            echo "Waiting for services to become healthy..."
+            # Wait for API through Nginx (max 90 seconds)
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+              if curl -kfsS "$WARMUP_BASE_URL/api/articles" > /dev/null 2>&1; then
+                echo "API is ready!"
+                break
+              fi
+              if [ "$i" -eq 18 ]; then
+                echo "API did not become ready in time."
+                docker compose ps
+                docker compose logs --tail=200 api nginx frontend
+                exit 1
+              fi
+              echo "Waiting for API... (attempt $i/18)"
+              sleep 5
+            done
+
+            # Wait for frontend through Nginx (max 90 seconds)
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18; do
+              if curl -kfsS "$WARMUP_BASE_URL/" > /dev/null 2>&1; then
+                echo "Frontend is ready!"
+                break
+              fi
+              if [ "$i" -eq 18 ]; then
+                echo "Frontend did not become ready in time."
+                docker compose ps
+                docker compose logs --tail=200 frontend nginx
+                exit 1
+              fi
+              echo "Waiting for Frontend... (attempt $i/18)"
+              sleep 5
+            done
+
+            echo "Triggering tag revalidation..."
+            if ! docker compose exec -T frontend node -e "const secret = process.env.REVALIDATE_SECRET; if (!secret) { console.error('REVALIDATE_SECRET missing in frontend container'); process.exit(1); } const payload = JSON.stringify({ tags: ['articles', 'mindmap', 'activities'] }); const urls = ['http://127.0.0.1:3000/api/revalidate', 'http://frontend:3000/api/revalidate']; const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); (async () => { for (let attempt = 1; attempt <= 8; attempt++) { for (const url of urls) { try { const res = await fetch(url, { method: 'POST', headers: { 'x-revalidate-secret': secret, 'content-type': 'application/json' }, body: payload }); const body = await res.text(); if (res.ok) { console.log('Revalidation OK:', url, body); process.exit(0); } console.error('Revalidation non-2xx:', url, res.status, body); } catch (err) { console.error('Revalidation request failed:', url, err && err.message ? err.message : err); } } await sleep(1000); } process.exit(1); })();"; then
+              echo "Warning: tag revalidation request failed after retries. Continuing deploy."
+            fi
             
-            sleep 3
-
-            echo "Pruning build cache..."
-            docker builder prune -f
-
-            echo "Starting build..."
-            docker compose up -d --build --force-recreate
-
-
+            echo "Warming up critical routes..."
+            for route in / /about /blog /blog/timeline; do
+              curl -kfsS "$WARMUP_BASE_URL$route" > /dev/null
+              echo "Warmed: $route (pass 1)"
+            done
+            
+            sleep 2
+            
+            for route in / /about /blog /blog/timeline; do
+              curl -kfsS "$WARMUP_BASE_URL$route" > /dev/null
+              echo "Warmed: $route (pass 2)"
+            done
+            
+            echo "Cache warm-up complete!"
+            docker compose ps

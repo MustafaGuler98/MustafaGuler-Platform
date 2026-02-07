@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Article, ArticleListWithoutImage } from "@/types/article";
 import { Calendar, Search, Activity, ChevronRight, Zap, X } from "lucide-react";
 import { cn, formatCardDate } from "@/lib/utils";
+import { michromaFont } from "@/lib/local-fonts";
 
 interface GroupedArticles {
   [year: string]: ArticleListWithoutImage[];
@@ -16,14 +17,10 @@ interface TimelineClientProps {
 
 export default function TimelineClient({ initialArticles }: TimelineClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
 
   // Using this to understand publish date of hovered article
   const [hoveredYear, setHoveredYear] = useState<string | null>(null);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const safeArticles = initialArticles || [];
   const filteredArticles = safeArticles.filter((article) => {
@@ -47,7 +44,6 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
 
   const years = Object.keys(grouped).sort((a, b) => Number(b) - Number(a));
 
-  if (!isMounted) return <div className="min-h-screen bg-transparent" />;
 
   let globalIndex = 0;
 
@@ -62,7 +58,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
               <span>System_Ready</span>
             </div>
             <Link href="/blog/timeline" className="group/title w-fit no-underline">
-              <h1 className="text-3xl md:text-6xl font-bold font-[family-name:var(--font-michroma)] text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300">
+              <h1 className={`${michromaFont.className} text-3xl md:text-6xl font-bold text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300`}>
                 TIMELINE
               </h1>
             </Link>

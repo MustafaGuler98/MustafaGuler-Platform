@@ -23,7 +23,8 @@ namespace MustafaGuler.Service.Services.Archives
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IImageService imageService,
-            Microsoft.Extensions.Logging.ILogger<MusicService> logger) : base(repository, unitOfWork, mapper)
+            Microsoft.Extensions.Logging.ILogger<MusicService> logger,
+            ICacheInvalidationService cacheInvalidation) : base(repository, unitOfWork, mapper, cacheInvalidation)
         {
             _imageService = imageService;
             _logger = logger;

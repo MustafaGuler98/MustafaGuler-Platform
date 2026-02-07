@@ -17,7 +17,7 @@ class ApiError extends Error {
 export const articleService = {
   async getArticleBySlug(slug: string): Promise<Article> {
     const response = await apiClient.get<Article>(`/articles/${slug}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     } as RequestInit);
 
     if (!response.isSuccess || !response.data) {
@@ -37,14 +37,13 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
     const query = params.toString() ? `?${params.toString()}` : '';
-    const response = await apiClient.get<Article[]>(`/articles/all${query}`, { cache: 'no-store' });
+    const response = await apiClient.get<Article[]>(`/articles/all${query}`, {
+      next: { revalidate: 86400, tags: ['articles'] }
+    });
 
     if (!response.isSuccess) {
-      throw new ApiError(
-        response.message || 'Failed to fetch articles',
-        response.statusCode,
-        response.errors
-      );
+      console.error(`[Build/Runtime Error] Failed to fetch articles: ${response.message}`);
+      return [];
     }
 
     return response.data || [];
@@ -56,14 +55,13 @@ export const articleService = {
     if (languageCode) {
       params.append('languageCode', languageCode);
     }
-    const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, { cache: 'no-store' });
+    const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, {
+      next: { revalidate: 86400, tags: ['articles'] }
+    });
 
     if (!response.isSuccess) {
-      throw new ApiError(
-        response.message || 'Failed to fetch popular articles',
-        response.statusCode,
-        response.errors
-      );
+      console.error(`[Build/Runtime Error] Failed to fetch popular articles: ${response.message}`);
+      return [];
     }
 
     return response.data || [];
@@ -80,7 +78,29 @@ export const articleService = {
       params.append('CategoryName', categoryName);
     }
 
-    return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, { cache: 'no-store' });
+    const response = await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, {
+      next: { revalidate: 86400, tags: ['articles'] }
+    });
+
+    if (!response.isSuccess) {
+      console.error(`[Build/Runtime Error] Failed to fetch paged articles: ${response.message}`);
+      return {
+        isSuccess: false,
+        message: response.message,
+        statusCode: response.statusCode,
+        data: {
+          items: [],
+          totalCount: 0,
+          pageNumber: page,
+          pageSize: pageSize,
+          totalPages: 0,
+          hasPrevious: false,
+          hasNext: false
+        } as PagedResult<Article>,
+        errors: response.errors
+      };
+    }
+    return response;
   },
 
   async getPagedWithoutImageArticles(page: number, pageSize: number, languageCode?: string): Promise<ServiceResponse<PagedResult<ArticleListWithoutImage>>> {
@@ -91,11 +111,35 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
 
-    return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, { cache: 'no-store' });
+    const response = await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, {
+      next: { revalidate: 86400, tags: ['articles'] }
+    });
+
+    if (!response.isSuccess) {
+      console.error(`[Build/Runtime Error] Failed to fetch paged list: ${response.message}`);
+      return {
+        isSuccess: false,
+        message: response.message,
+        statusCode: response.statusCode,
+        data: {
+          items: [],
+          totalCount: 0,
+          pageNumber: page,
+          pageSize: pageSize,
+          totalPages: 0,
+          hasPrevious: false,
+          hasNext: false
+        } as PagedResult<ArticleListWithoutImage>,
+        errors: response.errors
+      };
+    }
+    return response;
   },
 
   async getAllCategories(): Promise<Category[]> {
-    const response = await apiClient.get<Category[]>('/categories/active', { cache: 'no-store' }); // or 1 hour cache
+    const response = await apiClient.get<Category[]>('/categories/active', {
+      next: { revalidate: 3600 },
+    });
 
     if (!response.isSuccess) {
       // Log but return empty to not break page

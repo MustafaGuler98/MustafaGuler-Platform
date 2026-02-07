@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { authService } from '@/services/authService';
 
 import { useRouter } from 'next/navigation';
+import effectsStyles from '@/styles/effects.module.css';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -29,7 +30,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-start justify-center pt-24 footer-grid-pattern">
+        <div className={`min-h-screen flex items-start justify-center pt-24 ${effectsStyles.footerGridPattern}`}>
             {/* Login Card */}
             <div className="w-full max-w-md mx-4">
                 <div className="backdrop-blur-md bg-[#0a0118]/90 border border-primary/40 rounded-lg p-8 shadow-2xl">

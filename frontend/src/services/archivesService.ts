@@ -1,5 +1,5 @@
-import { ArchivesStats } from '@/types/archives';
-import { fetchApi } from '@/lib/api-client';
+import { ArchivesStats, PublicActivities } from '@/types/archives';
+import { fetchApi, apiClient } from '@/lib/api-client';
 
 export const archivesService = {
     async getStats(): Promise<ArchivesStats | null> {
@@ -14,6 +14,18 @@ export const archivesService = {
             return response.isSuccess ? response.data : null;
         } catch (error) {
             console.error('Failed to fetch archive stats:', error);
+            return null;
+        }
+    },
+
+    async getActivity(): Promise<PublicActivities | null> {
+        try {
+            const response = await apiClient.get<PublicActivities>('/archives/activity', {
+                next: { revalidate: 86400, tags: ['activities'] }
+            });
+            return response.isSuccess ? response.data : null;
+        } catch (error) {
+            console.error('Failed to fetch activities:', error);
             return null;
         }
     }

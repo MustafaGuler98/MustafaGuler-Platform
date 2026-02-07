@@ -9,7 +9,7 @@ class ArticleAdminService extends BaseAdminService<AdminArticle> {
 
     // Override getById to use /articles/id/{id} endpoint
     async getById(id: string): Promise<ServiceResponse<AdminArticle>> {
-        return apiClient.get<AdminArticle>(`/articles/id/${id}`);
+        return apiClient.get<AdminArticle>(`/articles/id/${id}`, { credentials: 'include' });
     }
 }
 

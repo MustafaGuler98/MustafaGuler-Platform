@@ -7,13 +7,7 @@ import FooterWrapper from "@/components/footer-wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   Inter,
-  Orbitron,
-  Cinzel,
-  Audiowide,
-  Rajdhani,
-  Syncopate,
-  Michroma,
-  Press_Start_2P
+  Orbitron
 } from "next/font/google";
 
 // Fonts
@@ -29,47 +23,6 @@ const orbitron = Orbitron({
   display: "swap",
 });
 
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  display: "swap",
-});
-
-const audiowide = Audiowide({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-audiowide",
-  display: "swap",
-});
-
-const rajdhani = Rajdhani({
-  weight: ["500", "700"],
-  subsets: ["latin"],
-  variable: "--font-rajdhani",
-  display: "swap",
-});
-
-const syncopate = Syncopate({
-  weight: "700",
-  subsets: ["latin"],
-  variable: "--font-syncopate",
-  display: "swap",
-});
-
-const michroma = Michroma({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-michroma",
-  display: "swap",
-});
-
-const pressStart = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-press-start",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://mustafaguler.me"),
   title: "Mustafa Güler",
@@ -78,11 +31,11 @@ export const metadata: Metadata = {
     google: "V-c8EJyAeGGs7coLDY0vhF4Y5OrcYfT3cB_uvoyMQY4",
   },
   openGraph: {
-    images: ["/logo1.png"],
+    images: ["/logo1.webp"],
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/logo1.png"],
+    images: ["/logo1.webp"],
   },
 };
 
@@ -96,23 +49,17 @@ export default function RootLayout({
       <body className={`
         ${inter.variable} 
         ${orbitron.variable} 
-        ${cinzel.variable} 
-        ${audiowide.variable} 
-        ${rajdhani.variable} 
-        ${syncopate.variable}
-        ${michroma.variable}
-        ${pressStart.variable}
         font-sans antialiased
         bg-transparent  
       `}>
         <div className="fixed inset-0 -z-50 h-full w-full pointer-events-none bg-black">
 
           <Image
-            src="/bg-magic.png"
+            src="/bg-magic.webp"
             alt="background"
             width={1024}
             height={1024}
-            priority
+            loading="eager"
             sizes="100vw"
             className="object-cover opacity-30 h-full w-full"
             quality={75}
@@ -131,7 +78,7 @@ export default function RootLayout({
 
         {/* Cloudflare Web Analytics */}
         <Script
-          defer
+          strategy="lazyOnload"
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "9d73043c5ddc487090833d6338541928"}'
         />

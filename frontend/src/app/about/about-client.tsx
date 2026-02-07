@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { AboutSidebar } from "@/components/about/sidebar/AboutSidebar";
 import { ActivitySection } from "@/components/shared/ActivitySection";
-import type { ArchivesStats } from "@/types/archives";
+import type { ArchivesStats, PublicActivities } from "@/types/archives";
 
 interface AboutClientProps {
     stats: ArchivesStats | null;
+    activities: PublicActivities | null;
 }
 
-export default function AboutClient({ stats }: AboutClientProps) {
+export default function AboutClient({ stats, activities }: AboutClientProps) {
     const [activeTerminalTab, setActiveTerminalTab] = useState<'bio' | 'site'>('bio');
 
     return (
@@ -175,7 +176,7 @@ export default function AboutClient({ stats }: AboutClientProps) {
                 <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent my-16" />
 
                 {/* THE BOX (ACTIVITIES)*/}
-                <ActivitySection />
+                <ActivitySection activities={activities} />
             </div>
         </div>
     );

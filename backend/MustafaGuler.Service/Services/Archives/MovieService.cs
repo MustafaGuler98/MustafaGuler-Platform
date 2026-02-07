@@ -12,7 +12,8 @@ namespace MustafaGuler.Service.Services.Archives
         public MovieService(
             IGenericRepository<Movie> repository,
             IUnitOfWork unitOfWork,
-            IMapper mapper) : base(repository, unitOfWork, mapper)
+            IMapper mapper,
+            ICacheInvalidationService cacheInvalidation) : base(repository, unitOfWork, mapper, cacheInvalidation)
         {
         }
 
@@ -32,7 +33,7 @@ namespace MustafaGuler.Service.Services.Archives
         protected override async Task<bool> CheckDuplicateOnUpdateAsync(Movie entity, UpdateMovieDto dto)
         {
             if (entity.Title == dto.Title && entity.Director == dto.Director)
-                return false; 
+                return false;
 
             return await _repository.AnyAsync(m =>
                 m.Title == dto.Title &&

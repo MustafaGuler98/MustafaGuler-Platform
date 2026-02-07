@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { Home, ArrowLeft } from 'lucide-react';
+import effectsStyles from '@/styles/effects.module.css';
 
 export default function NotFound() {
     return (
         <div className="min-h-screen flex items-start justify-center px-4 mt-4 relative overflow-hidden">
             {/* Background grid effect */}
-            <div className="absolute inset-0 footer-grid-pattern opacity-30" />
+            <div className={`absolute inset-0 ${effectsStyles.footerGridPattern} opacity-30`} />
 
             <div className="relative z-10 text-center space-y-8 max-w-lg">
                 {/* 404 */}

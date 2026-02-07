@@ -9,7 +9,7 @@ import { buildArticleMetadata } from "@/lib/seo";
 import { ARTICLE_MESSAGES } from "@/lib/Messages";
 import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{

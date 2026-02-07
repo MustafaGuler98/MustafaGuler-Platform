@@ -17,7 +17,7 @@ class ImageAdminService extends BaseAdminService<ImageInfo> {
         if (searchTerm) {
             url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
         }
-        return apiClient.get<PagedResult<ImageInfo>>(url);
+        return apiClient.get<PagedResult<ImageInfo>>(url, { credentials: 'include' });
     }
 
     // Custom upload method - FormData requires raw fetch, cannot use apiClient.post (enforces JSON)
@@ -26,6 +26,7 @@ class ImageAdminService extends BaseAdminService<ImageInfo> {
             return await fetchApi<ImageInfo>('/images/upload', {
                 method: 'POST',
                 body: formData,
+                credentials: 'include',
             });
         } catch {
             return {

@@ -13,18 +13,24 @@ namespace MustafaGuler.Service.Services
         private readonly IGenericRepository<MindmapItem> _repository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
         private readonly IMemoryCache _memoryCache;
+        private readonly ICacheInvalidationService _cacheInvalidation;
 
         private const string CacheKeyItems = "Mindmap:ActiveItems";
         private const string CacheKeyVersion = "Mindmap:Version";
 
-        public MindmapService(IGenericRepository<MindmapItem> repository, IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache memoryCache)
+        public MindmapService(
+            IGenericRepository<MindmapItem> repository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IMemoryCache memoryCache,
+            ICacheInvalidationService cacheInvalidation)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _memoryCache = memoryCache;
+            _cacheInvalidation = cacheInvalidation;
         }
 
 
@@ -54,10 +60,11 @@ namespace MustafaGuler.Service.Services
             }));
         }
 
-        private void InvalidateCache()
+        private async Task InvalidateCacheAsync()
         {
             _memoryCache.Remove(CacheKeyItems);
             _memoryCache.Set(CacheKeyVersion, Guid.NewGuid(), TimeSpan.FromHours(24));
+            await _cacheInvalidation.InvalidateTagsAsync("mindmap");
         }
 
         public async Task<Result<IEnumerable<MindmapItemDto>>> GetAllAsync()
@@ -87,7 +94,7 @@ namespace MustafaGuler.Service.Services
             await _repository.AddAsync(entity);
             await _unitOfWork.CommitAsync();
 
-            InvalidateCache();
+            await InvalidateCacheAsync();
 
             return Result.Success(201, "Item added successfully.");
         }
@@ -104,7 +111,7 @@ namespace MustafaGuler.Service.Services
             _repository.Update(entity);
             await _unitOfWork.CommitAsync();
 
-            InvalidateCache();
+            await InvalidateCacheAsync();
 
             return Result.Success(200, "Item updated successfully.");
         }
@@ -120,7 +127,7 @@ namespace MustafaGuler.Service.Services
             _repository.Update(entity);
             await _unitOfWork.CommitAsync();
 
-            InvalidateCache();
+            await InvalidateCacheAsync();
 
             return Result.Success(200, "Item deleted successfully.");
         }

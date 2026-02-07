@@ -19,14 +19,22 @@ namespace MustafaGuler.Service.Services
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
         private readonly ILogger<ArticleService> _logger;
+        private readonly ICacheInvalidationService _cacheInvalidation;
 
-        public ArticleService(IGenericRepository<Article> repository, IUnitOfWork unitOfWork, IMapper mapper, ICurrentUserService currentUserService, ILogger<ArticleService> logger)
+        public ArticleService(
+            IGenericRepository<Article> repository,
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ICurrentUserService currentUserService,
+            ILogger<ArticleService> logger,
+            ICacheInvalidationService cacheInvalidation)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _currentUserService = currentUserService;
             _logger = logger;
+            _cacheInvalidation = cacheInvalidation;
         }
 
         public async Task<Result<IEnumerable<ArticleListDto>>> GetAllAsync(string? languageCode = null, Guid? categoryId = null)
@@ -195,6 +203,7 @@ namespace MustafaGuler.Service.Services
 
             await _repository.AddAsync(article);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("articles");
 
             _logger.LogInformation("Article created: {Title} ({Id}) by User: {UserId}", article.Title, article.Id, article.UserId);
             return Result.Success(201, Messages.ArticleAdded);
@@ -245,6 +254,7 @@ namespace MustafaGuler.Service.Services
 
             _repository.Update(article);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("articles");
 
             _logger.LogInformation("Article updated: {Id}", article.Id);
             return Result.Success(200, Messages.ArticleUpdated);
@@ -266,6 +276,7 @@ namespace MustafaGuler.Service.Services
 
             _repository.Update(article);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("articles");
 
             _logger.LogWarning("Article soft-deleted: {Id}", id);
             return Result.Success(200, Messages.ArticleDeleted);

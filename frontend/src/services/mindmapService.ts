@@ -59,5 +59,18 @@ export const mindmapService = {
         }
 
         return [];
+    },
+
+    getAllActiveServer: async (): Promise<string[]> => {
+        const response = await apiClient.get<string[]>(`${API_URL}/all-active`, {
+            next: { revalidate: 86400, tags: ['mindmap'] }
+        });
+
+        if (!response.isSuccess || !response.data) {
+            console.error(`[Build/Runtime Error] Failed to fetch mindmap data: ${response.message}`);
+            return [];
+        }
+
+        return response.data;
     }
 };

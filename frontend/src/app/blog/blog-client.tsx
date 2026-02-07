@@ -28,7 +28,6 @@ interface BlogClientProps {
 export default function BlogClient({ articles, popularArticles, categories, stats, pagination }: BlogClientProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [mounted, setMounted] = useState(false);
 
     const currentCategory = searchParams.get('category');
     const [popularPage, setPopularPage] = useState(0);
@@ -37,9 +36,6 @@ export default function BlogClient({ articles, popularArticles, categories, stat
 
     const POPULAR_ITEMS_PER_PAGE = 3;
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const visiblePopularArticles = popularArticles.slice(
         popularPage * POPULAR_ITEMS_PER_PAGE,
@@ -91,7 +87,6 @@ export default function BlogClient({ articles, popularArticles, categories, stat
         }
     };
 
-    if (!mounted) return <div className="min-h-screen bg-[#020103]" />;
 
     return (
         <div className="min-h-screen text-foreground relative overflow-hidden flex flex-col">

@@ -1,0 +1,56 @@
+.orbitTrack {
+  transform-origin: 50% 50%;
+  animation: orbit-rotate 26s linear infinite;
+}
+
+.slot {
+  transform: translate(-50%, -50%);
+}
+
+.counterSpin {
+  display: inline-block;
+  animation: orbit-counter-rotate 26s linear infinite;
+}
+
+.word {
+  display: inline-block;
+  opacity: 0.9;
+  transition:
+    opacity 260ms ease,
+    filter 260ms ease,
+    text-shadow 260ms ease,
+    transform 260ms ease;
+  will-change: opacity, filter, transform;
+}
+
+.wordSwapping {
+  opacity: 0.18;
+  filter: blur(1px);
+  transform: scale(0.92);
+  text-shadow: none !important;
+}
+
+@keyframes orbit-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-counter-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbitTrack,
+  .counterSpin {
+    animation: none;
+  }
+}

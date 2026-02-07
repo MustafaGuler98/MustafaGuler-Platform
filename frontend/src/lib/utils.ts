@@ -25,8 +25,8 @@ const formatCardDate = (dateString: string) => {
 
 // Our wwwroot is in the backend folder.
 export function getImageUrl(path: string | null | undefined): string {
-  if (!path) return "/default-article.png";
-  if (path.includes("default-article")) return "/default-article.png";
+  if (!path) return "/default-article.webp";
+  if (path.includes("default-article")) return "/default-article.webp";
   if (path.startsWith("http")) return path;
 
   const baseUrl = getBackendUrl();

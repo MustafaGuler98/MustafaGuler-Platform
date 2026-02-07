@@ -5,23 +5,23 @@ export class BaseAdminService<T> {
     constructor(protected resourceName: string) { }
 
     async getAll(): Promise<ServiceResponse<T[]>> {
-        return apiClient.get<T[]>(`/${this.resourceName}`);
+        return apiClient.get<T[]>(`/${this.resourceName}`, { credentials: 'include' });
     }
 
     async getById(id: string): Promise<ServiceResponse<T>> {
-        return apiClient.get<T>(`/${this.resourceName}/${id}`);
+        return apiClient.get<T>(`/${this.resourceName}/${id}`, { credentials: 'include' });
     }
 
     async create(data: Partial<T>): Promise<ServiceResponse<T>> {
-        return apiClient.post<T>(`/${this.resourceName}`, data);
+        return apiClient.post<T>(`/${this.resourceName}`, data, { credentials: 'include' });
     }
 
     async update(id: string, data: Partial<T>): Promise<ServiceResponse<T>> {
-        return apiClient.put<T>(`/${this.resourceName}/${id}`, data);
+        return apiClient.put<T>(`/${this.resourceName}/${id}`, data, { credentials: 'include' });
     }
 
     async delete(id: string): Promise<ServiceResponse<void>> {
-        return apiClient.delete<void>(`/${this.resourceName}/${id}`);
+        return apiClient.delete<void>(`/${this.resourceName}/${id}`, { credentials: 'include' });
     }
 
     async getPaged(
@@ -41,7 +41,8 @@ export class BaseAdminService<T> {
         params.append('sortOrder', sortOrder);
 
         return apiClient.get<PagedResult<T>>(
-            `/${this.resourceName}?${params.toString()}`
+            `/${this.resourceName}?${params.toString()}`,
+            { credentials: 'include' }
         );
     }
 }

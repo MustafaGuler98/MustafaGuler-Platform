@@ -17,15 +17,18 @@ namespace MustafaGuler.Service.Services.Archives
         protected readonly IGenericRepository<TEntity> _repository;
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IMapper _mapper;
+        protected readonly ICacheInvalidationService _cacheInvalidation;
 
         protected BaseMediaService(
             IGenericRepository<TEntity> repository,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ICacheInvalidationService cacheInvalidation)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cacheInvalidation = cacheInvalidation;
         }
 
         public virtual async Task<Result<IEnumerable<TDto>>> GetAllAsync()
@@ -81,6 +84,7 @@ namespace MustafaGuler.Service.Services.Archives
 
             await _repository.AddAsync(entity);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("activities");
 
             var resultDto = _mapper.Map<TDto>(entity);
             return Result<TDto>.Success(resultDto, 201, GetEntityName() + " added successfully");
@@ -100,6 +104,7 @@ namespace MustafaGuler.Service.Services.Archives
 
             _repository.Update(entity);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("activities");
 
             return Result.Success(200, GetEntityName() + " updated successfully");
         }
@@ -116,6 +121,7 @@ namespace MustafaGuler.Service.Services.Archives
 
             _repository.Update(entity);
             await _unitOfWork.CommitAsync();
+            await _cacheInvalidation.InvalidateTagsAsync("activities");
 
             return Result.Success(200, GetEntityName() + " deleted successfully");
         }

@@ -57,6 +57,12 @@ namespace MustafaGuler.API.Extensions
                 client.Timeout = TimeSpan.FromSeconds(10);
             });
 
+            // Cache
+            services.AddHttpClient<ICacheInvalidationService, CacheInvalidationService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(5);
+            });
+
             services.AddHttpClient("ImageDownloader", client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(10);
