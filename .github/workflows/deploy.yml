@@ -139,7 +139,9 @@ jobs:
             done
 
             echo "Triggering tag revalidation..."
-            docker compose exec -T frontend node -e "const secret = process.env.REVALIDATE_SECRET; if (!secret) { console.error('REVALIDATE_SECRET missing in frontend container'); process.exit(1); } fetch('http://localhost:3000/api/revalidate', { method: 'POST', headers: { 'x-revalidate-secret': secret, 'content-type': 'application/json' }, body: JSON.stringify({ tags: ['articles', 'mindmap', 'activities'] }) }).then(async (res) => { const body = await res.text(); if (!res.ok) { console.error(body); process.exit(1); } console.log(body); }).catch((err) => { console.error(err); process.exit(1); });"
+            if ! docker compose exec -T frontend node -e "const secret = process.env.REVALIDATE_SECRET; if (!secret) { console.error('REVALIDATE_SECRET missing in frontend container'); process.exit(1); } const payload = JSON.stringify({ tags: ['articles', 'mindmap', 'activities'] }); const urls = ['http://127.0.0.1:3000/api/revalidate', 'http://frontend:3000/api/revalidate']; const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); (async () => { for (let attempt = 1; attempt <= 8; attempt++) { for (const url of urls) { try { const res = await fetch(url, { method: 'POST', headers: { 'x-revalidate-secret': secret, 'content-type': 'application/json' }, body: payload }); const body = await res.text(); if (res.ok) { console.log('Revalidation OK:', url, body); process.exit(0); } console.error('Revalidation non-2xx:', url, res.status, body); } catch (err) { console.error('Revalidation request failed:', url, err && err.message ? err.message : err); } } await sleep(1000); } process.exit(1); })();"; then
+              echo "Warning: tag revalidation request failed after retries. Continuing deploy."
+            fi
             
             echo "Warming up critical routes..."
             for route in / /about /blog /blog/timeline; do
