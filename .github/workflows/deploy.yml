@@ -100,4 +100,22 @@ jobs:
             echo "Starting build..."
             docker compose up -d --build --force-recreate
 
+            echo "Waiting for services to become healthy..."
+            # Wait for API to be ready (max 60 seconds)
+            for i in 1 2 3 4 5 6; do
+              if curl -s --fail http://localhost:80/api/articles > /dev/null 2>&1; then
+                echo "API is ready!"
+                break
+              fi
+              echo "Waiting for API... (attempt $i)"
+              sleep 10
+            done
+
+            echo "Warming up cache..."
+            # Trigger cache revalidation for all critical tags
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=articles&secret=$REVALIDATE_SECRET" || echo "articles revalidation failed"
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=mindmap&secret=$REVALIDATE_SECRET" || echo "mindmap revalidation failed"
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=activities&secret=$REVALIDATE_SECRET" || echo "activities revalidation failed"
+            
+            echo "Cache warm-up complete!"
 
