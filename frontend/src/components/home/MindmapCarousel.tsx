@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import NeuralNetwork from "@/components/neural-network";
+import styles from "./mindmap-carousel.module.css";
+import { cn } from "@/lib/utils";
 
 interface MindmapCarouselProps {
     items: string[];
@@ -10,15 +12,14 @@ interface MindmapCarouselProps {
 interface CarouselSlot {
     word: string;
     angle: number;
-    opacity: number;
-    glow: number;
     isSwapping: boolean;
 }
 
 const NUM_SLOTS = 6;
 const SLOT_ANGLES = [0, 60, 120, 180, 240, 300];
 const ORBIT_RADIUS = 38;
-const ROTATION_SPEED = 0.15;
+const SWAP_INTERVAL_MS = 2000;
+const SWAP_FADE_MS = 260;
 
 function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
@@ -31,8 +32,8 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export function MindmapCarousel({ items }: MindmapCarouselProps) {
     const [slots, setSlots] = useState<CarouselSlot[]>([]);
-    const [rotationOffset, setRotationOffset] = useState(0);
     const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const swapIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const wordQueue = useMemo(() => {
         if (items.length === 0) return [];
@@ -40,13 +41,12 @@ export function MindmapCarousel({ items }: MindmapCarouselProps) {
     }, [items]);
 
     const getPosition = useCallback((slotAngle: number) => {
-        const totalAngle = slotAngle + rotationOffset;
-        const radians = (totalAngle * Math.PI) / 180;
+        const radians = (slotAngle * Math.PI) / 180;
         return {
             x: 50 + Math.cos(radians) * ORBIT_RADIUS,
             y: 50 + Math.sin(radians) * ORBIT_RADIUS,
         };
-    }, [rotationOffset]);
+    }, []);
 
     // Initialize slots when wordQueue changes
     useEffect(() => {
@@ -58,86 +58,59 @@ export function MindmapCarousel({ items }: MindmapCarouselProps) {
         setSlots(SLOT_ANGLES.map((angle, i) => ({
             word: wordQueue[i % wordQueue.length],
             angle,
-            opacity: 1,
-            glow: 1,
             isSwapping: false,
         })));
     }, [wordQueue]);
 
-    // Animation loop
+    // Swap words periodically without running frame-based React updates.
     useEffect(() => {
-        if (slots.length === 0 || wordQueue.length === 0) return;
-
-        let animationFrame: number;
-        let lastSwapTime = Date.now();
+        if (wordQueue.length === 0) return;
         let currentWordIndex = NUM_SLOTS;
 
-        const animate = () => {
-            const now = Date.now();
+        const runSwap = () => {
+            const slotToSwap = Math.floor(Math.random() * NUM_SLOTS);
+            const nextWord = wordQueue[currentWordIndex % wordQueue.length];
+            currentWordIndex++;
 
-            setRotationOffset(prev => (prev + ROTATION_SPEED) % 360);
+            setSlots(prev => {
+                if (prev.length === 0) return prev;
+                const updated = [...prev];
+                updated[slotToSwap] = { ...updated[slotToSwap], isSwapping: true };
+                return updated;
+            });
 
-            if (now - lastSwapTime > 2000) {
-                lastSwapTime = now;
-                const slotToSwap = Math.floor(Math.random() * NUM_SLOTS);
-
-                setSlots(prev => {
-                    const updated = [...prev];
-                    updated[slotToSwap] = { ...updated[slotToSwap], isSwapping: true };
-                    return updated;
-                });
-
-                const capturedSlot = slotToSwap;
-                const capturedWord = wordQueue[currentWordIndex % wordQueue.length];
-                currentWordIndex++;
-
-                if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
-
-                animationTimeoutRef.current = setTimeout(() => {
-                    setSlots(prev => {
-                        const updated = [...prev];
-                        updated[capturedSlot] = {
-                            ...updated[capturedSlot],
-                            word: capturedWord,
-                            isSwapping: false,
-                            glow: 1
-                        };
-                        return updated;
-                    });
-                    animationTimeoutRef.current = null;
-                }, 800);
-            }
-
-            setSlots(prev => prev.map(slot => {
-                let op = slot.opacity;
-                let gl = slot.glow;
-
-                if (slot.isSwapping) {
-                    if (gl > 0) {
-                        gl = Math.max(0, gl - 0.08);
-                    } else if (op > 0) {
-                        op = Math.max(0, op - 0.025);
-                    }
-                } else {
-                    if (op < 1) op = Math.min(1, op + 0.05);
-                    if (gl < 1 && op > 0.5) gl = Math.min(1, gl + 0.06);
-                }
-
-                return { ...slot, opacity: op, glow: gl };
-            }));
-
-            animationFrame = requestAnimationFrame(animate);
-        };
-
-        animate();
-
-        return () => {
-            cancelAnimationFrame(animationFrame);
             if (animationTimeoutRef.current) {
                 clearTimeout(animationTimeoutRef.current);
             }
+
+            animationTimeoutRef.current = setTimeout(() => {
+                setSlots(prev => {
+                    if (prev.length === 0) return prev;
+                    const updated = [...prev];
+                    updated[slotToSwap] = {
+                        ...updated[slotToSwap],
+                        word: nextWord,
+                        isSwapping: false,
+                    };
+                    return updated;
+                });
+                animationTimeoutRef.current = null;
+            }, SWAP_FADE_MS);
         };
-    }, [slots.length, wordQueue]);
+
+        swapIntervalRef.current = setInterval(runSwap, SWAP_INTERVAL_MS);
+
+        return () => {
+            if (swapIntervalRef.current) {
+                clearInterval(swapIntervalRef.current);
+                swapIntervalRef.current = null;
+            }
+            if (animationTimeoutRef.current) {
+                clearTimeout(animationTimeoutRef.current);
+                animationTimeoutRef.current = null;
+            }
+        };
+    }, [wordQueue]);
 
     return (
         <div className="relative w-full mx-auto pb-8" style={{ height: '45vh', maxHeight: '450px', maxWidth: '450px' }}>
@@ -147,32 +120,47 @@ export function MindmapCarousel({ items }: MindmapCarouselProps) {
             </div>
 
             {/* Carousel Slots */}
-            {slots.length > 0 && slots.map((slot, idx) => {
-                const pos = getPosition(slot.angle);
-                const scale = 0.85 + slot.opacity * 0.25;
-                const glowSize = 8 + slot.glow * 12;
-                const glowOpacity = slot.glow * 0.7;
-                return (
-                    <span
-                        key={`${slot.angle}-${idx}`}
-                        className="absolute z-20 font-mono text-xs select-none pointer-events-none whitespace-nowrap"
-                        style={{
-                            left: `${pos.x}%`,
-                            top: `${pos.y}%`,
-                            transform: `translate(-50%, -50%) scale(${scale})`,
-                            opacity: slot.opacity * 0.9,
-                            color: idx % 2 === 0
-                                ? 'rgba(147, 51, 234, 0.95)'
-                                : 'rgba(34, 211, 238, 0.95)',
-                            textShadow: idx % 2 === 0
-                                ? `0 0 ${glowSize}px rgba(147, 51, 234, ${glowOpacity})`
-                                : `0 0 ${glowSize}px rgba(34, 211, 238, ${glowOpacity})`,
-                        }}
-                    >
-                        {slot.word}
-                    </span>
-                );
-            })}
+            <div className={cn("absolute inset-0 z-20", styles.orbitTrack)}>
+                {slots.length > 0 && slots.map((slot, idx) => {
+                    const pos = getPosition(slot.angle);
+                    const textColor = idx % 2 === 0
+                        ? "rgba(147, 51, 234, 0.95)"
+                        : "rgba(34, 211, 238, 0.95)";
+                    const textGlow = idx % 2 === 0
+                        ? "0 0 16px rgba(147, 51, 234, 0.65)"
+                        : "0 0 16px rgba(34, 211, 238, 0.65)";
+
+                    return (
+                        <span
+                            key={`${slot.angle}-${idx}`}
+                            className={cn(
+                                "absolute select-none pointer-events-none whitespace-nowrap",
+                                styles.slot
+                            )}
+                            style={{
+                                left: `${pos.x}%`,
+                                top: `${pos.y}%`,
+                            }}
+                        >
+                            <span className={styles.counterSpin}>
+                                <span
+                                    className={cn(
+                                        "font-mono text-xs",
+                                        styles.word,
+                                        slot.isSwapping && styles.wordSwapping
+                                    )}
+                                    style={{
+                                        color: textColor,
+                                        textShadow: textGlow,
+                                    }}
+                                >
+                                    {slot.word}
+                                </span>
+                            </span>
+                        </span>
+                    );
+                })}
+            </div>
         </div>
     );
 }

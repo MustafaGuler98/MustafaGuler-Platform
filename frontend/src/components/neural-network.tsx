@@ -17,17 +17,9 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
         const ctx = canvas.getContext("2d")!;
         if (!ctx) return;
 
-        // Set canvas size
-        const resize = () => {
-            canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-            canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-        };
-        resize();
-        window.addEventListener("resize", resize);
-
-        const w = canvas.offsetWidth;
-        const h = canvas.offsetHeight;
+        let width = 0;
+        let height = 0;
+        let isVisible = true;
 
         // Configuration
         const opts = {
@@ -45,8 +37,29 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
             rotVelY: 0.18, // radians per second
             depth: 200,
             focalLength: 200,
-            vanishPoint: { x: w / 2, y: h / 2 },
+            vanishPoint: { x: 0, y: 0 },
         };
+
+        const resize = () => {
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            width = canvas.offsetWidth;
+            height = canvas.offsetHeight;
+            canvas.width = Math.max(1, Math.floor(width * dpr));
+            canvas.height = Math.max(1, Math.floor(height * dpr));
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            opts.vanishPoint.x = width / 2;
+            opts.vanishPoint.y = height / 2;
+        };
+        resize();
+        window.addEventListener("resize", resize, { passive: true });
+
+        const visibilityObserver = new IntersectionObserver(
+            (entries) => {
+                isVisible = entries[0]?.isIntersecting ?? true;
+            },
+            { threshold: 0.01 }
+        );
+        visibilityObserver.observe(canvas);
 
         const squareRange = opts.range * opts.range;
         const squareAllowed = opts.allowedDist * opts.allowedDist;
@@ -55,6 +68,7 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
         let sinX = 0, sinY = 0, cosX = 1, cosY = 1;
         let time = 0; // Total elapsed time in seconds
         let lastTime = performance.now();
+        let frameCount = 0;
 
         interface Connection {
             x: number;
@@ -177,17 +191,17 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
             linkConnection(toDevelop.shift()!);
         }
 
-        function animate() {
+        function animate(now: number) {
             animationRef.current = requestAnimationFrame(animate);
 
             // Calculate deltaTime for frame-rate independence
-            const now = performance.now();
             const deltaTime = (now - lastTime) / 1000; // Convert to seconds
             lastTime = now;
+            if (!isVisible) return;
             time += deltaTime;
 
             // Clear with transparency to show page background
-            ctx.clearRect(0, 0, w, h);
+            ctx.clearRect(0, 0, width, height);
 
             // Rotation based on elapsed time (not frame count)
             const rotX = time * opts.rotVelX;
@@ -212,8 +226,11 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
                 conn.screen.scale = isFiring ? conn.screen.scale * 1.2 : conn.screen.scale;
             }
 
-            // Sort by depth for proper rendering
-            const sorted = [...connections].sort((a, b) => b.screen.z - a.screen.z);
+            // Sort every other frame to reduce unnecessary allocations and CPU churn.
+            if ((frameCount++ & 1) === 0) {
+                connections.sort((a, b) => b.screen.z - a.screen.z);
+            }
+            const sorted = connections;
 
             // Draw connections (lines)
             ctx.globalCompositeOperation = "lighter";
@@ -231,9 +248,9 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
 
             // Draw nodes with glow
             ctx.globalCompositeOperation = "source-over";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "rgba(34, 211, 238, 0.6)";
             for (const conn of sorted) {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = "rgba(34, 211, 238, 0.6)";
                 ctx.fillStyle = conn.screen.color;
                 ctx.beginPath();
                 ctx.arc(conn.screen.x, conn.screen.y, conn.size * conn.screen.scale, 0, Math.PI * 2);
@@ -255,10 +272,11 @@ export default function NeuralNetwork({ className }: NeuralNetworkProps) {
             ctx.shadowBlur = 0;
         }
 
-        animate();
+        animationRef.current = requestAnimationFrame(animate);
 
         return () => {
             window.removeEventListener("resize", resize);
+            visibilityObserver.disconnect();
             if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current);
             }
