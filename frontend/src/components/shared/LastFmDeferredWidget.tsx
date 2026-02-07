@@ -15,13 +15,6 @@ interface LastFmDeferredWidgetProps {
 type IdleCallbackHandle = number;
 type IdleCallbackFn = (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void;
 
-declare global {
-    interface Window {
-        requestIdleCallback?: (callback: IdleCallbackFn, options?: { timeout: number }) => IdleCallbackHandle;
-        cancelIdleCallback?: (handle: IdleCallbackHandle) => void;
-    }
-}
-
 const LazyLastFmWidget = dynamic<LastFmWidgetProps>(
     () => import("./LastFmWidget").then((mod) => mod.LastFmWidget),
     { ssr: false }
@@ -59,6 +52,10 @@ export function LastFmDeferredWidget({
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
         let idleId: IdleCallbackHandle | null = null;
         let effectiveDelayMs = delayMs;
+        const win = window as Window & {
+            requestIdleCallback?: (callback: IdleCallbackFn, options?: { timeout: number }) => IdleCallbackHandle;
+            cancelIdleCallback?: (handle: IdleCallbackHandle) => void;
+        };
 
         try {
             if (sessionStorage.getItem(LASTFM_TAB_WARMED_KEY) === "1") {
@@ -78,8 +75,8 @@ export function LastFmDeferredWidget({
         };
 
         timeoutId = setTimeout(() => {
-            if (typeof window.requestIdleCallback === "function") {
-                idleId = window.requestIdleCallback(
+            if (typeof win.requestIdleCallback === "function") {
+                idleId = win.requestIdleCallback(
                     () => startWarmup(),
                     { timeout: 1500 }
                 );
@@ -94,8 +91,8 @@ export function LastFmDeferredWidget({
             if (timeoutId) {
                 clearTimeout(timeoutId);
             }
-            if (idleId !== null && typeof window.cancelIdleCallback === "function") {
-                window.cancelIdleCallback(idleId);
+            if (idleId !== null && typeof win.cancelIdleCallback === "function") {
+                win.cancelIdleCallback(idleId);
             }
         };
     }, [delayMs]);
