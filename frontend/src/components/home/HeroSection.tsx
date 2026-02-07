@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Sparkles, Github, Linkedin } from "lucide-react";
-import { LastFmWidget } from "@/components/shared/LastFmWidget";
+import { LastFmWidgetServer } from "@/components/shared/LastFmWidgetServer";
 import { MobileNav } from "@/components/mobile-nav";
 import { MindmapCarousel } from "./MindmapCarousel";
 import effectsStyles from "@/styles/effects.module.css";
@@ -69,7 +69,7 @@ export function HeroSection({ mindmapItems }: HeroSectionProps) {
                 {/* Right: Social + Contact */}
                 <div className="hidden md:flex flex-col items-end gap-5 pt-8">
                     <div className="flex items-center gap-12 pr-0">
-                        <LastFmWidget />
+                        <LastFmWidgetServer />
                         <div className="flex items-center gap-9">
                             <a href="https://www.linkedin.com/in/mustafaguler98" target="_blank" rel="noopener noreferrer"
                                 className={cn(effectsStyles.glitchIcon, "text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]")}>

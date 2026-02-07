@@ -4,17 +4,49 @@ import { useEffect, useState, useRef } from "react";
 import { AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
 import styles from "./lastfm-widget.module.css";
+import { LASTFM_STATUS_CACHE_KEY } from "./lastfm-cache";
+import type { MusicStatus } from "./lastfm-types";
 
-interface MusicStatus {
-    isPlaying: boolean;
-    title: string;
-    artist: string;
-    lastPlayedAt: string;
+export interface LastFmWidgetProps {
+    onReady?: () => void;
+    initialStatus?: MusicStatus | null;
 }
 
-function useMusicStatus() {
-    const [status, setStatus] = useState<MusicStatus | null>(null);
+const FALLBACK_STATUS: MusicStatus = {
+    isPlaying: false,
+    title: "No recent track",
+    artist: "Last.fm unavailable",
+    lastPlayedAt: new Date().toISOString(),
+};
+
+function readCachedStatus(): MusicStatus | null {
+    if (typeof window === "undefined") return null;
+
+    try {
+        const raw = sessionStorage.getItem(LASTFM_STATUS_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw) as MusicStatus;
+        if (!parsed?.title || !parsed?.artist) return null;
+        return parsed;
+    } catch {
+        return null;
+    }
+}
+
+function writeCachedStatus(status: MusicStatus) {
+    if (typeof window === "undefined") return;
+    try {
+        sessionStorage.setItem(LASTFM_STATUS_CACHE_KEY, JSON.stringify(status));
+    } catch {
+        // Ignore storage quota/privacy mode errors.
+    }
+}
+
+function useMusicStatus(initialStatus?: MusicStatus | null) {
+    const initialStatusRef = useRef<MusicStatus | null>(initialStatus ?? readCachedStatus());
+    const [status, setStatus] = useState<MusicStatus | null>(initialStatusRef.current);
     const [timeAgo, setTimeAgo] = useState<string>("");
+    const [isReady, setIsReady] = useState<boolean>(initialStatusRef.current !== null);
 
     const fetchStatus = async () => {
         try {
@@ -22,16 +54,15 @@ function useMusicStatus() {
             if (res.ok) {
                 const data = await res.json();
                 setStatus(data);
+                writeCachedStatus(data);
             } else {
-                setStatus({
-                    isPlaying: true,
-                    title: "Midnight City",
-                    artist: "M83",
-                    lastPlayedAt: new Date().toISOString()
-                });
+                setStatus((prev) => prev ?? FALLBACK_STATUS);
             }
         } catch (error) {
             console.error(error);
+            setStatus((prev) => prev ?? FALLBACK_STATUS);
+        } finally {
+            setIsReady(true);
         }
     };
 
@@ -69,7 +100,7 @@ function useMusicStatus() {
         return () => clearInterval(timer);
     }, [status]);
 
-    return { status, timeAgo };
+    return { status, timeAgo, isReady };
 }
 
 // SCROLL ON HOVER 
@@ -119,10 +150,22 @@ const ConditionalMarquee = ({ text, className, parentGroup = true }: { text: str
     );
 };
 
-export function LastFmWidget() {
-    const { status, timeAgo } = useMusicStatus();
+export function LastFmWidget({ onReady, initialStatus = null }: LastFmWidgetProps = {}) {
+    const { status, timeAgo, isReady } = useMusicStatus(initialStatus);
+    const readyNotifiedRef = useRef(false);
+    const displayStatus = status ?? {
+        isPlaying: false,
+        title: "Loading track...",
+        artist: "Fetching Last.fm",
+        lastPlayedAt: "",
+    };
+    const isLoading = !status;
 
-    if (!status) return null;
+    useEffect(() => {
+        if (!onReady || !isReady || readyNotifiedRef.current) return;
+        readyNotifiedRef.current = true;
+        onReady();
+    }, [isReady, onReady]);
 
     // Approximate perimeter for 202x46 with 8px radius
     // (202-16)*2 + (46-16)*2 + 2*PI*8 = 372 + 60 + ~50 = 482
@@ -140,7 +183,7 @@ export function LastFmWidget() {
             )}>
 
                 {/* 1. ANIMATED SVG BORDER (Playing State Only) */}
-                {status.isPlaying && (
+                {displayStatus.isPlaying && !isLoading && (
                     <svg className="absolute inset-0 w-full h-full pointer-events-none z-20 rounded-lg overflow-visible">
                         <defs>
                             <linearGradient id="cyan-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -182,7 +225,7 @@ export function LastFmWidget() {
                 <div className={cn(
                     "absolute inset-0 rounded-lg border border-transparent transition-all duration-300 pointer-events-none z-10",
                 )} style={{
-                    background: status.isPlaying
+                    background: displayStatus.isPlaying && !isLoading
                         ? 'transparent'
                         : 'linear-gradient(#050510, #050510) padding-box, linear-gradient(to bottom, rgba(34,211,238,0.8), rgba(147,51,234,0.8)) border-box',
                     border: '1px solid transparent'
@@ -196,7 +239,7 @@ export function LastFmWidget() {
 
                     {/* Left Icon Area - Stronger Gradient */}
                     <div className="w-[44px] h-full shrink-0 bg-gradient-to-b from-cyan-500/30 to-purple-600/30 relative flex items-center justify-center border-r border-white/5">
-                        <AudioLines className={cn("w-4 h-4 relative z-10 text-white drop-shadow-md", status.isPlaying && "animate-[pulse_1.5s_ease-in-out_infinite]")} />
+                        <AudioLines className={cn("w-4 h-4 relative z-10 text-white drop-shadow-md", displayStatus.isPlaying && !isLoading && "animate-[pulse_1.5s_ease-in-out_infinite]")} />
                         {/* Enhanced Overlay for depth */}
                         <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 to-purple-500/20 backdrop-blur-[1px]" />
                     </div>
@@ -205,22 +248,22 @@ export function LastFmWidget() {
                     <div className="flex-1 px-3 flex flex-col justify-center overflow-hidden relative z-10">
                         {/* Song Title - Hover turns Cyan */}
                         <div className="w-full text-[12px] font-bold text-gray-100 group-hover:text-cyan-400 transition-colors h-[18px] relative">
-                            <ConditionalMarquee text={status.title.toUpperCase()} />
+                            <ConditionalMarquee text={displayStatus.title.toUpperCase()} />
                         </div>
 
                         {/* Artist & Status */}
                         <div className="flex w-full items-center justify-between text-[10px] font-bold text-purple-500 mt-[-2px]">
                             {/* Artist Name with Marquee */}
                             <div className="flex-1 min-w-0 pr-2 h-[15px] relative">
-                                <ConditionalMarquee text={status.artist} />
+                                <ConditionalMarquee text={displayStatus.artist} />
                             </div>
 
                             {/* Status Text - High Contrast White */}
                             <span className={cn(
                                 "text-[9px] font-bold transition-colors text-gray-400 shrink-0",
-                                status.isPlaying && "animate-pulse"
+                                displayStatus.isPlaying && !isLoading && "animate-pulse"
                             )}>
-                                {status.isPlaying ? "LIVE" : timeAgo}
+                                {isLoading ? "SYNC" : (displayStatus.isPlaying ? "LIVE" : timeAgo || "Idle")}
                             </span>
                         </div>
                     </div>
