@@ -84,9 +84,14 @@ export const articleService = {
       params.append('CategoryName', categoryName);
     }
 
-    return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, {
+    const response = await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, {
       next: { revalidate: 86400, tags: ['articles'] }
     });
+
+    if (!response.isSuccess) {
+      throw new ApiError(response.message || 'Failed to fetch paged articles', response.statusCode, response.errors);
+    }
+    return response;
   },
 
   async getPagedWithoutImageArticles(page: number, pageSize: number, languageCode?: string): Promise<ServiceResponse<PagedResult<ArticleListWithoutImage>>> {
@@ -97,9 +102,14 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
 
-    return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, {
+    const response = await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, {
       next: { revalidate: 86400, tags: ['articles'] }
     });
+
+    if (!response.isSuccess) {
+      throw new ApiError(response.message || 'Failed to fetch paged list', response.statusCode, response.errors);
+    }
+    return response;
   },
 
   async getAllCategories(): Promise<Category[]> {

@@ -66,9 +66,10 @@ export const mindmapService = {
             next: { revalidate: 86400, tags: ['mindmap'] }
         });
 
-        if (response.isSuccess && response.data) {
-            return response.data;
+        if (!response.isSuccess || !response.data) {
+            throw new Error("Failed to fetch mindmap data: " + response.message);
         }
-        return [];
+
+        return response.data;
     }
 };

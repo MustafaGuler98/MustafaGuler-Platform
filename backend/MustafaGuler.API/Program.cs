@@ -68,11 +68,6 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<MustafaGuler.API.Middlewares.GlobalExceptionMiddleware>();
 app.UseForwardedHeaders();
 
-// Only redirect to HTTPS in Production
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
 
 app.UseStaticFiles();
 app.UseCors("AllowFrontend");
