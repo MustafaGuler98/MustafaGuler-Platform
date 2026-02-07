@@ -113,9 +113,18 @@ jobs:
 
             echo "Warming up cache..."
             # Trigger cache revalidation for all critical tags
-            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=articles&secret=$REVALIDATE_SECRET" || echo "articles revalidation failed"
-            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=mindmap&secret=$REVALIDATE_SECRET" || echo "mindmap revalidation failed"
-            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=activities&secret=$REVALIDATE_SECRET" || echo "activities revalidation failed"
+            echo "Revalidating articles..."
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=articles&secret=$REVALIDATE_SECRET" && echo " [OK]" || echo " [FAILED]"
+            echo "Revalidating mindmap..."
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=mindmap&secret=$REVALIDATE_SECRET" && echo " [OK]" || echo " [FAILED]"
+            echo "Revalidating activities..."
+            curl -s -X POST "https://mustafaguler.me/api/revalidate?tag=activities&secret=$REVALIDATE_SECRET" && echo " [OK]" || echo " [FAILED]"
+            
+            # Visit pages to populate cache with fresh data
+            echo "Visiting homepage to populate cache..."
+            curl -s https://mustafaguler.me/ > /dev/null && echo " [OK]" || echo " [FAILED]"
+            echo "Visiting about page to populate cache..."
+            curl -s https://mustafaguler.me/about > /dev/null && echo " [OK]" || echo " [FAILED]"
             
             echo "Cache warm-up complete!"
 
