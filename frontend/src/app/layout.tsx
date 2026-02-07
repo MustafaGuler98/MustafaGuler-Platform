@@ -7,13 +7,7 @@ import FooterWrapper from "@/components/footer-wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   Inter,
-  Orbitron,
-  Cinzel,
-  Audiowide,
-  Rajdhani,
-  Syncopate,
-  Michroma,
-  Press_Start_2P
+  Orbitron
 } from "next/font/google";
 
 // Fonts
@@ -26,47 +20,6 @@ const inter = Inter({
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
-  display: "swap",
-});
-
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  display: "swap",
-});
-
-const audiowide = Audiowide({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-audiowide",
-  display: "swap",
-});
-
-const rajdhani = Rajdhani({
-  weight: ["500", "700"],
-  subsets: ["latin"],
-  variable: "--font-rajdhani",
-  display: "swap",
-});
-
-const syncopate = Syncopate({
-  weight: "700",
-  subsets: ["latin"],
-  variable: "--font-syncopate",
-  display: "swap",
-});
-
-const michroma = Michroma({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-michroma",
-  display: "swap",
-});
-
-const pressStart = Press_Start_2P({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-press-start",
   display: "swap",
 });
 
@@ -96,12 +49,6 @@ export default function RootLayout({
       <body className={`
         ${inter.variable} 
         ${orbitron.variable} 
-        ${cinzel.variable} 
-        ${audiowide.variable} 
-        ${rajdhani.variable} 
-        ${syncopate.variable}
-        ${michroma.variable}
-        ${pressStart.variable}
         font-sans antialiased
         bg-transparent  
       `}>

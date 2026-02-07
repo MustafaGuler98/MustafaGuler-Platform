@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Article, ArticleListWithoutImage } from "@/types/article";
 import { Calendar, Search, Activity, ChevronRight, Zap, X } from "lucide-react";
 import { cn, formatCardDate } from "@/lib/utils";
+import { michromaFont } from "@/lib/local-fonts";
 
 interface GroupedArticles {
   [year: string]: ArticleListWithoutImage[];
@@ -57,7 +58,7 @@ export default function TimelineClient({ initialArticles }: TimelineClientProps)
               <span>System_Ready</span>
             </div>
             <Link href="/blog/timeline" className="group/title w-fit no-underline">
-              <h1 className="text-3xl md:text-6xl font-bold font-[family-name:var(--font-michroma)] text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300">
+              <h1 className={`${michromaFont.className} text-3xl md:text-6xl font-bold text-gray-300 tracking-wider uppercase group-hover/title:text-white group-hover/title:drop-shadow-[0_0_15px_var(--cyan-neon)] transition-all duration-300`}>
                 TIMELINE
               </h1>
             </Link>

@@ -1,6 +1,7 @@
 import { SidebarSection } from "./SidebarSection";
 import { BookOpen, Film, Gamepad2, Headphones, Dices, Quote, Tv, Eye } from "lucide-react";
 import type { ArchivesStats } from "@/types/archives";
+import { rajdhaniFont } from "@/lib/local-fonts";
 
 interface Props {
     stats: ArchivesStats | null;
@@ -30,7 +31,7 @@ export function ArchivesWidget({ stats }: Props) {
                             <div className="p-1 rounded-full bg-white/5 group-hover:bg-cyan-950/50 transition-colors duration-300 transform group-hover:scale-110">
                                 <span className={`${item.color} font-bold transition-colors`}>{item.icon}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-gray-400 truncate font-rajdhani group-hover:text-white transition-colors">{item.label}</span>
+                            <span className={`${rajdhaniFont.className} text-[10px] font-bold text-gray-400 truncate group-hover:text-white transition-colors`}>{item.label}</span>
                         </div>
                         <span className="text-xs font-bold text-gray-500 font-mono group-hover:text-cyan-300 relative z-10 transition-colors">
                             {item.count ?? 0}

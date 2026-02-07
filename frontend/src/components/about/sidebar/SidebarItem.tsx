@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { rajdhaniFont } from "@/lib/local-fonts";
 
 interface SidebarItemProps {
     label: string;
@@ -42,7 +43,7 @@ export function SidebarItem({ label, icon, imageUrl, href, onClick, children, cl
             </div>
 
             {/* Label */}
-            <span className={`relative z-10 text-[9px] md:text-[10px] font-bold text-gray-400 group-hover:text-white tracking-wider font-rajdhani uppercase transition-colors text-center w-full px-1 ${truncateLabel ? "truncate" : ""}`}>
+            <span className={`${rajdhaniFont.className} relative z-10 text-[9px] md:text-[10px] font-bold text-gray-400 group-hover:text-white tracking-wider uppercase transition-colors text-center w-full px-1 ${truncateLabel ? "truncate" : ""}`}>
                 {label}
             </span>
 

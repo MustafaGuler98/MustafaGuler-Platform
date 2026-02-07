@@ -4,6 +4,7 @@ import { ActivityCard } from '@/components/content/activity-card';
 import { Film, Gamepad2, Headphones, BookOpen, Eye, Dices, Tv, type LucideIcon } from 'lucide-react';
 import type { PublicActivities, PublicActivity } from '@/types/archives';
 import { getImageUrl } from '@/lib/utils';
+import { rajdhaniFont } from '@/lib/local-fonts';
 
 interface FeaturedActivityCardsProps {
     data: PublicActivities | null;
@@ -51,7 +52,7 @@ export function FeaturedActivityCards({ data }: FeaturedActivityCardsProps) {
                             Icon={slot.icon}
                             colorClass={slot.color}
                             imageUrl={getImageUrl(item?.imageUrl)}
-                            fontClass="font-[family-name:var(--font-rajdhani)] font-bold uppercase tracking-wide text-base md:text-lg"
+                            fontClass={`${rajdhaniFont.className} font-bold uppercase tracking-wide text-base md:text-lg`}
                         />
                     </div>
                 );
