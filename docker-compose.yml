@@ -40,6 +40,8 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - LastFm__ApiKey=${LASTFM_APIKEY}
       - LastFm__Username=${LASTFM_USERNAME}
+      - Frontend__BaseUrl=${FRONTEND_INTERNAL_URL}
+      - Frontend__RevalidateSecret=${REVALIDATE_SECRET}
     volumes:
       - ./uploads:/app/wwwroot/uploads
       - static_files:/app/wwwroot/live-status
@@ -61,6 +63,7 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - INTERNAL_API_URL=${INTERNAL_API_URL}
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      - REVALIDATE_SECRET=${REVALIDATE_SECRET}
     restart: always
 
   nginx:

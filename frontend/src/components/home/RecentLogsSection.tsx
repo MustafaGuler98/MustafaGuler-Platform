@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { ArticleListWithoutImage } from "@/types/article";
@@ -16,11 +16,40 @@ const ARTICLES_PER_PAGE = 3;
 
 export function RecentLogsSection({ articles, totalCount }: RecentLogsSectionProps) {
     const [currentArticles, setCurrentArticles] = useState<ArticleListWithoutImage[]>(articles);
+    const [currentPage, setCurrentPage] = useState(0);
     const [isLoadingArticles, setIsLoadingArticles] = useState(false);
     const totalPages = Math.ceil(totalCount / ARTICLES_PER_PAGE);
 
-    const handleArticlesChange = (newArticles: ArticleListWithoutImage[], _page: number) => {
-        setCurrentArticles(newArticles);
+    // Pre-load the service module after initial render
+    useEffect(() => {
+        const prefetchServices = async () => {
+            try {
+                await import("@/services/articleServices");
+            } catch (e) {
+                console.debug("Prefetch failed", e);
+            }
+        };
+
+        // Wait 3 seconds to ensure it doesn't interfere with initial page load
+        const timer = setTimeout(prefetchServices, 3000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handlePageChange = async (newPage: number) => {
+        setIsLoadingArticles(true);
+        try {
+            const { articleService } = await import("@/services/articleServices");
+            const result = await articleService.getPagedWithoutImageArticles(newPage + 1, ARTICLES_PER_PAGE, 'en');
+
+            if (result.isSuccess && result.data) {
+                setCurrentArticles(result.data.items);
+                setCurrentPage(newPage);
+            }
+        } catch (error) {
+            console.error("Failed to fetch articles:", error);
+        } finally {
+            setIsLoadingArticles(false);
+        }
     };
 
     return (
@@ -50,9 +79,20 @@ export function RecentLogsSection({ articles, totalCount }: RecentLogsSectionPro
                         </p>
                     </div>
                 ) : (
-                    <div className="flex flex-col gap-6">
+                    <div className="flex items-center gap-4">
+                        {/* Left Arrow */}
+                        {totalPages > 1 && (
+                            <ArticlePagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                showOnly="left"
+                                isLoading={isLoadingArticles}
+                            />
+                        )}
+
                         {/* Cards Grid */}
-                        <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 transition-opacity duration-300 ${isLoadingArticles ? 'opacity-50' : 'opacity-100'}`}>
+                        <div className={`flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 transition-opacity duration-300 ${isLoadingArticles ? 'opacity-50' : 'opacity-100'}`}>
                             {currentArticles.map((article) => (
                                 <Link
                                     key={article.id}
@@ -78,16 +118,15 @@ export function RecentLogsSection({ articles, totalCount }: RecentLogsSectionPro
                             ))}
                         </div>
 
-                        {/* Pagination */}
+                        {/* Right Arrow */}
                         {totalPages > 1 && (
-                            <div className="flex justify-center">
-                                <ArticlePagination
-                                    initialPage={0}
-                                    totalPages={totalPages}
-                                    articlesPerPage={ARTICLES_PER_PAGE}
-                                    onArticlesChange={handleArticlesChange}
-                                />
-                            </div>
+                            <ArticlePagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                showOnly="right"
+                                isLoading={isLoadingArticles}
+                            />
                         )}
                     </div>
                 )}

@@ -8,6 +8,7 @@ import { formatTerminalDateTime } from '@/lib/date-utils';
 import { CyberButton } from "@/components/ui/cyber/CyberButton";
 import { CyberCard } from "@/components/ui/cyber/CyberCard";
 import { Skeleton } from "@/components/ui/cyber/Skeleton";
+import { RefreshHomepageButton } from '@/components/admin/RefreshHomepageButton';
 import { articleAdminService, categoryAdminService, imageAdminService, archivesStatsService } from '@/services/admin';
 import type { AdminArticle, Category, ImageInfo } from '@/types/admin';
 import type { ArchivesStats } from '@/types/archives';
@@ -108,7 +109,8 @@ export default function AdminDashboard() {
                         SYSTEM_STATUS: <span className="text-emerald-400">ONLINE</span>
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                    <RefreshHomepageButton />
                     <span className="px-3 py-1 bg-violet-500/10 border border-violet-500/20 rounded text-[10px] font-mono text-violet-300 flex items-center gap-2">
                         <ShieldCheck size={12} /> ADMIN_ACCESS
                     </span>
@@ -213,7 +215,7 @@ export default function AdminDashboard() {
                                 <p className="font-mono text-xs">NO_ACTIVITY_DETECTED</p>
                             </div>
                         ) : (
-                            <div className="space-y-2"> {}
+                            <div className="space-y-2"> { }
                                 {recentActivity.map((item, i) => (
                                     <Link
                                         key={`${item.type}-${item.id}`}

@@ -1,7 +1,7 @@
 import AboutClient from "./about-client";
 import { archivesService } from "@/services/archivesService";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 export default async function AboutPage() {
     const [stats, activities] = await Promise.all([

@@ -21,7 +21,7 @@ export const archivesService = {
     async getActivity(): Promise<PublicActivities | null> {
         try {
             const response = await apiClient.get<PublicActivities>('/archives/activity', {
-                next: { revalidate: 60 }
+                next: { revalidate: 86400, tags: ['activities'] }
             });
             return response.isSuccess ? response.data : null;
         } catch (error) {

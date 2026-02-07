@@ -63,7 +63,7 @@ export const mindmapService = {
 
     getAllActiveServer: async (): Promise<string[]> => {
         const response = await apiClient.get<string[]>(`${API_URL}/all-active`, {
-            next: { revalidate: 60 }
+            next: { revalidate: 86400, tags: ['mindmap'] }
         });
 
         if (response.isSuccess && response.data) {

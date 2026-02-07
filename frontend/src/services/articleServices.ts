@@ -17,7 +17,7 @@ class ApiError extends Error {
 export const articleService = {
   async getArticleBySlug(slug: string): Promise<Article> {
     const response = await apiClient.get<Article>(`/articles/${slug}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     } as RequestInit);
 
     if (!response.isSuccess || !response.data) {
@@ -38,7 +38,7 @@ export const articleService = {
     }
     const query = params.toString() ? `?${params.toString()}` : '';
     const response = await apiClient.get<Article[]>(`/articles/all${query}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     });
 
     if (!response.isSuccess) {
@@ -59,7 +59,7 @@ export const articleService = {
       params.append('languageCode', languageCode);
     }
     const response = await apiClient.get<Article[]>(`/articles/popular?${params.toString()}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     });
 
     if (!response.isSuccess) {
@@ -85,7 +85,7 @@ export const articleService = {
     }
 
     return await apiClient.get<PagedResult<Article>>(`/articles?${params.toString()}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     });
   },
 
@@ -98,7 +98,7 @@ export const articleService = {
     }
 
     return await apiClient.get<PagedResult<ArticleListWithoutImage>>(`/articles/without-image?${params.toString()}`, {
-      next: { revalidate: 60 }
+      next: { revalidate: 86400, tags: ['articles'] }
     });
   },
 

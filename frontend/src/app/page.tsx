@@ -5,7 +5,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { RecentLogsSection } from "@/components/home/RecentLogsSection";
 import { ActivitySectionServer } from "@/components/home/ActivitySectionServer";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 
 export default async function Home() {

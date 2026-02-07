@@ -3,7 +3,7 @@ import { archivesService } from "@/services/archivesService";
 import BlogClient from "./blog-client";
 import { constructMetadata } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 export const metadata = constructMetadata({
     title: "Blog",
