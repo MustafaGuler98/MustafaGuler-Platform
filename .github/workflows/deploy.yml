@@ -158,4 +158,3 @@ jobs:
             
             echo "Cache warm-up complete!"
             docker compose ps
-
