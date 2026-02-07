@@ -4,6 +4,8 @@ import { Sparkles, Github, Linkedin } from "lucide-react";
 import { LastFmWidget } from "@/components/shared/LastFmWidget";
 import { MobileNav } from "@/components/mobile-nav";
 import { MindmapCarousel } from "./MindmapCarousel";
+import effectsStyles from "@/styles/effects.module.css";
+import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
     mindmapItems: string[];
@@ -42,8 +44,8 @@ export function HeroSection({ mindmapItems }: HeroSectionProps) {
 
                 {/* Center: Logo + Title */}
                 <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 group mt-4 md:mt-0">
-                    <div className="logo-orbital relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-visible transition-all duration-300">
-                        <div className="logo-glow-border w-full h-full rounded-full overflow-hidden transition-all duration-300">
+                    <div className={cn(effectsStyles.logoOrbital, "relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-visible transition-all duration-300")}>
+                        <div className={cn(effectsStyles.logoGlowBorder, "w-full h-full rounded-full overflow-hidden transition-all duration-300")}>
                             <Image
                                 src="/logo1.webp"
                                 alt="Mustafa Guler"
@@ -70,17 +72,17 @@ export function HeroSection({ mindmapItems }: HeroSectionProps) {
                         <LastFmWidget />
                         <div className="flex items-center gap-9">
                             <a href="https://www.linkedin.com/in/mustafaguler98" target="_blank" rel="noopener noreferrer"
-                                className="glitch-icon text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">
+                                className={cn(effectsStyles.glitchIcon, "text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]")}>
                                 <Linkedin className="w-6 h-6" />
                             </a>
                             <a href="https://github.com/MustafaGuler98" target="_blank" rel="noopener noreferrer"
-                                className="glitch-icon-delayed text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]">
+                                className={cn(effectsStyles.glitchIconDelayed, "text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]")}>
                                 <Github className="w-6 h-6" />
                             </a>
                         </div>
                     </div>
-                    <Link href="/contact" className="holo-terminal-btn rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase px-4 py-2 border border-primary/50">
-                        <span className="blink-cursor">CONTACT</span>
+                    <Link href="/contact" className={cn(effectsStyles.holoTerminalBtn, "rounded-none text-white hover:text-cyan-neon transition-all duration-300 font-mono text-xs tracking-widest uppercase px-4 py-2 border border-primary/50")}>
+                        <span className={effectsStyles.blinkCursor}>CONTACT</span>
                     </Link>
                 </div>
 
@@ -92,7 +94,7 @@ export function HeroSection({ mindmapItems }: HeroSectionProps) {
 
             {/* Role Text */}
             <div className="text-center mb-3 z-20 relative mt-16 md:mt-0">
-                <p className="role-text font-heading text-sm md:text-base font-medium tracking-widest text-muted-foreground">
+                <p className={cn(effectsStyles.roleText, "font-heading text-sm md:text-base font-medium tracking-widest text-muted-foreground")}>
                     Software Developer / Storyteller / Digital Nomad
                 </p>
             </div>

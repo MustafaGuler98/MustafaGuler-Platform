@@ -78,7 +78,7 @@ export default function RootLayout({
 
         {/* Cloudflare Web Analytics */}
         <Script
-          defer
+          strategy="lazyOnload"
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon='{"token": "9d73043c5ddc487090833d6338541928"}'
         />

@@ -1,0 +1,60 @@
+.maskBorderFade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+.animateMarqueeSeamless {
+  display: flex;
+  width: max-content;
+  animation: marqueeSeamless 8s linear infinite;
+}
+
+@keyframes marqueeSeamless {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-33.33%);
+  }
+}
+
+.animateBeamCyan {
+  animation: beamRotateCyan 6s linear infinite;
+}
+
+@keyframes beamRotateCyan {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: -482;
+  }
+}
+
+.animateBeamPurple {
+  animation: beamRotatePurple 6s linear infinite;
+}
+
+@keyframes beamRotatePurple {
+  from {
+    stroke-dashoffset: -241;
+  }
+
+  to {
+    stroke-dashoffset: -723;
+  }
+}

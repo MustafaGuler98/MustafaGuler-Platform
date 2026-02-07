@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Terminal, AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import effectsStyles from '@/styles/effects.module.css';
 
 export default function Error({
     error,
@@ -42,7 +43,7 @@ export default function Error({
     return (
         <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
             {/* Background grid effect */}
-            <div className="absolute inset-0 footer-grid-pattern opacity-30" />
+            <div className={`absolute inset-0 ${effectsStyles.footerGridPattern} opacity-30`} />
 
             {/* Scan line effect */}
             <div className="absolute inset-0 pointer-events-none">
@@ -53,7 +54,7 @@ export default function Error({
                 {/* Glitchy error icon */}
                 <div className="relative inline-block">
                     <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-full border-2 border-red-500/50 bg-red-500/10">
-                        <AlertTriangle className="w-12 h-12 text-red-500 glitch-icon" />
+                        <AlertTriangle className={`w-12 h-12 text-red-500 ${effectsStyles.glitchIcon}`} />
                     </div>
                     {/* Orbital ring */}
                     <div className="absolute inset-[-8px] rounded-full border border-dashed border-red-500/30 animate-spin" style={{ animationDuration: '8s' }} />

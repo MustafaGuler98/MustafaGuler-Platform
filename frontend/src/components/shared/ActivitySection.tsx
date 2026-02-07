@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import { NeonStreamNav } from "@/components/ui/neon-stream-nav";
 import { FeaturedActivityCards } from "@/components/about/FeaturedActivityCards";
 import type { PublicActivities } from "@/types/archives";
+import styles from "./activity-section.module.css";
 
 interface ActivitySectionProps {
     activities: PublicActivities | null;
@@ -143,7 +144,7 @@ export function ActivitySection({ activities }: ActivitySectionProps) {
                         id="system-logs-container"
                         ref={el => { containerRef.current = el; }}
                         onScroll={handleScroll}
-                        className="flex gap-6 overflow-x-auto py-8 px-4 md:px-8 snap-x snap-mandatory scrollbar-none"
+                        className={`flex gap-6 overflow-x-auto py-8 px-4 md:px-8 snap-x snap-mandatory ${styles.scrollbarNone}`}
                     >
                         {/* Dynamic Featured Items from API */}
                         <FeaturedActivityCards data={activities} />

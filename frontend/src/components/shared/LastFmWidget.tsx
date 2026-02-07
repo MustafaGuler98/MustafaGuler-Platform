@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
+import styles from "./lastfm-widget.module.css";
 
 interface MusicStatus {
     isPlaying: boolean;
@@ -101,7 +102,9 @@ const ConditionalMarquee = ({ text, className, parentGroup = true }: { text: str
 
                     {/* 2. Hover State: Marquee (Hidden by default, Visible on Hover) */}
                     <div className={cn(
-                        "absolute inset-0 flex items-center animate-marquee-seamless opacity-0 transition-opacity duration-300 mask-border-fade",
+                        "absolute inset-0 flex items-center opacity-0 transition-opacity duration-300",
+                        styles.animateMarqueeSeamless,
+                        styles.maskBorderFade,
                         parentGroup ? "group-hover:opacity-100" : "hover:opacity-100"
                     )}>
                         <span className="mr-8">{text}</span>
@@ -160,7 +163,7 @@ export function LastFmWidget() {
                             strokeWidth="1.5"
                             strokeDasharray={`${beamLength} ${gap}`}
                             strokeLinecap="round"
-                            className="animate-beam-cyan"
+                            className={styles.animateBeamCyan}
                         />
                         {/* Rect for Purple Beam (Offset by half) */}
                         <rect
@@ -170,7 +173,7 @@ export function LastFmWidget() {
                             strokeWidth="1.5"
                             strokeDasharray={`${beamLength} ${gap}`}
                             strokeLinecap="round"
-                            className="animate-beam-purple"
+                            className={styles.animateBeamPurple}
                         />
                     </svg>
                 )}
@@ -223,30 +226,6 @@ export function LastFmWidget() {
                     </div>
                 </div>
             </div>
-
-            <style jsx global>{`
-                .mask-border-fade {
-                    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
-                }
-                
-                @keyframes beam-rotate-cyan {
-                    from { stroke-dashoffset: 0; }
-                    to { stroke-dashoffset: -482; }
-                }
-
-                @keyframes beam-rotate-purple {
-                    from { stroke-dashoffset: -241; }
-                    to { stroke-dashoffset: -723; } /* -241 - 482 = -723 */
-                }
-                
-                .animate-beam-cyan {
-                    animation: beam-rotate-cyan 6s linear infinite;
-                }
-                
-                .animate-beam-purple {
-                    animation: beam-rotate-purple 6s linear infinite;
-                }
-            `}</style>
         </div>
     );
 }
