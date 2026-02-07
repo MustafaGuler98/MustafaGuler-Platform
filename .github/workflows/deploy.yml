@@ -3,7 +3,7 @@ name: Deploy to Production (Hetzner)
 on:
   push:
     branches:
-      - mobileperformance
+      - main
 
 jobs:
   deploy:
@@ -46,7 +46,7 @@ jobs:
             set -Eeuo pipefail
 
             APP_DIR="app"
-            BRANCH="mobileperformance"
+            BRANCH="main"
             WARMUP_BASE_URL="https://localhost"
 
             if [ -d "app" ] && [ ! -d "app/.git" ]; then
