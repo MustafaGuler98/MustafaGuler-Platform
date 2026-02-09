@@ -9,18 +9,20 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(dateString: string): string {
   if (!dateString) return "";
-  return new Date(dateString).toLocaleDateString('en-US', {
+  return new Intl.DateTimeFormat('en-US', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
-  });
+    year: 'numeric',
+    timeZone: 'UTC'
+  }).format(new Date(dateString));
 }
 
 const formatCardDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString('en-US', {
+  return new Intl.DateTimeFormat('en-US', {
     month: 'short',
-    day: 'numeric'
-  });
+    day: 'numeric',
+    timeZone: 'UTC'
+  }).format(new Date(dateString));
 };
 
 // Our wwwroot is in the backend folder.

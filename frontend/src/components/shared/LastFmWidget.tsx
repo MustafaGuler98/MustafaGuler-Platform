@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { AudioLines } from "lucide-react";
 import { cn } from "@/lib/utils";
 import styles from "./lastfm-widget.module.css";
-import { LASTFM_STATUS_CACHE_KEY } from "./lastfm-cache";
 import type { MusicStatus } from "./lastfm-types";
 
 export interface LastFmWidgetProps {
@@ -14,66 +13,80 @@ export interface LastFmWidgetProps {
 
 const FALLBACK_STATUS: MusicStatus = {
     isPlaying: false,
-    title: "No recent track",
-    artist: "Last.fm unavailable",
-    lastPlayedAt: new Date().toISOString(),
+    title: "",
+    artist: "",
+    lastPlayedAt: "",
 };
 
-function readCachedStatus(): MusicStatus | null {
-    if (typeof window === "undefined") return null;
-
-    try {
-        const raw = sessionStorage.getItem(LASTFM_STATUS_CACHE_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw) as MusicStatus;
-        if (!parsed?.title || !parsed?.artist) return null;
-        return parsed;
-    } catch {
-        return null;
-    }
-}
-
-function writeCachedStatus(status: MusicStatus) {
-    if (typeof window === "undefined") return;
-    try {
-        sessionStorage.setItem(LASTFM_STATUS_CACHE_KEY, JSON.stringify(status));
-    } catch {
-        // Ignore storage quota/privacy mode errors.
-    }
+function isMusicStatus(value: unknown): value is MusicStatus {
+    if (!value || typeof value !== "object") return false;
+    const candidate = value as Partial<MusicStatus>;
+    return typeof candidate.isPlaying === "boolean"
+        && typeof candidate.title === "string"
+        && candidate.title.length > 0
+        && typeof candidate.artist === "string"
+        && candidate.artist.length > 0
+        && typeof candidate.lastPlayedAt === "string";
 }
 
 function useMusicStatus(initialStatus?: MusicStatus | null) {
-    const initialStatusRef = useRef<MusicStatus | null>(initialStatus ?? readCachedStatus());
-    const [status, setStatus] = useState<MusicStatus | null>(initialStatusRef.current);
+    const initial = initialStatus ?? null;
+    const [status, setStatus] = useState<MusicStatus | null>(initial);
     const [timeAgo, setTimeAgo] = useState<string>("");
-    const [isReady, setIsReady] = useState<boolean>(initialStatusRef.current !== null);
-
-    const fetchStatus = async () => {
-        try {
-            const res = await fetch(`/music-status.json`);
-            if (res.ok) {
-                const data = await res.json();
-                setStatus(data);
-                writeCachedStatus(data);
-            } else {
-                setStatus((prev) => prev ?? FALLBACK_STATUS);
-            }
-        } catch (error) {
-            console.error(error);
-            setStatus((prev) => prev ?? FALLBACK_STATUS);
-        } finally {
-            setIsReady(true);
-        }
-    };
+    const [isReady, setIsReady] = useState<boolean>(initial !== null);
+    const fetchRequestIdRef = useRef(0);
 
     useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchStatus = async () => {
+            const requestId = ++fetchRequestIdRef.current;
+
+            try {
+                const url = `/music-status.json?ts=${Date.now()}`;
+                const res = await fetch(url, {
+                    cache: "no-store",
+                    signal: controller.signal,
+                });
+
+                if (requestId !== fetchRequestIdRef.current) return;
+
+                if (res.ok) {
+                    const data = await res.json() as unknown;
+                    if (!isMusicStatus(data)) {
+                        setStatus((prev) => prev ?? FALLBACK_STATUS);
+                        return;
+                    }
+                    setStatus(data);
+                } else {
+                    setStatus((prev) => prev ?? FALLBACK_STATUS);
+                }
+            } catch (error) {
+                if (requestId !== fetchRequestIdRef.current) return;
+                if ((error as { name?: string } | null)?.name === "AbortError") return;
+                console.error(error);
+                setStatus((prev) => prev ?? FALLBACK_STATUS);
+            } finally {
+                if (requestId === fetchRequestIdRef.current) {
+                    setIsReady(true);
+                }
+            }
+        };
+
         fetchStatus();
         const interval = setInterval(fetchStatus, 60000);
-        return () => clearInterval(interval);
+        return () => {
+            controller.abort();
+            clearInterval(interval);
+        };
     }, []);
 
     useEffect(() => {
-        if (!status) return;
+        if (!status) {
+            setTimeAgo("");
+            return;
+        }
+
         const updateTime = () => {
             if (status.isPlaying) {
                 setTimeAgo("Listening");
@@ -155,11 +168,11 @@ export function LastFmWidget({ onReady, initialStatus = null }: LastFmWidgetProp
     const readyNotifiedRef = useRef(false);
     const displayStatus = status ?? {
         isPlaying: false,
-        title: "Loading track...",
-        artist: "Fetching Last.fm",
+        title: "",
+        artist: "",
         lastPlayedAt: "",
     };
-    const isLoading = !status;
+    const isLoading = !status && !isReady;
 
     useEffect(() => {
         if (!onReady || !isReady || readyNotifiedRef.current) return;
@@ -263,7 +276,7 @@ export function LastFmWidget({ onReady, initialStatus = null }: LastFmWidgetProp
                                 "text-[9px] font-bold transition-colors text-gray-400 shrink-0",
                                 displayStatus.isPlaying && !isLoading && "animate-pulse"
                             )}>
-                                {isLoading ? "SYNC" : (displayStatus.isPlaying ? "LIVE" : timeAgo || "Idle")}
+                                {isLoading ? "" : (displayStatus.isPlaying ? "LIVE" : timeAgo || "Idle")}
                             </span>
                         </div>
                     </div>

@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Article } from "@/types/article";
-import { formatDate, getImageUrl } from "@/lib/utils";
+import { cn, formatDate, getImageUrl } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Zap, Database, Folder, Filter, Calendar } from "lucide-react";
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { BlogQuoteWidget, BlogBookWidget, BlogFilmWidget, BlogMusicWidget } from "@/components/blog/widgets/SidebarWidgets";
@@ -141,10 +141,12 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                                 {/* Top Border Accent */}
                                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-60 rounded-t-lg z-10" />
 
-                                <div className="relative h-full overflow-hidden rounded-lg border transition-all duration-300
-                                            bg-[#0d0416]/95 border-purple-500/30 backdrop-blur-sm
-                                            hover:bg-[#180a2e] hover:border-purple-400/60 hover:translate-x-1 
-                                            hover:shadow-[0_4px_25px_-8px_rgba(168,85,247,0.3)]">
+                                <div className={cn(
+                                    "relative h-full overflow-hidden rounded-lg border transition-all duration-300",
+                                    "bg-[#0d0416]/95 border-purple-500/30 backdrop-blur-sm",
+                                    "hover:bg-[#180a2e] hover:border-purple-400/60 hover:translate-x-1",
+                                    "hover:shadow-[0_4px_25px_-8px_rgba(168,85,247,0.3)]"
+                                )}>
 
                                     {/* Image Area */}
                                     <div className="relative h-48 w-full overflow-hidden border-b border-purple-500/20">
@@ -162,9 +164,11 @@ export default function BlogClient({ articles, popularArticles, categories, stat
 
                                     {/* Content Area */}
                                     <div className="p-5 flex flex-col gap-3">
-                                        <h3 className="text-base font-semibold tracking-tight text-gray-100 leading-snug
-                                                    group-hover:text-cyan-400 transition-colors 
-                                                    line-clamp-2">
+                                        <h3 className={cn(
+                                            "text-base font-semibold tracking-tight text-gray-100 leading-snug",
+                                            "group-hover:text-cyan-400 transition-colors",
+                                            "line-clamp-2"
+                                        )}>
                                             {article.title}
                                         </h3>
 
@@ -207,10 +211,12 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                                 <Link href={`/blog/${article.slug}`} key={article.id} className="group flex flex-col h-full">
                                     {/* Top Border Accent - Cyan Theme */}
 
-                                    <div className="relative overflow-hidden rounded-lg border transition-all duration-300 h-full flex flex-col
-                                                bg-[#0a0e14]/95 border-cyan-500/20 backdrop-blur-sm
-                                                hover:bg-[#0f1419] hover:border-cyan-400/50 hover:translate-x-1 
-                                                hover:shadow-[0_4px_25px_-8px_rgba(34,211,238,0.25)]">
+                                    <div className={cn(
+                                        "relative overflow-hidden rounded-lg border transition-all duration-300 h-full flex flex-col",
+                                        "bg-[#0a0e14]/95 border-cyan-500/20 backdrop-blur-sm",
+                                        "hover:bg-[#0f1419] hover:border-cyan-400/50 hover:translate-x-1",
+                                        "hover:shadow-[0_4px_25px_-8px_rgba(34,211,238,0.25)]"
+                                    )}>
 
                                         {/* Image Header */}
                                         <div className="relative h-44 w-full overflow-hidden border-b border-cyan-500/15">
@@ -257,10 +263,12 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                                 <button
                                     onClick={() => handleGridNav('prev')}
                                     disabled={currentPage <= 1}
-                                    className="px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest 
-                                            hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon
-                                            disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500
-                                            transition-all"
+                                    className={cn(
+                                        "px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest",
+                                        "hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon",
+                                        "disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500",
+                                        "transition-all"
+                                    )}
                                 >
                                     Previous
                                 </button>
@@ -270,10 +278,12 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                                 <button
                                     onClick={() => handleGridNav('next')}
                                     disabled={currentPage >= totalPages}
-                                    className="px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest 
-                                            hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon
-                                            disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500
-                                            transition-all"
+                                    className={cn(
+                                        "px-5 py-2 rounded border border-white/10 text-xs font-mono uppercase tracking-widest",
+                                        "hover:bg-white/5 hover:border-primary/50 hover:text-cyan-neon",
+                                        "disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:border-white/10 disabled:hover:text-gray-500",
+                                        "transition-all"
+                                    )}
                                 >
                                     Next
                                 </button>
