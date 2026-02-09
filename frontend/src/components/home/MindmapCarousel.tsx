@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import NeuralNetwork from "@/components/neural-network";
 import styles from "./mindmap-carousel.module.css";
 import { cn } from "@/lib/utils";
@@ -31,13 +31,35 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function MindmapCarousel({ items }: MindmapCarouselProps) {
-    const [slots, setSlots] = useState<CarouselSlot[]>([]);
+    const [slots, setSlots] = useState<CarouselSlot[]>(() => {
+        if (items.length === 0) return [];
+        return SLOT_ANGLES.map((angle, i) => ({
+            word: items[i % items.length],
+            angle,
+            isSwapping: false,
+        }));
+    });
     const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const swapIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const wordQueueRef = useRef<string[]>([]);
 
-    const wordQueue = useMemo(() => {
-        if (items.length === 0) return [];
-        return shuffleArray(items);
+    useEffect(() => {
+        if (items.length === 0) {
+            wordQueueRef.current = [];
+            setSlots([]);
+            return;
+        }
+
+        wordQueueRef.current = shuffleArray(items);
+
+        setSlots((prev) => {
+            if (prev.length > 0) return prev;
+            return SLOT_ANGLES.map((angle, i) => ({
+                word: items[i % items.length],
+                angle,
+                isSwapping: false,
+            }));
+        });
     }, [items]);
 
     const getPosition = useCallback((slotAngle: number) => {
@@ -48,28 +70,15 @@ export function MindmapCarousel({ items }: MindmapCarouselProps) {
         };
     }, []);
 
-    // Initialize slots when wordQueue changes
-    useEffect(() => {
-        if (wordQueue.length === 0) {
-            setSlots([]);
-            return;
-        }
-
-        setSlots(SLOT_ANGLES.map((angle, i) => ({
-            word: wordQueue[i % wordQueue.length],
-            angle,
-            isSwapping: false,
-        })));
-    }, [wordQueue]);
-
     // Swap words periodically without running frame-based React updates.
     useEffect(() => {
-        if (wordQueue.length === 0) return;
+        const queue = wordQueueRef.current;
+        if (queue.length === 0) return;
         let currentWordIndex = NUM_SLOTS;
 
         const runSwap = () => {
             const slotToSwap = Math.floor(Math.random() * NUM_SLOTS);
-            const nextWord = wordQueue[currentWordIndex % wordQueue.length];
+            const nextWord = queue[currentWordIndex % queue.length];
             currentWordIndex++;
 
             setSlots(prev => {
@@ -110,7 +119,7 @@ export function MindmapCarousel({ items }: MindmapCarouselProps) {
                 animationTimeoutRef.current = null;
             }
         };
-    }, [wordQueue]);
+    }, [items]);
 
     return (
         <div className="relative w-full mx-auto pb-8" style={{ height: '45vh', maxHeight: '450px', maxWidth: '450px' }}>

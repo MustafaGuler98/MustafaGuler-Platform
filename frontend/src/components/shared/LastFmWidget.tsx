@@ -11,6 +11,9 @@ export interface LastFmWidgetProps {
     initialStatus?: MusicStatus | null;
 }
 
+const LASTFM_STATUS_COOKIE = "lastfm_status_v1";
+const COOKIE_MAX_AGE_SECONDS = 5 * 60;
+
 const FALLBACK_STATUS: MusicStatus = {
     isPlaying: false,
     title: "",
@@ -29,6 +32,31 @@ function isMusicStatus(value: unknown): value is MusicStatus {
         && typeof candidate.lastPlayedAt === "string";
 }
 
+function writeStatusCookie(status: MusicStatus) {
+    try {
+        const payload = encodeURIComponent(JSON.stringify({ cachedAt: Date.now(), status }));
+        document.cookie = `${LASTFM_STATUS_COOKIE}=${payload}; Max-Age=${COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax`;
+    } catch {
+        // Ignore serialization/privacy mode issues.
+    }
+}
+
+function isNewerOrSameStatus(next: MusicStatus, current: MusicStatus) {
+    if (!current.lastPlayedAt || !next.lastPlayedAt) return true;
+
+    const nextTime = Date.parse(next.lastPlayedAt);
+    const currentTime = Date.parse(current.lastPlayedAt);
+    if (!Number.isFinite(nextTime) || !Number.isFinite(currentTime)) return true;
+
+    if (nextTime > currentTime) return true;
+    if (nextTime < currentTime) return false;
+
+    // Same timestamp; allow state transitions without treating it as stale.
+    return next.isPlaying !== current.isPlaying
+        || next.title !== current.title
+        || next.artist !== current.artist;
+}
+
 function useMusicStatus(initialStatus?: MusicStatus | null) {
     const initial = initialStatus ?? null;
     const [status, setStatus] = useState<MusicStatus | null>(initial);
@@ -43,9 +71,9 @@ function useMusicStatus(initialStatus?: MusicStatus | null) {
             const requestId = ++fetchRequestIdRef.current;
 
             try {
-                const url = `/music-status.json?ts=${Date.now()}`;
+                const url = `/music-status.json`;
                 const res = await fetch(url, {
-                    cache: "no-store",
+                    cache: "no-cache",
                     signal: controller.signal,
                 });
 
@@ -57,7 +85,12 @@ function useMusicStatus(initialStatus?: MusicStatus | null) {
                         setStatus((prev) => prev ?? FALLBACK_STATUS);
                         return;
                     }
-                    setStatus(data);
+
+                    writeStatusCookie(data);
+                    setStatus((prev) => {
+                        if (!prev) return data;
+                        return isNewerOrSameStatus(data, prev) ? data : prev;
+                    });
                 } else {
                     setStatus((prev) => prev ?? FALLBACK_STATUS);
                 }
@@ -261,14 +294,22 @@ export function LastFmWidget({ onReady, initialStatus = null }: LastFmWidgetProp
                     <div className="flex-1 px-3 flex flex-col justify-center overflow-hidden relative z-10">
                         {/* Song Title - Hover turns Cyan */}
                         <div className="w-full text-[12px] font-bold text-gray-100 group-hover:text-cyan-400 transition-colors h-[18px] relative">
-                            <ConditionalMarquee text={displayStatus.title.toUpperCase()} />
+                            {isLoading ? (
+                                <div className="h-[12px] w-4/5 rounded bg-white/10" />
+                            ) : (
+                                <ConditionalMarquee text={displayStatus.title.toUpperCase()} />
+                            )}
                         </div>
 
                         {/* Artist & Status */}
                         <div className="flex w-full items-center justify-between text-[10px] font-bold text-purple-500 mt-[-2px]">
                             {/* Artist Name with Marquee */}
                             <div className="flex-1 min-w-0 pr-2 h-[15px] relative">
-                                <ConditionalMarquee text={displayStatus.artist} />
+                                {isLoading ? (
+                                    <div className="h-[10px] w-3/5 rounded bg-white/10" />
+                                ) : (
+                                    <ConditionalMarquee text={displayStatus.artist} />
+                                )}
                             </div>
 
                             {/* Status Text - High Contrast White */}
