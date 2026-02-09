@@ -1,14 +1,5 @@
-import { cookies } from "next/headers";
 import { LastFmWidget } from "./LastFmWidget";
 import type { MusicStatus } from "./lastfm-types";
-
-const LASTFM_STATUS_COOKIE = "lastfm_status_v1";
-const COOKIE_TTL_MS = 2 * 60 * 1000;
-
-type LastFmCookiePayload = {
-    cachedAt: number;
-    status: MusicStatus;
-};
 
 function isMusicStatus(value: unknown): value is MusicStatus {
     if (!value || typeof value !== "object") return false;
@@ -19,19 +10,6 @@ function isMusicStatus(value: unknown): value is MusicStatus {
         && typeof candidate.artist === "string"
         && candidate.artist.length > 0
         && typeof candidate.lastPlayedAt === "string";
-}
-
-function parseCookiePayload(raw: string | undefined): LastFmCookiePayload | null {
-    if (!raw) return null;
-    try {
-        const decoded = decodeURIComponent(raw);
-        const parsed = JSON.parse(decoded) as Partial<LastFmCookiePayload>;
-        if (typeof parsed.cachedAt !== "number") return null;
-        if (!isMusicStatus(parsed.status)) return null;
-        return { cachedAt: parsed.cachedAt, status: parsed.status };
-    } catch {
-        return null;
-    }
 }
 
 function getBaseCandidates(): string[] {
@@ -67,14 +45,7 @@ async function fetchInitialStatus(): Promise<MusicStatus | null> {
 }
 
 export async function LastFmWidgetServer() {
-    const cookieStore = await cookies();
-    const payload = parseCookiePayload(cookieStore.get(LASTFM_STATUS_COOKIE)?.value);
-    const now = Date.now();
-    const cachedStatus = payload && (now - payload.cachedAt) < COOKIE_TTL_MS ? payload.status : null;
-
-    const fetchedStatus = await fetchInitialStatus();
-
-    const initialStatus = cachedStatus ?? fetchedStatus;
+    const initialStatus = await fetchInitialStatus();
 
     return <LastFmWidget initialStatus={initialStatus} />;
 }

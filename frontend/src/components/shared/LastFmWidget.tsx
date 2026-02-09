@@ -11,9 +11,6 @@ export interface LastFmWidgetProps {
     initialStatus?: MusicStatus | null;
 }
 
-const LASTFM_STATUS_COOKIE = "lastfm_status_v1";
-const COOKIE_MAX_AGE_SECONDS = 5 * 60;
-
 const FALLBACK_STATUS: MusicStatus = {
     isPlaying: false,
     title: "",
@@ -30,15 +27,6 @@ function isMusicStatus(value: unknown): value is MusicStatus {
         && typeof candidate.artist === "string"
         && candidate.artist.length > 0
         && typeof candidate.lastPlayedAt === "string";
-}
-
-function writeStatusCookie(status: MusicStatus) {
-    try {
-        const payload = encodeURIComponent(JSON.stringify({ cachedAt: Date.now(), status }));
-        document.cookie = `${LASTFM_STATUS_COOKIE}=${payload}; Max-Age=${COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax`;
-    } catch {
-        // Ignore serialization/privacy mode issues.
-    }
 }
 
 function isNewerOrSameStatus(next: MusicStatus, current: MusicStatus) {
@@ -71,9 +59,7 @@ function useMusicStatus(initialStatus?: MusicStatus | null) {
             const requestId = ++fetchRequestIdRef.current;
 
             try {
-                const url = `/music-status.json`;
-                const res = await fetch(url, {
-                    cache: "no-cache",
+                const res = await fetch("/music-status.json", {
                     signal: controller.signal,
                 });
 
@@ -86,7 +72,6 @@ function useMusicStatus(initialStatus?: MusicStatus | null) {
                         return;
                     }
 
-                    writeStatusCookie(data);
                     setStatus((prev) => {
                         if (!prev) return data;
                         return isNewerOrSameStatus(data, prev) ? data : prev;
