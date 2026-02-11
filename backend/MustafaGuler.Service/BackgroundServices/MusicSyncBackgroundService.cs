@@ -49,6 +49,7 @@ namespace MustafaGuler.Service.BackgroundServices
                 var lastFmService = scope.ServiceProvider.GetRequiredService<ILastFmService>();
                 var musicStatusService = scope.ServiceProvider.GetRequiredService<IMusicStatusService>();
                 var musicRepository = scope.ServiceProvider.GetRequiredService<IGenericRepository<Music>>();
+                var cacheInvalidationService = scope.ServiceProvider.GetRequiredService<ICacheInvalidationService>();
 
                 if (stoppingToken.IsCancellationRequested) return;
 
@@ -94,7 +95,11 @@ namespace MustafaGuler.Service.BackgroundServices
                 // Update Activity Widget
                 if (syncResult.IsSuccess && syncResult.Data.HasValue)
                 {
-                    await activityService.UpdateActivityAsync("Music", syncResult.Data.Value);
+                    var updateResult = await activityService.UpdateActivityAsync("Music", syncResult.Data.Value);
+                    if (updateResult.IsSuccess)
+                    {
+                        await cacheInvalidationService.InvalidateTagsAsync("activities");
+                    }
                 }
             }
             catch (Exception ex)
