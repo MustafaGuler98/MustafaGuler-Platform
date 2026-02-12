@@ -58,11 +58,33 @@ namespace MustafaGuler.Service.Services
                 return Result<ImageInfoDto>.Failure(400, Messages.FileSizeLimitExceeded);
             }
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             var extension = Path.GetExtension(fileData.FileName).ToLowerInvariant();
 
             if (!allowedExtensions.Contains(extension))
                 return Result<ImageInfoDto>.Failure(400, Messages.InvalidFileType);
+
+            // Signature Validation
+            if (!fileData.Content.CanRead)
+            {
+                return Result<ImageInfoDto>.Failure(400, "File stream is not readable.");
+            }
+
+            if (fileData.Content.CanSeek)
+            {
+                fileData.Content.Position = 0;
+            }
+
+            if (!FileSignatureValidator.IsValidSignature(fileData.Content, extension))
+            {
+                _logger.LogWarning("File signature validation failed for {FileName}. Extension: {Extension}", fileData.FileName, extension);
+                return Result<ImageInfoDto>.Failure(400, "Invalid file signature (File content does not match extension).");
+            }
+
+            if (fileData.Content.CanSeek)
+            {
+                fileData.Content.Position = 0;
+            }
 
             string safeName = SlugHelper.GenerateSlug(customName);
 

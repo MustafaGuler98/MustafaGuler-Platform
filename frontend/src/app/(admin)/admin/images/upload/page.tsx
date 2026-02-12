@@ -38,9 +38,9 @@ export default function UploadImagePage() {
     const handleFileSelect = (selectedFile: File) => {
         setValidationError(null);
 
-        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
         if (!validTypes.includes(selectedFile.type)) {
-            setValidationError('Only JPG and PNG files are allowed.');
+            setValidationError('Only JPG, PNG, GIF and WEBP files are allowed.');
             return;
         }
 
@@ -120,7 +120,7 @@ export default function UploadImagePage() {
                     <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".jpg,.jpeg,.png"
+                        accept=".jpg,.jpeg,.png,.gif,.webp"
                         onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                         className="hidden"
                     />
@@ -148,7 +148,7 @@ export default function UploadImagePage() {
                                 DROP_FILE_OR_CLICK
                             </p>
                             <p className="font-mono text-[9px] text-muted-foreground/40 mt-1">
-                                JPG, PNG ONLY
+                                JPG, PNG, GIF, WEBP
                             </p>
                         </>
                     )}

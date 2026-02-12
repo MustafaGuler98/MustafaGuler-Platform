@@ -27,7 +27,7 @@
         public const string ImageUploaded = "Image uploaded successfully.";
         public const string NoFileUploaded = "No file uploaded.";
         public const string FileSizeLimitExceeded = "File size exceeds the 10MB limit.";
-        public const string InvalidFileType = "Invalid file type. Only JPG, JPEG, and PNG are allowed.";
+        public const string InvalidFileType = "Invalid file type. Only JPG, JPEG, PNG, GIF, and WEBP are allowed.";
         public const string InvalidFilename = "Invalid filename provided.";
         public const string FileAlreadyExists = "A file with the name '{0}' already exists. Please choose a different name.";
         public const string ImageNotFound = "Image not found.";
