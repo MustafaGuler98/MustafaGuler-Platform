@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Mail, Send, Terminal, AlertTriangle, CheckCircle2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
+import { CyberActionButton } from "@/components/ui/cyber/CyberActionButton";
 
 interface FormErrors {
     name?: string;
@@ -276,36 +277,15 @@ export default function ContactPage() {
                             </div>
 
                             {/* Submit Button */}
-                            <Button
+                            <CyberActionButton
                                 type="submit"
-                                disabled={status === "submitting"}
-                                className={cn(
-                                    "w-full mt-2 h-10 text-sm font-bold tracking-widest relative overflow-hidden transition-all duration-300 rounded-sm font-mono",
-                                    status === "success"
-                                        ? "bg-green-500/20 text-green-400 border-green-500 border cursor-default"
-                                        : status === "error"
-                                            ? "bg-red-500/10 text-red-500 border-red-500 border hover:bg-red-500/20"
-                                            : status === "submitting"
-                                                ? "bg-cyan-neon text-black border-cyan-neon border shadow-[0_0_20px_rgba(34,211,238,0.4)]"
-                                                : "bg-primary text-primary-foreground hover:bg-cyan-neon hover:text-black hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] border border-transparent hover:border-cyan-neon/50"
-                                )}
-                            >
-                                {status === "submitting" ? (
-                                    <span className="animate-pulse">TRANSMITTING...</span>
-                                ) : status === "success" ? (
-                                    <span className="flex items-center gap-2">
-                                        <CheckCircle2 className="w-4 h-4" /> MESSAGE SENT
-                                    </span>
-                                ) : status === "error" ? (
-                                    <span className="flex items-center gap-2">
-                                        <AlertTriangle className="w-4 h-4" /> TRANSMISSION FAILED
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-2">
-                                        SEND MESSAGE <Send className="w-3 h-3" />
-                                    </span>
-                                )}
-                            </Button>
+                                status={status}
+                                defaultText="SEND MESSAGE"
+                                submittingText="TRANSMITTING..."
+                                successText="MESSAGE SENT"
+                                errorText="TRANSMISSION FAILED"
+                                className="mt-2 text-sm font-bold tracking-widest font-mono"
+                            />
 
                         </form>
                     </div>
