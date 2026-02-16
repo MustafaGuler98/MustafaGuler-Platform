@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using MustafaGuler.Core.DTOs.Contact;
 using MustafaGuler.Core.Entities;
 using MustafaGuler.Core.Interfaces;
@@ -12,21 +13,24 @@ namespace MustafaGuler.Service.Services
         private readonly IGenericRepository<ContactMessage> _repository;
         private readonly IGenericRepository<Subscriber> _subscriberRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMailService _mailService;
+        private readonly IEmailQueueService _emailQueueService;
         private readonly IMapper _mapper;
+        private readonly ILogger<ContactService> _logger;
 
         public ContactService(
             IGenericRepository<ContactMessage> repository,
             IGenericRepository<Subscriber> subscriberRepository,
             IUnitOfWork unitOfWork,
-            IMailService mailService,
-            IMapper mapper)
+            IEmailQueueService emailQueueService,
+            IMapper mapper,
+            ILogger<ContactService> logger)
         {
             _repository = repository;
-            _subscriberRepository = subscriberRepository; // Correctly assigned
+            _subscriberRepository = subscriberRepository;
             _unitOfWork = unitOfWork;
-            _mailService = mailService;
+            _emailQueueService = emailQueueService;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result> SubmitContactFormAsync(CreateContactMessageDto dto, string? clientIp)
@@ -66,14 +70,17 @@ namespace MustafaGuler.Service.Services
 
             await _unitOfWork.CommitAsync();
 
-            var mailSent = await _mailService.SendContactEmailAsync(contactMessage);
-
-            if (mailSent)
+            await _emailQueueService.QueueEmailAsync(new MustafaGuler.Core.DTOs.Events.EmailEvent
             {
-                contactMessage.IsMailSent = true;
-                _repository.Update(contactMessage);
-                await _unitOfWork.CommitAsync();
-            }
+                ContactMessageId = contactMessage.Id,
+                SenderName = contactMessage.SenderName,
+                SenderEmail = contactMessage.SenderEmail,
+                Subject = contactMessage.Subject,
+                MessageBody = contactMessage.MessageBody,
+                AllowPromo = contactMessage.AllowPromo,
+                ClientIp = contactMessage.ClientIp,
+                EnqueuedAt = DateTime.UtcNow
+            });
 
             return Result.Success(201, "Your message has been received. Thank you for contacting us!");
         }
