@@ -70,19 +70,27 @@ namespace MustafaGuler.Service.Services
 
             await _unitOfWork.CommitAsync();
 
-            await _emailQueueService.QueueEmailAsync(new MustafaGuler.Core.DTOs.Events.EmailEvent
+            try
             {
-                ContactMessageId = contactMessage.Id,
-                SenderName = contactMessage.SenderName,
-                SenderEmail = contactMessage.SenderEmail,
-                Subject = contactMessage.Subject,
-                MessageBody = contactMessage.MessageBody,
-                AllowPromo = contactMessage.AllowPromo,
-                ClientIp = contactMessage.ClientIp,
-                EnqueuedAt = DateTime.UtcNow
-            });
+                await _emailQueueService.QueueEmailAsync(new MustafaGuler.Core.DTOs.Events.EmailEvent
+                {
+                    ContactMessageId = contactMessage.Id,
+                    SenderName = contactMessage.SenderName,
+                    SenderEmail = contactMessage.SenderEmail,
+                    Subject = contactMessage.Subject,
+                    MessageBody = contactMessage.MessageBody,
+                    AllowPromo = contactMessage.AllowPromo,
+                    ClientIp = contactMessage.ClientIp,
+                    EnqueuedAt = DateTime.UtcNow
+                });
 
-            return Result.Success(201, "Your message has been received. Thank you for contacting us!");
+                return Result.Success(201, "Your message has been received. Thank you for contacting us!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Message saved to DB but failed to queue for email sending. ContactMessageId: {Id}", contactMessage.Id);
+                return Result.Failure(500, "Your message has been recorded, but we encountered an issue processing the notification. Please try again later or contact us directly if urgent.");
+            }
         }
 
         public async Task<Result<PagedResult<ContactMessageListDto>>> GetPagedListAsync(PaginationParams paginationParams)

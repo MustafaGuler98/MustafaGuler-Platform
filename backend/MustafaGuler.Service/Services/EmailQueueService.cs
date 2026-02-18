@@ -27,6 +27,7 @@ namespace MustafaGuler.Service.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to queue email for ContactMessageId: {Id}", emailEvent.ContactMessageId);
+                throw;
             }
         }
     }

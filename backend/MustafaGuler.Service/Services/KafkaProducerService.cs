@@ -47,8 +47,8 @@ namespace MustafaGuler.Service.Services
         {
             if (_producer == null)
             {
-                _logger.LogWarning("Kafka Producer is not initialized. Message to topic {Topic} will not be sent.", topic);
-                return;
+                _logger.LogError("Kafka Producer is not initialized. Message to topic {Topic} cannot be sent.", topic);
+                throw new InvalidOperationException("Kafka Producer is not initialized. Service is unavailable.");
             }
 
             try
