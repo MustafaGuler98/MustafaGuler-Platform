@@ -12,11 +12,13 @@ namespace MustafaGuler.Service.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<MailManager> _logger;
+        private readonly ISecurityService _securityService;
 
-        public MailManager(IConfiguration configuration, ILogger<MailManager> logger)
+        public MailManager(IConfiguration configuration, ILogger<MailManager> logger, ISecurityService securityService)
         {
             _configuration = configuration;
             _logger = logger;
+            _securityService = securityService;
         }
 
         public async Task<bool> SendContactEmailAsync(ContactMessage message)
@@ -30,26 +32,39 @@ namespace MustafaGuler.Service.Services
                 var fromEmail = _configuration["MailSettings:FromEmail"];
                 var toEmail = _configuration["MailSettings:ToEmail"];
 
+                var safeSenderName = _securityService.SanitizeForHeader(message.SenderName);
+                var safeSubject = _securityService.SanitizeForHeader(message.Subject);
+
+                var safeSenderEmail = _securityService.SanitizeEmail(message.SenderEmail);
+
+                var htmlSenderName = _securityService.SanitizeForHtml(message.SenderName);
+                var htmlSenderEmail = _securityService.SanitizeForHtml(message.SenderEmail);
+                var htmlSubject = _securityService.SanitizeForHtml(message.Subject);
+                
+                var htmlMessageBody = _securityService.SanitizeForHtml(message.MessageBody).Replace("\n", "<br />");
+
+
                 var email = new MimeMessage();
                 email.From.Add(new MailboxAddress("Website Contact Form", fromEmail));
                 email.To.Add(MailboxAddress.Parse(toEmail));
-                email.ReplyTo.Add(new MailboxAddress(message.SenderName, message.SenderEmail));
-                email.Subject = $"[Contact Form] {message.Subject}";
+
+                email.ReplyTo.Add(new MailboxAddress(safeSenderName, safeSenderEmail));
+                email.Subject = $"[Contact Form] {safeSubject}";
 
                 var bodyBuilder = new BodyBuilder
                 {
                     HtmlBody = $@"
                         <h2>New Contact Form Submission</h2>
-                        <p><strong>Name:</strong> {message.SenderName}</p>
-                        <p><strong>Email:</strong> {message.SenderEmail}</p>
-                        <p><strong>Subject:</strong> {message.Subject}</p>
+                        <p><strong>Name:</strong> {htmlSenderName}</p>
+                        <p><strong>Email:</strong> {htmlSenderEmail}</p>
+                        <p><strong>Subject:</strong> {htmlSubject}</p>
                         <p><strong>Allow Promo:</strong> {(message.AllowPromo ? "Yes" : "No")}</p>
                         <p><strong>IP Address:</strong> {message.ClientIp ?? "Unknown"}</p>
                         <hr />
                         <p><strong>Message:</strong></p>
-                        <p>{System.Net.WebUtility.HtmlEncode(message.MessageBody).Replace("\n", "<br />")}</p>
+                        <p>{htmlMessageBody}</p>
                     ",
-                    TextBody = $"Name: {message.SenderName}\nEmail: {message.SenderEmail}\nSubject: {message.Subject}\nAllow Promo: {(message.AllowPromo ? "Yes" : "No")}\nIP: {message.ClientIp}\n\nMessage:\n{message.MessageBody}"
+                    TextBody = $"Name: {safeSenderName}\nEmail: {safeSenderEmail}\nSubject: {safeSubject}\nAllow Promo: {(message.AllowPromo ? "Yes" : "No")}\nIP: {message.ClientIp}\n\nMessage:\n{message.MessageBody}"
                 };
                 email.Body = bodyBuilder.ToMessageBody();
 

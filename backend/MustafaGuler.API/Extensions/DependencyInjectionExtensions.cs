@@ -29,6 +29,7 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<ISecurityService, SecurityService>();
             services.AddScoped<IAuthCookieService, AuthCookieService>();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IMailService, MailManager>();
