@@ -1,6 +1,17 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+
+const schema = {
+    ...defaultSchema,
+    tagNames: [...(defaultSchema.tagNames || []), 'span'],
+    attributes: {
+        ...defaultSchema.attributes,
+        span: ['style'],
+    },
+};
 
 interface MarkdownRendererProps {
     content: string;
@@ -10,6 +21,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
     return (
         <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, [rehypeSanitize, schema]]}
             components={{
                 a: ({ node, className, children, href, ...props }) => {
                     const isExternal = href?.startsWith('http') || href?.startsWith('https');
