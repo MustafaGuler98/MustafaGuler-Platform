@@ -95,10 +95,17 @@ namespace MustafaGuler.Service.BackgroundServices
                 // Update Activity Widget
                 if (syncResult.IsSuccess && syncResult.Data.HasValue)
                 {
-                    var updateResult = await activityService.UpdateActivityAsync("Music", syncResult.Data.Value);
-                    if (updateResult.IsSuccess)
+                    var newMusicId = syncResult.Data.Value;
+                    var activities = await activityService.GetAllActivitiesAsync();
+                    var musicActivity = activities.IsSuccess ? activities.Data?.FirstOrDefault(a => a.ActivityType == "Music") : null;
+
+                    if (musicActivity == null || musicActivity.SelectedItemId != newMusicId)
                     {
-                        await cacheInvalidationService.InvalidateTagsAsync("activities");
+                        var updateResult = await activityService.UpdateActivityAsync("Music", newMusicId);
+                        if (updateResult.IsSuccess)
+                        {
+                            await cacheInvalidationService.InvalidateTagsAsync("activities");
+                        }
                     }
                 }
             }
