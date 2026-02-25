@@ -35,8 +35,8 @@ export function MobileNav() {
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden text-foreground hover:text-cyan-neon transition-colors">
-                    <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="icon" aria-label="Open navigation menu" className="md:hidden text-foreground hover:text-cyan-neon transition-colors">
+                    <Menu className="h-6 w-6" aria-hidden="true" />
                 </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] border-l border-primary/20 bg-[#0a0118]/95 backdrop-blur-xl p-0 flex flex-col">
@@ -78,16 +78,18 @@ export function MobileNav() {
                         <Link
                             href="https://www.linkedin.com/in/mustafaguler98"
                             target="_blank"
+                            aria-label="LinkedIn profile"
                             className="text-muted-foreground hover:text-cyan-neon transition-colors"
                         >
-                            <Linkedin className="w-5 h-5" />
+                            <Linkedin className="w-5 h-5" aria-hidden="true" />
                         </Link>
                         <Link
                             href="https://github.com/MustafaGuler98"
                             target="_blank"
+                            aria-label="GitHub profile"
                             className="text-muted-foreground hover:text-cyan-neon transition-colors"
                         >
-                            <Github className="w-5 h-5" />
+                            <Github className="w-5 h-5" aria-hidden="true" />
                         </Link>
                     </div>
 

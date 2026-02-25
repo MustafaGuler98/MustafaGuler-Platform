@@ -141,17 +141,19 @@ export default function Footer() {
                                 href="https://github.com/MustafaGuler98"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                aria-label="GitHub profile"
                                 className="p-2 rounded-md border-2 border-white/40 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
                             >
-                                <Github className="w-5 h-5" />
+                                <Github className="w-5 h-5" aria-hidden="true" />
                             </Link>
                             <Link
                                 href="https://www.linkedin.com/in/mustafaguler98"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                aria-label="LinkedIn profile"
                                 className="p-2 rounded-md border-2 border-white/40 text-gray-400 hover:text-cyan-neon hover:border-cyan-neon hover:shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-300"
                             >
-                                <Linkedin className="w-5 h-5" />
+                                <Linkedin className="w-5 h-5" aria-hidden="true" />
                             </Link>
                         </div>
                     </div>

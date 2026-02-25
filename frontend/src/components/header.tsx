@@ -123,16 +123,20 @@ export default function Header() {
                 <Link
                   href="https://www.linkedin.com/in/mustafaguler98"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn profile"
                   className={cn(effectsStyles.glitchIcon, "text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]")}
                 >
-                  <Linkedin className="w-6 h-6" />
+                  <Linkedin className="w-6 h-6" aria-hidden="true" />
                 </Link>
                 <Link
                   href="https://github.com/MustafaGuler98"
                   target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub profile"
                   className={cn(effectsStyles.glitchIconDelayed, "text-primary drop-shadow-[0_0_8px_rgba(147,51,234,0.8)] hover:text-cyan-neon transition-colors duration-300 hover:drop-shadow-[0_0_8px_rgba(147,51,234,0.8)]")}
                 >
-                  <Github className="w-6 h-6" />
+                  <Github className="w-6 h-6" aria-hidden="true" />
                 </Link>
               </div>
             </div>
