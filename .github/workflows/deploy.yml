@@ -3,7 +3,7 @@ name: Deploy to Production (Hetzner)
 on:
   push:
     branches:
-      - feature/ssl-automation
+      - main
 
 jobs:
   deploy:
@@ -46,7 +46,7 @@ jobs:
             set -Eeuo pipefail
 
             APP_DIR="app"
-            BRANCH="feature/ssl-automation"
+            BRANCH="main"
             WARMUP_BASE_URL="https://localhost"
 
             if [ -d "app" ] && [ ! -d "app/.git" ]; then
