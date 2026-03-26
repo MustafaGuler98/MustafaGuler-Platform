@@ -1,4 +1,4 @@
-FROM nginx:1.28-alpine
+FROM nginx:1.27-alpine
 
 RUN apk add --no-cache nginx-mod-http-brotli
 
