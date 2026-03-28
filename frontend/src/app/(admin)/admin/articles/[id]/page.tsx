@@ -12,9 +12,11 @@ import { CyberInput } from '@/components/ui/cyber/CyberInput';
 import { CyberSelect } from '@/components/ui/cyber/CyberSelect';
 import { MarkdownEditor } from '@/components/admin/ui/MarkdownEditor';
 import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
+import { useToast } from '@/components/ui/cyber/Toast';
 import type { AdminArticle, Category } from '@/types/admin';
 
 export default function EditArticlePage() {
+    const { showToast } = useToast();
     const params = useParams();
     const id = params.id as string;
 
@@ -57,8 +59,10 @@ export default function EditArticlePage() {
         'articles',
         (id, data) => articleAdminService.update(id, data),
         {
-            onSuccessRedirect: '/admin/articles',
             invalidateQueries: ['articles', 'article'],
+            onSuccess: () => {
+                showToast('Article updated successfully.', 'success');
+            }
         }
     );
 
