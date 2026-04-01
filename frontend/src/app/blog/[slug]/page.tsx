@@ -125,6 +125,7 @@ export default async function ArticlePage({ params }: PageProps) {
             [&_pre]:bg-[#0f0518] [&_pre]:border [&_pre]:border-primary/20 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-6
             [&_img]:rounded-xl [&_img]:shadow-md [&_img]:border [&_img]:border-primary/20 [&_img]:my-8
             [&_a]:text-foreground [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-cyan-400 [&_a]:transition-colors
+            [&_hr]:border-t [&_hr]:border-primary [&_hr]:opacity-50 [&_hr]:my-8
           "
         >
           {post.contentHtml?.trim() ? (

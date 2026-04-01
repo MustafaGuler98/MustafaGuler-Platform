@@ -39,7 +39,8 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
         lowlight,
       }),
       TextAlign.configure({
-        types: ['heading', 'paragraph'],
+        types: ['heading', 'paragraph', 'image'],
+        alignments: ['left', 'center', 'right'],
       }),
       Table.configure({
         resizable: true,
@@ -59,7 +60,8 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
         autolink: true,
       }),
       Image.configure({
-        inline: true,
+        inline: false, // Must be block-level to accept text-align natively
+        allowBase64: true,
       }),
       TextStyle,
       Color,
