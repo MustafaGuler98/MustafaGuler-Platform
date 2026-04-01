@@ -5,15 +5,17 @@ import {
     List, ListOrdered, Quote, Minus,
     Link as LinkIcon, Image as ImageIcon,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Table, Trash2
+    Table, Trash2, Code2
 } from 'lucide-react';
 import { useCallback } from 'react';
 
 interface EditorToolbarProps {
     editor: Editor;
+    isSourceMode?: boolean;
+    onToggleSource?: () => void;
 }
 
-export function EditorToolbar({ editor }: EditorToolbarProps) {
+export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorToolbarProps) {
     if (!editor) return null;
 
     const setLink = useCallback(() => {
@@ -53,26 +55,42 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     }, [editor]);
 
     const ToolbarButton = ({ 
-        onClick, isActive, icon: Icon, title 
+        onClick, isActive, icon: Icon, title, forceEnable 
     }: { 
-        onClick: () => void, isActive: boolean, icon: any, title: string 
-    }) => (
-        <button
-            type="button"
-            onClick={onClick}
-            title={title}
-            className={`
-                p-2 rounded transition-all duration-200 
-                hover:bg-primary/20 hover:text-cyan-400
-                ${isActive ? 'bg-primary/20 text-cyan-400 shadow-[0_0_10px_rgba(139,92,246,0.3)]' : 'text-muted-foreground'}
-            `}
-        >
-            <Icon size={16} />
-        </button>
-    );
+        onClick: () => void, isActive: boolean, icon: any, title: string, forceEnable?: boolean
+    }) => {
+        const disabled = !forceEnable && isSourceMode;
+        
+        return (
+            <button
+                type="button"
+                onClick={onClick}
+                title={title}
+                disabled={disabled}
+                className={`
+                    p-2 rounded transition-all duration-200 
+                    ${isActive ? 'bg-primary/20 text-cyan-neon shadow-[0_0_10px_rgba(139,92,246,0.3)]' : 'text-muted-foreground hover:bg-primary/20 hover:text-cyan-neon'}
+                    ${disabled ? 'opacity-30 cursor-not-allowed pointer-events-none' : ''}
+                `}
+            >
+                <Icon size={16} />
+            </button>
+        );
+    };
 
     return (
         <div className="flex flex-wrap items-center gap-1 p-2 border-b border-primary/20 bg-[#0a0118]">
+            {/* View Modes */}
+            <ToolbarButton
+                onClick={() => onToggleSource && onToggleSource()}
+                isActive={!!isSourceMode}
+                icon={Code2}
+                title="Toggle Markdown Source (</>)"
+                forceEnable={true}
+            />
+
+            <div className="w-px h-5 bg-primary/20 mx-1" />
+
             {/* Formatting */}
             <ToolbarButton
                 onClick={() => editor.chain().focus().toggleBold().run()}

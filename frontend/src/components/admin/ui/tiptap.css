@@ -1,13 +1,13 @@
 /* Tiptap Main Editor Area (ProseMirror Container) */
 .ProseMirror {
   outline: none !important;
-  min-height: 400px;
   color: hsl(var(--foreground));
 }
 
 /* --- Typography --- */
 .ProseMirror p {
-  margin-bottom: 0.5rem; /* Reduced to prevent excessive jumps during editing */
+  margin-top: 0;
+  margin-bottom: 0.25rem;
   line-height: 1.8;
   color: var(--foreground);
 }
