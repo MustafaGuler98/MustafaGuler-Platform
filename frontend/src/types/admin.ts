@@ -12,6 +12,7 @@ export interface AdminArticle {
     id: string;
     title: string;
     content: string;
+    contentHtml?: string;
     slug: string;
     categoryId: string;
     categoryName?: string;
@@ -49,6 +50,7 @@ export interface SortConfig {
 export interface ArticleFormData {
     title: string;
     content: string;
+    contentHtml: string;
     categoryId: string;
     languageCode: string;
     mainImage: string;

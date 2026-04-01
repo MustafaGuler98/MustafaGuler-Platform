@@ -2,6 +2,7 @@ export interface Article {
   id: string;
   title: string;
   content: string;
+  contentHtml?: string;
   categoryId: string;
   categoryName: string;
   languageCode: string;

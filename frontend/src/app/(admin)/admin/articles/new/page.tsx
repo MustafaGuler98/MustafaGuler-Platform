@@ -8,13 +8,15 @@ import { useResourceList, useCreateResource } from '@/hooks/admin';
 import { AdminPageHeader, ErrorMessage } from '@/components/admin/layout';
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { CyberInput } from '@/components/ui/cyber/CyberInput';
-import { MarkdownEditor } from '@/components/admin/ui/MarkdownEditor';
+import { CyberSelect } from '@/components/ui/cyber/CyberSelect';
+import { TiptapEditor } from '@/components/admin/ui/TiptapEditor';
 import type { Category, ArticleFormData } from '@/types/admin';
 
 export default function NewArticlePage() {
     const [form, setForm] = useState<ArticleFormData>({
         title: '',
         content: '',
+        contentHtml: '',
         categoryId: '',
         languageCode: 'en',
         mainImage: '',
@@ -48,8 +50,8 @@ export default function NewArticlePage() {
             <ErrorMessage error={mutation.error} />
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left: Editor (2/3) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    {/* Left Column: Primary Tiptap Editor Instance */}
                     <div className="lg:col-span-2 space-y-6">
                         <CyberInput
                             label="TITLE"
@@ -59,59 +61,37 @@ export default function NewArticlePage() {
                             required
                         />
 
-                        <MarkdownEditor
-                            value={form.content}
-                            onChange={(value) => setForm({ ...form, content: value })}
+                        <TiptapEditor
+                            content={form.content}
+                            onChange={(json, html) => setForm({ ...form, content: json, contentHtml: html })}
                         />
                     </div>
 
-                    {/* Right: Settings Panel (1/3) */}
-                    <div className="space-y-6">
-                        <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-5 space-y-6">
+                    {/* Right Column: Sticky Article Metadata Settings Form */}
+                    <div className="space-y-6 sticky top-8">
+                        <div className="backdrop-blur-sm bg-black/20 border border-white/5 rounded-lg p-5 space-y-6 flex flex-col">
                             <h3 className="font-mono text-[10px] text-primary tracking-widest">
                                 SETTINGS
                             </h3>
 
-                            {/* Category */}
-                            <div className="space-y-2">
-                                <label className="block text-[10px] text-primary font-mono uppercase tracking-widest">
-                                    CATEGORY
-                                </label>
-                                <select
-                                    value={form.categoryId}
-                                    onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                                    required
-                                    className="w-full bg-transparent border-b border-white/20 focus:border-cyan-neon px-0 py-3 text-foreground focus:outline-none transition-colors duration-300 font-mono text-sm"
-                                >
-                                    <option value="" className="bg-[#0a0118]">
-                                        SELECT...
-                                    </option>
-                                    {categories.map((cat) => (
-                                        <option key={cat.id} value={cat.id} className="bg-[#0a0118]">
-                                            {cat.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            {/* Article Category Selection Wrapper */}
+                            <CyberSelect
+                                label="CATEGORY"
+                                value={form.categoryId}
+                                onChange={(val) => setForm({ ...form, categoryId: String(val) })}
+                                options={categories.map((cat) => ({ value: cat.id, label: cat.name }))}
+                            />
 
-                            {/* Language */}
-                            <div className="space-y-2">
-                                <label className="block text-[10px] text-primary font-mono uppercase tracking-widest">
-                                    LANGUAGE
-                                </label>
-                                <select
-                                    value={form.languageCode}
-                                    onChange={(e) => setForm({ ...form, languageCode: e.target.value })}
-                                    className="w-full bg-transparent border-b border-white/20 focus:border-cyan-neon px-0 py-3 text-foreground focus:outline-none transition-colors duration-300 font-mono text-sm"
-                                >
-                                    <option value="en" className="bg-[#0a0118]">
-                                        EN
-                                    </option>
-                                    <option value="tr" className="bg-[#0a0118]">
-                                        TR
-                                    </option>
-                                </select>
-                            </div>
+                            {/* Article Language Code Specification */}
+                            <CyberSelect
+                                label="LANGUAGE"
+                                value={form.languageCode}
+                                onChange={(val) => setForm({ ...form, languageCode: String(val) })}
+                                options={[
+                                    { value: 'en', label: 'EN' },
+                                    { value: 'tr', label: 'TR' }
+                                ]}
+                            />
 
                             <CyberInput
                                 label="COVER_IMAGE"
