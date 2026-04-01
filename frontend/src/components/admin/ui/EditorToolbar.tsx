@@ -116,6 +116,17 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
                 icon={Code}
                 title="Inline Code"
             />
+            
+            {/* Color Picker Native Input */}
+            <div className={`p-1 flex items-center justify-center rounded transition-all duration-200 hover:bg-primary/20 ${isSourceMode ? 'opacity-30 pointer-events-none cursor-not-allowed' : 'cursor-pointer'}`} title="Metin Rengi">
+                <input
+                    type="color"
+                    onInput={event => editor.chain().focus().setColor((event.target as HTMLInputElement).value).run()}
+                    value={editor.getAttributes('textStyle').color || '#8B5CF6'}
+                    className="w-5 h-5 p-0 border-0 bg-transparent cursor-pointer rounded"
+                    disabled={isSourceMode}
+                />
+            </div>
 
             <div className="w-px h-5 bg-primary/20 mx-1" />
 

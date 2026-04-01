@@ -124,10 +124,12 @@ export default async function ArticlePage({ params }: PageProps) {
             [&_code]:text-cyan-400 [&_code]:bg-primary/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
             [&_pre]:bg-[#0f0518] [&_pre]:border [&_pre]:border-primary/20 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-6
             [&_img]:rounded-xl [&_img]:shadow-md [&_img]:border [&_img]:border-primary/20 [&_img]:my-8
-            [&_a]:text-primary [&_a]:underline-offset-4 [&_a]:hover:text-cyan-400 [&_a]:transition-colors
+            [&_a]:text-foreground [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-cyan-400 [&_a]:transition-colors
           "
         >
-          {post.content?.trim() ? (
+          {post.contentHtml?.trim() ? (
+            <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} className="tiptap-renderer" />
+          ) : post.content?.trim() ? (
             <MarkdownRenderer content={post.content} />
           ) : (
             <div className="border border-primary/20 bg-primary/5 p-6 rounded-lg text-center">

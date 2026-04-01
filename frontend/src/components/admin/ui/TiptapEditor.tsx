@@ -12,6 +12,8 @@ import { TableHeader } from '@tiptap/extension-table-header';
 import { TableCell } from '@tiptap/extension-table-cell';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import CharacterCount from '@tiptap/extension-character-count';
+import Color from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
 import { createLowlight, common } from 'lowlight';
 import './tiptap.css';
 
@@ -59,8 +61,17 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
       Image.configure({
         inline: true,
       }),
+      TextStyle,
+      Color,
     ],
-    content: content,
+    content: (() => {
+      if (!content) return '';
+      try {
+        return JSON.parse(content); // New structure: JSON string from editor.getJSON()
+      } catch {
+        return content; // Legacy fallback: raw HTML string
+      }
+    })(),
     immediatelyRender: false, 
     onCreate: ({ editor }) => {
       setWords(editor.storage.characterCount.words());
@@ -133,7 +144,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
       {isSourceMode ? (
         <div className="h-[60vh] overflow-y-auto">
           <textarea
-            className="w-full h-full bg-transparent text-purple-200/80 font-mono text-sm p-4 resize-none focus:outline-none focus:ring-0 whitespace-pre-wrap leading-relaxed"
+            className="w-full h-full bg-transparent text-white/90 font-mono text-sm p-4 resize-none focus:outline-none focus:ring-0 whitespace-pre-wrap leading-relaxed"
             value={sourceContent}
             onChange={handleSourceChange}
             spellCheck={false}

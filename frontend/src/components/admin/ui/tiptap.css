@@ -107,7 +107,8 @@
 
 /* --- Links --- */
 .ProseMirror a {
-  color: hsl(var(--primary));
+  color: inherit;
+  font-weight: 600;
   text-underline-offset: 4px;
   text-decoration: underline;
   transition: color 0.15s ease-in-out;
