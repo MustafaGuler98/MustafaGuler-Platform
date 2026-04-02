@@ -9,6 +9,15 @@ import {
 } from 'lucide-react';
 import { useCallback } from 'react';
 
+// Align helper: if an image is selected, set its alignment attribute; otherwise use TextAlign
+const handleAlign = (editor: Editor, alignment: string) => {
+    if (editor.isActive('image')) {
+        editor.chain().focus().updateAttributes('image', { alignment }).run();
+    } else {
+        editor.chain().focus().setTextAlign(alignment).run();
+    }
+};
+
 interface EditorToolbarProps {
     editor: Editor;
     isSourceMode?: boolean;
@@ -182,20 +191,20 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
 
             {/* Typography Alignments */}
             <ToolbarButton
-                onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                isActive={editor.isActive({ textAlign: 'left' })}
+                onClick={() => handleAlign(editor, 'left')}
+                isActive={editor.isActive({ textAlign: 'left' }) || editor.getAttributes('image').alignment === 'left'}
                 icon={AlignLeft}
                 title="Align Left"
             />
             <ToolbarButton
-                onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                isActive={editor.isActive({ textAlign: 'center' })}
+                onClick={() => handleAlign(editor, 'center')}
+                isActive={editor.isActive({ textAlign: 'center' }) || editor.getAttributes('image').alignment === 'center'}
                 icon={AlignCenter}
                 title="Align Center"
             />
             <ToolbarButton
-                onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                isActive={editor.isActive({ textAlign: 'right' })}
+                onClick={() => handleAlign(editor, 'right')}
+                isActive={editor.isActive({ textAlign: 'right' }) || editor.getAttributes('image').alignment === 'right'}
                 icon={AlignRight}
                 title="Align Right"
             />

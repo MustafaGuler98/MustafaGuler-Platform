@@ -89,6 +89,15 @@ export default function EditArticlePage() {
         deleteMutation.mutate(id);
     };
 
+    // Check if form data deviates from the fetched article
+    const isDirty = !!article && (
+        form.title !== article.title ||
+        form.content !== article.content ||
+        form.categoryId !== article.categoryId ||
+        form.languageCode !== article.languageCode ||
+        form.mainImage !== (article.mainImage || '')
+    );
+
     // Wait for BOTH the API payload and the local form state to synchronize
     if (articleLoading || !form.id) {
         return <LoadingState />;
@@ -186,9 +195,10 @@ export default function EditArticlePage() {
                                 size="md"
                                 fullWidth
                                 disabled={updateMutation.isPending}
+                                className={isDirty ? "animate-pulse border-cyan-400/80 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)] bg-cyan-900/10" : ""}
                             >
                                 <Save size={12} />
-                                {updateMutation.isPending ? 'SAVING...' : 'UPDATE'}
+                                {updateMutation.isPending ? 'SAVING...' : isDirty ? 'UPDATE (UNSAVED)' : 'UPDATE'}
                             </CyberButton>
                             <Link href="/admin/articles" className="w-full">
                                 <CyberButton type="button" variant="ghost" size="md" fullWidth>

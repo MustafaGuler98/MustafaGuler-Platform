@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
 import Link from '@tiptap/extension-link';
-import Image from '@tiptap/extension-image';
+import { AlignableImage } from './extensions/AlignableImage';
 import TextAlign from '@tiptap/extension-text-align';
 import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
@@ -58,8 +58,8 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
         openOnClick: false,
         autolink: true,
       }),
-      Image.configure({
-        inline: true, // It inherits paragraph-level text-align
+      AlignableImage.configure({
+        inline: false,
         allowBase64: true,
       }),
       TextStyle,
