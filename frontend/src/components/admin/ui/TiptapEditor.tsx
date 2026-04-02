@@ -89,7 +89,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
 
     editorProps: {
       attributes: {
-        class: 'prose-container min-h-[400px] w-full bg-transparent px-3 py-4 focus-visible:outline-none',
+        class: 'prose-cyber min-h-[400px] w-full bg-transparent px-3 py-4 focus-visible:outline-none',
       },
     },
   });
