@@ -7,7 +7,6 @@ import { formatDate, getImageUrl } from "@/lib/utils";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
 import { ARTICLE_MESSAGES } from "@/lib/Messages";
-import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 export const revalidate = 86400;
 
@@ -130,8 +129,6 @@ export default async function ArticlePage({ params }: PageProps) {
         >
           {post.contentHtml?.trim() ? (
             <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} className="tiptap-renderer" />
-          ) : post.content?.trim() ? (
-            <MarkdownRenderer content={post.content} />
           ) : (
             <div className="border border-primary/20 bg-primary/5 p-6 rounded-lg text-center">
               <p className="text-muted-foreground italic">
