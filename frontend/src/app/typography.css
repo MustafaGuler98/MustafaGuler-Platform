@@ -1,7 +1,7 @@
 @layer components {
   /* Editor and Blog Reader typography */
   .prose-cyber {
-    @apply prose-invert max-w-none;
+    @apply prose prose-invert max-w-none;
 
     /* Base Typography */
     @apply prose-p:text-foreground prose-p:leading-8;
