@@ -77,20 +77,4 @@
     font-family: var(--font-heading);
   }
 
-  /* Tiptap Image Alignment Utilities (Global) */
-  img[style*="text-align: center"] {
-    display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  img[style*="text-align: right"] {
-    display: block !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-  }
-  img[style*="text-align: left"] {
-    display: block !important;
-    margin-left: 0 !important;
-    margin-right: auto !important;
-  }
 }
