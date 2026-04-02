@@ -9,12 +9,14 @@
     @apply prose-li:text-foreground;
 
     /* Links */
-    @apply prose-a:text-foreground prose-a:font-semibold prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-cyan-neon prose-a:transition-colors;
+    @apply prose-a:text-foreground prose-a:font-semibold prose-a:underline prose-a:underline-offset-4 prose-a:transition-colors;
+    @apply prose-a:hover:text-cyan-neon;
 
     /* Blockquote */
     @apply prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-muted-foreground;
-    /* Prevent extra margin inside blockquote paragraph */
+    /* Prevent extra margin inside blockquote paragraph and remove default decorative quotes */
     @apply [&_blockquote_p:first-of-type]:mt-0 [&_blockquote_p:last-of-type]:mb-0; 
+    @apply [&_blockquote_p::before]:content-none [&_blockquote_p::after]:content-none;
 
     /* Inline Code */
     @apply prose-code:text-cyan-neon prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono;
