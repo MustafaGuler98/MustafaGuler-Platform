@@ -10,79 +10,7 @@ import {
     Table, Trash2, Code2
 } from 'lucide-react';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-
-type ImageNodeLike = {
-    attrs: Record<string, unknown>;
-    type: {
-        name: string;
-    };
-};
-
-type SelectionWithNode = {
-    empty?: boolean;
-    from: number;
-    node?: ImageNodeLike | null;
-};
-
-type ImageSnapshot = {
-    attrs: Record<string, unknown>;
-    pos: number;
-};
-
-const updateImageAttributes = (editor: Editor, attrs: Record<string, unknown>) => {
-    const selection = editor.state.selection as SelectionWithNode;
-    if (editor.isActive('image')) {
-        editor.chain().focus().updateAttributes('image', attrs).run();
-    } else if (selection.node?.type.name === 'image') {
-        editor.chain().focus().command(({ tr }) => {
-            tr.setNodeMarkup(selection.from, undefined, {
-                ...selection.node.attrs,
-                ...attrs
-            });
-            return true;
-        }).run();
-    }
-};
-
-const getSelectedImageSnapshot = (editor: Editor): ImageSnapshot | null => {
-    const selection = editor.state.selection as SelectionWithNode;
-    const isImage = editor.isActive('image') || selection.node?.type.name === 'image';
-
-    if (!isImage) {
-        return null;
-    }
-
-    const pos = selection.from;
-    const node = editor.state.doc.nodeAt(pos) ?? selection.node;
-
-    if (!node || node.type.name !== 'image') {
-        return null;
-    }
-
-    const domNode = editor.view.nodeDOM(pos);
-    const domImage = domNode instanceof HTMLImageElement ? domNode : null;
-    const originalWidth = node.attrs.originalWidth ?? domImage?.naturalWidth ?? null;
-
-    return {
-        pos,
-        attrs: {
-            ...node.attrs,
-            ...(originalWidth ? { originalWidth } : {}),
-        },
-    };
-};
-
-// Align helper: if an image is selected, set its alignment attribute; otherwise use TextAlign
-const handleAlign = (editor: Editor, alignment: string) => {
-    const selection = editor.state.selection as SelectionWithNode;
-    const isImage = editor.isActive('image') || selection.node?.type.name === 'image';
-
-    if (isImage) {
-        updateImageAttributes(editor, { alignment });
-    } else {
-        editor.chain().focus().setTextAlign(alignment).run();
-    }
-};
+import { useEditorCommands, type ImageSnapshot, type SelectionWithNode } from './hooks/useEditorCommands';
 
 interface EditorToolbarProps {
     editor: Editor;
@@ -118,6 +46,7 @@ function ToolbarButton({ onClick, isActive, icon: Icon, title, disabled }: Toolb
 
 export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorToolbarProps) {
     const [, forceRender] = useReducer((value: number) => value + 1, 0);
+    const { getSelectedImageSnapshot, handleAlign } = useEditorCommands(editor);
 
     useEffect(() => {
         const rerender = () => {
@@ -178,7 +107,11 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
             const text = window.prompt('Enter Link Text:', 'Link');
             if (text === null || text === '') return;
 
-            editor.chain().focus().insertContent(`<a href="${url}">${text}</a>`).run();
+            editor.chain().focus().insertContent({
+                type: 'text',
+                text: text,
+                marks: [{ type: 'link', attrs: { href: url } }]
+            }).run();
         } 
         // Handle active selection
         else {
@@ -201,20 +134,26 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
         if (url) {
             const image = new window.Image();
             image.onload = () => {
-                editor.chain().focus().setImage({
-                    src: url,
-                    originalWidth: image.naturalWidth || null,
+                editor.chain().focus().insertContent({
+                    type: 'image',
+                    attrs: {
+                        src: url,
+                        originalWidth: image.naturalWidth || null,
+                    }
                 }).run();
             };
             image.onerror = () => {
-                editor.chain().focus().setImage({ src: url }).run();
+                editor.chain().focus().insertContent({
+                    type: 'image',
+                    attrs: { src: url }
+                }).run();
             };
             image.src = url;
         }
     }, [editor]);
 
     const applyImageWidth = useCallback((selectedWidth: string) => {
-        const snapshot = savedImage.current ?? getSelectedImageSnapshot(editor);
+        const snapshot = savedImage.current ?? getSelectedImageSnapshot();
         if (!snapshot) {
             setIsSizeMenuOpen(false);
             return;
@@ -247,7 +186,7 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
             return;
         }
 
-        savedImage.current = getSelectedImageSnapshot(editor);
+        savedImage.current = getSelectedImageSnapshot();
         if (!savedImage.current) {
             return;
         }
@@ -369,21 +308,21 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
 
             {/* Typography Alignments */}
             <ToolbarButton
-                onClick={() => handleAlign(editor, 'left')}
+                onClick={() => handleAlign('left')}
                 isActive={false}
                 icon={AlignLeft}
                 title="Align Left"
                 disabled={!!isSourceMode}
             />
             <ToolbarButton
-                onClick={() => handleAlign(editor, 'center')}
+                onClick={() => handleAlign('center')}
                 isActive={false}
                 icon={AlignCenter}
                 title="Align Center"
                 disabled={!!isSourceMode}
             />
             <ToolbarButton
-                onClick={() => handleAlign(editor, 'right')}
+                onClick={() => handleAlign('right')}
                 isActive={false}
                 icon={AlignRight}
                 title="Align Right"

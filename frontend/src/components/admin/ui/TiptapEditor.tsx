@@ -35,6 +35,11 @@ type MarkdownStorage = {
 };
 
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
+  const [isSourceMode, setIsSourceMode] = useState(false);
+  const [sourceContent, setSourceContent] = useState('');
+  const [words, setWords] = useState(0);
+  const [chars, setChars] = useState(0);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -100,11 +105,6 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
     },
   });
 
-  const [isSourceMode, setIsSourceMode] = useState(false);
-  const [sourceContent, setSourceContent] = useState('');
-  const [words, setWords] = useState(0);
-  const [chars, setChars] = useState(0);
-
   // Handle switching
   const handleToggleSourceMode = () => {
     if (!editor) return;
@@ -132,7 +132,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
 
     // Silently sync markdown into editor so getJSON/getHTML reflect real content
     if (editor) {
-      editor.commands.setContent(newVal, false);
+      editor.commands.setContent(newVal, { emitUpdate: false });
       onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
     }
   };
