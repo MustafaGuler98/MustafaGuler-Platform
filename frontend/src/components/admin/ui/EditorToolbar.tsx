@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { useEditorCommands, type ImageSnapshot, type SelectionWithNode } from './hooks/useEditorCommands';
+import { LinkDialog } from './dialogs/LinkDialog';
+import { ImageDialog } from './dialogs/ImageDialog';
 
 interface EditorToolbarProps {
     editor: Editor;
@@ -70,6 +72,9 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
 
     const savedImage = useRef<ImageSnapshot | null>(null);
 
+    const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+    const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+
     useEffect(() => {
         if (!isSizeMenuOpen) {
             return;
@@ -96,41 +101,24 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
         };
     }, [isSizeMenuOpen]);
 
-    const setLink = useCallback(() => {
-        const previousUrl = editor.getAttributes('link').href;
-        
-        // Handle empty selection
+    const handleLinkSubmit = useCallback((url: string, text?: string) => {
         if (editor.state.selection.empty) {
-            const url = window.prompt('Enter URL:', previousUrl || 'https://');
-            if (url === null) return;
-
-            const text = window.prompt('Enter Link Text:', 'Link');
-            if (text === null || text === '') return;
-
+            if (!url || !text) return;
             editor.chain().focus().insertContent({
                 type: 'text',
                 text: text,
                 marks: [{ type: 'link', attrs: { href: url } }]
             }).run();
-        } 
-        // Handle active selection
-        else {
-            const url = window.prompt('Enter URL for selected text:', previousUrl || 'https://');
-            
-            if (url === null) return; 
-
-            if (url === '') {
+        } else {
+            if (!url) {
                 editor.chain().focus().extendMarkRange('link').unsetLink().run();
                 return;
             }
-
             editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
         }
     }, [editor]);
 
-    const addImage = useCallback(() => {
-        const url = window.prompt('Enter Image URL:');
-        
+    const handleImageSubmit = useCallback((url: string) => {
         if (url) {
             const image = new window.Image();
             image.onload = () => {
@@ -396,18 +384,31 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
 
             {/* Media & Hyperlinks */}
             <ToolbarButton
-                onClick={setLink}
+                onClick={() => setIsLinkDialogOpen(true)}
                 isActive={editor.isActive('link')}
                 icon={LinkIcon}
                 title="Insert Link"
                 disabled={!!isSourceMode}
             />
             <ToolbarButton
-                onClick={addImage}
+                onClick={() => setIsImageDialogOpen(true)}
                 isActive={false}
                 icon={ImageIcon}
                 title="Insert Image (URL)"
                 disabled={!!isSourceMode}
+            />
+
+            <LinkDialog 
+                isOpen={isLinkDialogOpen} 
+                onOpenChange={setIsLinkDialogOpen} 
+                onSubmit={handleLinkSubmit} 
+                initialUrl={editor.getAttributes('link').href || ''}
+                requireText={editor.state.selection.empty}
+            />
+            <ImageDialog 
+                isOpen={isImageDialogOpen} 
+                onOpenChange={setIsImageDialogOpen} 
+                onSubmit={handleImageSubmit} 
             />
         </div>
     );

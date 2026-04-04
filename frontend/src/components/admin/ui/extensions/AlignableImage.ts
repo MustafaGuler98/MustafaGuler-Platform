@@ -36,19 +36,16 @@ export const AlignableImage = Image.extend({
       left: ['margin-left: 0', 'margin-right: auto'],
     };
 
-    const styleParts: string[] = ['display: block', 'height: auto'];
+    const styleParts: string[] = ['display: block', 'height: auto', 'max-width: 100%'];
     if (width) {
       const pct = parseInt(width);
       if (!Number.isNaN(pct) && pct > 0 && originalWidth) {
         styleParts.push(`width: ${Math.round((originalWidth * pct) / 100)}px`);
-        styleParts.push('max-width: none');
       } else {
         styleParts.push(`width: ${width}`);
-        styleParts.push(pct > 100 ? 'max-width: none' : 'max-width: 100%');
       }
     } else {
       styleParts.push('width: auto');
-      styleParts.push('max-width: 100%');
     }
 
     styleParts.push(...(alignmentStyles[alignment] || ['margin-left: 0', 'margin-right: 0']));
