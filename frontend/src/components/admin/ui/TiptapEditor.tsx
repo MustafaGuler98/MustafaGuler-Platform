@@ -2,7 +2,6 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { marked } from 'marked';
 import Link from '@tiptap/extension-link';
 import { AlignableImage } from './extensions/AlignableImage';
 import TextAlign from '@tiptap/extension-text-align';
@@ -81,10 +80,10 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
     content: (() => {
       if (!content) return '';
       try {
-        return JSON.parse(content); // New structure: JSON string from editor.getJSON()
+        return JSON.parse(content); 
       } catch {
-        // Legacy fallback: Parse Markdown to HTML for backward compatibility
-        return marked.parse(content) as string; 
+        console.error("Editor content is not valid JSON. Legacy markdown fallback has been removed.");
+        return '';
       }
     })(),
     immediatelyRender: false, 
@@ -129,9 +128,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
             try {
                 editor.commands.setContent(JSON.parse(content), { emitUpdate: false });
             } catch {
-                // Parse markdown fallback during hydration
-                const legacyHtml = marked.parse(content) as string;
-                editor.commands.setContent(legacyHtml, { emitUpdate: false });
+                console.error("Hydrated content is not valid JSON. Legacy markdown fallback has been removed.");
             }
             
             setWords(editor.storage.characterCount.words());
