@@ -1,4 +1,4 @@
-﻿using MustafaGuler.Core.Common;
+using MustafaGuler.Core.Common;
 
 namespace MustafaGuler.Core.Entities
 {
@@ -6,6 +6,7 @@ namespace MustafaGuler.Core.Entities
     {
         public string Title { get; set; } = null!;
         public string Content { get; set; } = null!;
+        public string? ContentHtml { get; set; }
         public string Slug { get; set; } = null!;
         public string? MainImage { get; set; } // URL or path to the main image, null if none
         public string LanguageCode { get; set; } = null!; // "tr", "en"

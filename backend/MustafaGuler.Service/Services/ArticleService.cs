@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MustafaGuler.Core.Constants;
 using MustafaGuler.Core.DTOs;
 using MustafaGuler.Core.Parameters;
@@ -241,6 +241,7 @@ namespace MustafaGuler.Service.Services
 
             article.Title = articleUpdateDto.Title;
             article.Content = articleUpdateDto.Content;
+            article.ContentHtml = articleUpdateDto.ContentHtml;
             article.CategoryId = articleUpdateDto.CategoryId;
             article.LanguageCode = articleUpdateDto.LanguageCode;
             article.MainImage = articleUpdateDto.MainImage;

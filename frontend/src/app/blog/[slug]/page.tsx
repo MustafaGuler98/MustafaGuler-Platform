@@ -7,7 +7,6 @@ import { formatDate, getImageUrl } from "@/lib/utils";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
 import { ARTICLE_MESSAGES } from "@/lib/Messages";
-import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 
 export const revalidate = 86400;
 
@@ -109,26 +108,9 @@ export default async function ArticlePage({ params }: PageProps) {
         )}
 
         {/* Article Content */}
-        <div
-          className="
-            max-w-none 
-            [&_p]:mb-6 [&_p]:leading-8 [&_p]:text-foreground
-            [&_li]:text-foreground [&_li]:mb-2
-            [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-6
-            [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-6
-            [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-foreground [&_h1]:mb-6 [&_h1]:mt-10
-            [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-foreground [&_h2]:mb-4 [&_h2]:mt-8
-            [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-foreground [&_h3]:mb-3 [&_h3]:mt-6
-            [&_strong]:font-semibold [&_strong]:text-foreground
-            [&_blockquote]:border-l-4 [&_blockquote]:border-l-primary [&_blockquote]:bg-primary/5 [&_blockquote]:pl-6 [&_blockquote]:py-4 [&_blockquote]:my-6 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_blockquote]:rounded-r-lg
-            [&_code]:text-cyan-400 [&_code]:bg-primary/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
-            [&_pre]:bg-[#0f0518] [&_pre]:border [&_pre]:border-primary/20 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-6
-            [&_img]:rounded-xl [&_img]:shadow-md [&_img]:border [&_img]:border-primary/20 [&_img]:my-8
-            [&_a]:text-primary [&_a]:underline-offset-4 [&_a]:hover:text-cyan-400 [&_a]:transition-colors
-          "
-        >
-          {post.content?.trim() ? (
-            <MarkdownRenderer content={post.content} />
+        <div className="prose-cyber w-full">
+          {post.contentHtml?.trim() ? (
+            <div dangerouslySetInnerHTML={{ __html: post.contentHtml }} className="tiptap-renderer" />
           ) : (
             <div className="border border-primary/20 bg-primary/5 p-6 rounded-lg text-center">
               <p className="text-muted-foreground italic">

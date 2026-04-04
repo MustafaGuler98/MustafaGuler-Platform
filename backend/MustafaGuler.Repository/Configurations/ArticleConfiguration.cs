@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MustafaGuler.Core.Entities;
 using System;
@@ -11,6 +11,7 @@ namespace MustafaGuler.Repository.Configurations
         {
             builder.Property(x => x.Title).IsRequired().HasMaxLength(200);
             builder.Property(x => x.Content).IsRequired();
+            builder.Property(x => x.ContentHtml).HasColumnType("text");
             builder.Property(x => x.LanguageCode).HasMaxLength(5);
 
             builder.Property(x => x.Slug).IsRequired().HasMaxLength(250);

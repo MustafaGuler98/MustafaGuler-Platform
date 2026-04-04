@@ -1,0 +1,23 @@
+/* Tiptap Main Editor Area (ProseMirror Container) */
+.ProseMirror {
+  outline: none !important;
+  color: hsl(var(--foreground));
+}
+
+/* --- Images --- */
+
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid var(--cyan-neon);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+}
+
+/* --- Placeholder --- */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  font-style: italic;
+  opacity: 0.5;
+}

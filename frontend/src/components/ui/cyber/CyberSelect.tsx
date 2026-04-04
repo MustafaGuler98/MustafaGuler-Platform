@@ -84,7 +84,7 @@ export function CyberSelect({
                 {/* Custom Cyber Menu - positioned relative to trigger */}
                 {isOpen && (
                     <div className="absolute top-full left-0 z-[100] w-full mt-1 bg-[#05050a]/95 backdrop-blur-xl border border-white/10 rounded-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 origin-top">
-                        <div className="max-h-60 overflow-y-auto py-1 space-y-0.5">
+                        <div className="max-h-48 overflow-y-auto py-1 space-y-0.5 custom-scrollbar">
                             {options.map((option) => (
                                 <div
                                     key={option.value}

@@ -10,7 +10,7 @@ import { AdminPageHeader, ErrorMessage, LoadingState } from '@/components/admin/
 import { CyberButton } from '@/components/ui/cyber/CyberButton';
 import { CyberInput } from '@/components/ui/cyber/CyberInput';
 import { CyberSelect } from '@/components/ui/cyber/CyberSelect';
-import { MarkdownEditor } from '@/components/admin/ui/MarkdownEditor';
+import { TiptapEditor } from '@/components/admin/ui/TiptapEditor';
 import { CyberConfirmationModal } from '@/components/ui/cyber/CyberConfirmationModal';
 import { useToast } from '@/components/ui/cyber/Toast';
 import type { AdminArticle, Category } from '@/types/admin';
@@ -26,6 +26,7 @@ export default function EditArticlePage() {
         id: '',
         title: '',
         content: '',
+        contentHtml: '',
         categoryId: '',
         languageCode: 'en',
         mainImage: '',
@@ -48,6 +49,7 @@ export default function EditArticlePage() {
                 id: article.id,
                 title: article.title,
                 content: article.content,
+                contentHtml: article.contentHtml || '', // Fallback for legacy docs
                 categoryId: article.categoryId,
                 languageCode: article.languageCode,
                 mainImage: article.mainImage || '',
@@ -87,7 +89,17 @@ export default function EditArticlePage() {
         deleteMutation.mutate(id);
     };
 
-    if (articleLoading) {
+    // Check if form data deviates from the fetched article
+    const isDirty = !!article && (
+        form.title !== article.title ||
+        form.content !== article.content ||
+        form.categoryId !== article.categoryId ||
+        form.languageCode !== article.languageCode ||
+        form.mainImage !== (article.mainImage || '')
+    );
+
+    // Wait for BOTH the API payload and the local form state to synchronize
+    if (articleLoading || !form.id) {
         return <LoadingState />;
     }
 
@@ -135,9 +147,9 @@ export default function EditArticlePage() {
                             required
                         />
 
-                        <MarkdownEditor
-                            value={form.content}
-                            onChange={(value) => setForm({ ...form, content: value })}
+                        <TiptapEditor
+                            content={form.content}
+                            onChange={(json, html) => setForm({ ...form, content: json, contentHtml: html })}
                         />
                     </div>
 
@@ -183,9 +195,10 @@ export default function EditArticlePage() {
                                 size="md"
                                 fullWidth
                                 disabled={updateMutation.isPending}
+                                className={isDirty ? "animate-pulse border-cyan-400/80 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)] bg-cyan-900/10" : ""}
                             >
                                 <Save size={12} />
-                                {updateMutation.isPending ? 'SAVING...' : 'UPDATE'}
+                                {updateMutation.isPending ? 'SAVING...' : isDirty ? 'UPDATE (UNSAVED)' : 'UPDATE'}
                             </CyberButton>
                             <Link href="/admin/articles" className="w-full">
                                 <CyberButton type="button" variant="ghost" size="md" fullWidth>

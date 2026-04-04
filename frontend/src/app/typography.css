@@ -1,0 +1,37 @@
+@layer components {
+  /* Editor and Blog Reader typography */
+  .prose-cyber {
+    @apply prose prose-invert max-w-none break-words;
+
+    /* Base Typography */
+    @apply prose-p:text-foreground prose-p:leading-8 prose-p:my-6;
+    @apply prose-headings:text-foreground;
+    @apply prose-li:text-foreground;
+
+    /* Links */
+    @apply prose-a:text-foreground prose-a:font-semibold prose-a:underline prose-a:underline-offset-4 prose-a:transition-colors;
+    @apply prose-a:hover:text-cyan-neon;
+
+    /* Blockquote */
+    @apply prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-muted-foreground;
+    /* Prevent extra margin inside blockquote paragraph and remove default decorative quotes */
+    @apply [&_blockquote_p:first-of-type]:mt-0 [&_blockquote_p:last-of-type]:mb-0; 
+    @apply [&_blockquote_p::before]:content-none [&_blockquote_p::after]:content-none;
+
+    /* Inline Code */
+    @apply prose-code:text-cyan-neon prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono;
+    @apply prose-code:before:content-none prose-code:after:content-none; /* Remove default backticks */
+
+    /* Preformatted Code Block */
+    @apply prose-pre:bg-[#0f0518] prose-pre:border prose-pre:border-primary/20 prose-pre:shadow-sm;
+
+    /* Images */
+    @apply prose-img:rounded-xl prose-img:border prose-img:border-primary/20 prose-img:shadow-[0_0_15px_rgba(139,92,246,0.05)];
+
+    /* Table */
+    @apply prose-td:border-border prose-th:border-border;
+
+    /* HR */
+    @apply prose-hr:border-t prose-hr:border-primary/50;
+  }
+}
