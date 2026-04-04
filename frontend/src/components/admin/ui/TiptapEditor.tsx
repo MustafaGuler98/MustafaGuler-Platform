@@ -28,6 +28,12 @@ interface TiptapEditorProps {
   placeholder?: string;
 }
 
+type MarkdownStorage = {
+  markdown?: {
+    getMarkdown: () => string;
+  };
+};
+
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -105,7 +111,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
 
     if (!isSourceMode) {
       // Enter Source Mode
-      setSourceContent((editor.storage as any).markdown.getMarkdown());
+      setSourceContent((editor.storage as MarkdownStorage).markdown?.getMarkdown() ?? '');
       setIsSourceMode(true);
     } else {
       // Exit Source Mode
@@ -114,18 +120,21 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
     }
   };
 
-  // Sync manual textarea changes to the parent component forms continuously
+  // Sync manual textarea changes to the parent component forms continuously.
+  // Applies markdown to editor in background so both JSON and HTML stay valid if form is saved.
   const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     setSourceContent(newVal);
 
-    // Fallback
     setChars(newVal.length);
     const textStr = newVal.trim();
     setWords(textStr ? textStr.split(/\s+/).length : 0);
 
-    // Transmit pseudo-JSON and raw text so form states are aware text exists
-    onChange(JSON.stringify({ type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: '[Source Mode Active]' }] }] }), newVal);
+    // Silently sync markdown into editor so getJSON/getHTML reflect real content
+    if (editor) {
+      editor.commands.setContent(newVal, false);
+      onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
+    }
   };
 
   if (!editor) {
@@ -149,7 +158,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
             value={sourceContent}
             onChange={handleSourceChange}
             spellCheck={false}
-            placeholder="Write raw markdown here..."
+            placeholder={placeholder || 'Write raw markdown here...'}
           />
         </div>
       ) : (
