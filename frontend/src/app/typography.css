@@ -1,10 +1,10 @@
 @layer components {
   /* Editor and Blog Reader typography */
   .prose-cyber {
-    @apply prose prose-invert max-w-none;
+    @apply prose prose-invert max-w-none break-words;
 
     /* Base Typography */
-    @apply prose-p:text-foreground prose-p:leading-8;
+    @apply prose-p:text-foreground prose-p:leading-8 prose-p:my-6;
     @apply prose-headings:text-foreground;
     @apply prose-li:text-foreground;
 

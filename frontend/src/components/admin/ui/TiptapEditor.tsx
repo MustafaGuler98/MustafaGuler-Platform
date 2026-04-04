@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Markdown } from 'tiptap-markdown';
+import { marked } from 'marked';
 import Link from '@tiptap/extension-link';
 import { AlignableImage } from './extensions/AlignableImage';
 import TextAlign from '@tiptap/extension-text-align';
@@ -20,7 +20,7 @@ import './tiptap.css';
 const lowlight = createLowlight(common);
 
 import { EditorToolbar } from './EditorToolbar';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TiptapEditorProps {
   content: string;
@@ -28,10 +28,14 @@ interface TiptapEditorProps {
   placeholder?: string;
 }
 
-type MarkdownStorage = {
-  markdown?: {
-    getMarkdown: () => string;
-  };
+const formatHTML = (html: string) => {
+  return html
+    // Add newlines after block-level closing tags and self-closing tags
+    .replace(/(<\/(p|h[1-6]|ul|ol|li|blockquote|table|tr|div)>|<img[^>]+>|<hr[^>]*>)/ig, '$1\n\n')
+    .replace(/(<\/pre>)/ig, '$1\n\n')
+    // Remove excessive newlines
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 };
 
 export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
@@ -39,6 +43,8 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
   const [sourceContent, setSourceContent] = useState('');
   const [words, setWords] = useState(0);
   const [chars, setChars] = useState(0);
+
+  const previousContent = useRef(content);
 
   const editor = useEditor({
     extensions: [
@@ -61,10 +67,6 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
       CharacterCount.configure({
         limit: 50000, 
       }),
-      Markdown.configure({
-        transformPastedText: true,
-        transformCopiedText: true,
-      }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -81,13 +83,15 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
       try {
         return JSON.parse(content); // New structure: JSON string from editor.getJSON()
       } catch {
-        return content; // Legacy fallback: raw HTML string
+        // Legacy fallback: Parse Markdown to HTML for backward compatibility
+        return marked.parse(content) as string; 
       }
     })(),
     immediatelyRender: false, 
     onCreate: ({ editor }) => {
       setWords(editor.storage.characterCount.words());
       setChars(editor.storage.characterCount.characters());
+      onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
     },
     onUpdate: ({ editor }) => {
       const json = JSON.stringify(editor.getJSON());
@@ -105,36 +109,81 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
     },
   });
 
+  // Observe and hydrate async content fetches
+  useEffect(() => {
+    if (!editor) return;
+
+    if (content !== previousContent.current) {
+        let currentString = '';
+        try {
+            currentString = JSON.stringify(editor.getJSON());
+        } catch {
+            currentString = '';
+        }
+
+        // Only inject if incoming content strictly differs from current editor state 
+        // to prevent race conditions and cursor jumping during rapid typing
+        const isDifferent = content !== currentString && content !== editor.getHTML();
+
+        if (isDifferent && content) {
+            try {
+                editor.commands.setContent(JSON.parse(content), { emitUpdate: false });
+            } catch {
+                // Parse markdown fallback during hydration
+                const legacyHtml = marked.parse(content) as string;
+                editor.commands.setContent(legacyHtml, { emitUpdate: false });
+            }
+            
+            setWords(editor.storage.characterCount.words());
+            setChars(editor.storage.characterCount.characters());
+            
+            // Push the potentially migrated content up to the form automatically
+            onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
+            
+            if (isSourceMode) {
+                setSourceContent(content);
+            }
+        }
+        previousContent.current = content;
+    }
+  }, [content, editor, isSourceMode]);
+
   // Handle switching
   const handleToggleSourceMode = () => {
     if (!editor) return;
 
     if (!isSourceMode) {
-      // Enter Source Mode
-      setSourceContent((editor.storage as MarkdownStorage).markdown?.getMarkdown() ?? '');
+      // Enter HTML Source Mode with pretty formatting
+      const rawHtml = editor.getHTML();
+      setSourceContent(formatHTML(rawHtml));
       setIsSourceMode(true);
     } else {
       // Exit Source Mode
-      editor.commands.setContent(sourceContent);
+      editor.commands.setContent(sourceContent, { emitUpdate: false });
       setIsSourceMode(false);
     }
   };
 
-  // Sync manual textarea changes to the parent component forms continuously.
-  // Applies markdown to editor in background so both JSON and HTML stay valid if form is saved.
+  // Debounce sync for HTML source mode
+  useEffect(() => {
+    if (isSourceMode && editor) {
+      const handler = setTimeout(() => {
+        editor.commands.setContent(sourceContent, { emitUpdate: false });
+        onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
+      }, 300);
+      
+      return () => clearTimeout(handler);
+    }
+  }, [sourceContent, isSourceMode, editor, onChange]);
+
   const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     setSourceContent(newVal);
 
     setChars(newVal.length);
-    const textStr = newVal.trim();
+    // Rough estimate for words ignoring HTML tags
+    const textStr = newVal.replace(/<[^>]*>?/gm, '').trim();
     setWords(textStr ? textStr.split(/\s+/).length : 0);
-
-    // Silently sync markdown into editor so getJSON/getHTML reflect real content
-    if (editor) {
-      editor.commands.setContent(newVal, { emitUpdate: false });
-      onChange(JSON.stringify(editor.getJSON()), editor.getHTML());
-    }
   };
 
   if (!editor) {
@@ -158,7 +207,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
             value={sourceContent}
             onChange={handleSourceChange}
             spellCheck={false}
-            placeholder={placeholder || 'Write raw markdown here...'}
+            placeholder={placeholder || 'Write raw HTML here...'}
           />
         </div>
       ) : (
@@ -172,7 +221,7 @@ export function TiptapEditor({ content, onChange, placeholder }: TiptapEditorPro
 
       {/* Footer: Live Character Count Dashboard */}
       <div className="flex justify-between items-center px-4 py-2 bg-black/40 border-t border-primary/10 text-[10px] font-mono text-primary/60 tracking-widest uppercase shadow-[inset_0_10px_10px_-10px_rgba(0,0,0,0.5)]">
-         <span>Mode: {isSourceMode ? 'Markdown Source' : 'Visual Editor'}</span>
+         <span>Mode: {isSourceMode ? 'HTML Source' : 'Visual Editor'}</span>
          <div className="flex gap-4">
             <span className="flex items-center gap-1">
                <span className="text-cyan-neon/70">{words}</span> Words

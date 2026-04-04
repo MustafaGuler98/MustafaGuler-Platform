@@ -201,7 +201,7 @@ export function EditorToolbar({ editor, isSourceMode, onToggleSource }: EditorTo
                 onClick={() => onToggleSource && onToggleSource()}
                 isActive={!!isSourceMode}
                 icon={Code2}
-                title="Toggle Markdown Source (<//>)"
+                title="Toggle HTML Source Code (<//>)"
             />
 
             <div className="w-px h-5 bg-primary/20 mx-1" />
