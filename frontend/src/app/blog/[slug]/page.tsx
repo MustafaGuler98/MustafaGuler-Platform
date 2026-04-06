@@ -14,6 +14,7 @@ interface PageProps {
   params: Promise<{
     slug: string;
   }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: PageProps) {
   }
 }
 
-export default async function ArticlePage({ params }: PageProps) {
+export default async function ArticlePage({ params, searchParams }: PageProps) {
   const resolvedParams = await params;
 
   let post;
@@ -70,7 +71,7 @@ export default async function ArticlePage({ params }: PageProps) {
       )}
 
       {/* Article Content */}
-      <article className="container max-w-4xl mx-auto px-4 mt-10">
+      <article className="container mx-auto px-8 md:px-4 mt-10 max-w-3xl">
 
         {/* Metadata Row */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-primary/20">

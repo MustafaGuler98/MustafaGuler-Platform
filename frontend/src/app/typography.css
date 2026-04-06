@@ -4,23 +4,33 @@
     @apply prose prose-invert max-w-none break-words;
 
     /* Base Typography */
-    @apply prose-p:text-foreground prose-p:leading-8 prose-p:my-6;
+    @apply prose-p:text-slate-400 prose-p:leading-8 prose-p:my-6;
     @apply prose-headings:text-foreground;
-    @apply prose-li:text-foreground;
+    @apply prose-li:text-slate-400;
+    @apply prose-strong:text-slate-200 prose-strong:font-bold;
 
     /* Links */
-    @apply prose-a:text-foreground prose-a:font-semibold prose-a:underline prose-a:underline-offset-4 prose-a:transition-colors;
-    @apply prose-a:hover:text-cyan-neon;
+    @apply prose-a:text-cyan-500 prose-a:font-semibold prose-a:underline prose-a:underline-offset-4 prose-a:transition-colors;
+    @apply prose-a:hover:text-cyan-400;
 
-    /* Blockquote */
-    @apply prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-muted-foreground;
+    /* Blockquote Container */
+    @apply prose-blockquote:border-l-4 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:rounded-r-lg;
+
     /* Prevent extra margin inside blockquote paragraph and remove default decorative quotes */
-    @apply [&_blockquote_p:first-of-type]:mt-0 [&_blockquote_p:last-of-type]:mb-0; 
+    @apply [&_blockquote_p:first-of-type]:mt-0 [&_blockquote_p:last-of-type]:mb-0;
     @apply [&_blockquote_p::before]:content-none [&_blockquote_p::after]:content-none;
+
+    /* Blockquote text styling */
+    @apply prose-blockquote:text-[#a5b4c7] prose-blockquote:font-normal prose-blockquote:italic;
+    @apply [&_blockquote_p]:text-[#a5b4c7] [&_blockquote_p]:font-normal [&_blockquote_p]:italic;
+
+    /* Bold text within blockquote */
+    @apply [&_blockquote_strong]:text-slate-100 [&_blockquote_strong]:font-bold;
+    @apply [&_blockquote_b]:text-slate-100 [&_blockquote_b]:font-bold;
 
     /* Inline Code */
     @apply prose-code:text-cyan-neon prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono;
-    @apply prose-code:before:content-none prose-code:after:content-none; /* Remove default backticks */
+    @apply prose-code:before:content-none prose-code:after:content-none;
 
     /* Preformatted Code Block */
     @apply prose-pre:bg-[#0f0518] prose-pre:border prose-pre:border-primary/20 prose-pre:shadow-sm;
