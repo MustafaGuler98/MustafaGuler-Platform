@@ -100,6 +100,8 @@ services:
       - INTERNAL_API_URL=${INTERNAL_API_URL}
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
       - REVALIDATE_SECRET=${REVALIDATE_SECRET}
+    volumes:
+      - nextjs_image_cache:/app/.next/cache/images
     restart: always
 
   nginx:
@@ -144,3 +146,4 @@ volumes:
   postgres_data:
   seq_data:
   static_files:
+  nextjs_image_cache:
