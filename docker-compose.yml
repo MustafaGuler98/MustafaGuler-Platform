@@ -101,7 +101,7 @@ services:
       - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
       - REVALIDATE_SECRET=${REVALIDATE_SECRET}
     volumes:
-      - nextjs_image_cache:/app/.next/cache/images
+      - nextjs_image_cache_v2:/app/.next/cache/images
     restart: always
 
   nginx:
@@ -146,4 +146,4 @@ volumes:
   postgres_data:
   seq_data:
   static_files:
-  nextjs_image_cache:
+  nextjs_image_cache_v2:
