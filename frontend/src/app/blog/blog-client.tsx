@@ -225,7 +225,6 @@ export default function BlogClient({ articles, popularArticles, categories, stat
                                                 alt={article.title}
                                                 width={777}
                                                 height={494}
-                                                priority
                                                 title={article.title}
                                                 className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-60 h-full w-full"
                                             />

@@ -46,6 +46,7 @@ logs/
 # Misc & Backups
 articlesbackup.sql
 
-# Agent
+# Agents
+.claude/
 .agent/
 CLAUDE.md

@@ -93,7 +93,7 @@ services:
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-        INTERNAL_API_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        INTERNAL_API_URL: http://api:8080
     container_name: mustafa-prod-frontend
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}

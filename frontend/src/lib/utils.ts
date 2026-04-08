@@ -25,24 +25,24 @@ const formatCardDate = (dateString: string) => {
   }).format(new Date(dateString));
 };
 
-// Our wwwroot is in the backend folder.
+// Relative path for internal use
 export function getImageUrl(path: string | null | undefined): string {
   if (!path) return "/default-article.webp";
   if (path.includes("default-article")) return "/default-article.webp";
   if (path.startsWith("http")) return path;
 
-  const baseUrl = getBackendUrl();
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-
-  return `${baseUrl}${cleanPath}`;
+  return path.startsWith("/") ? path : `/${path}`;
 }
 
-function getBackendUrl(): string {
-  // Static files (images) are served directly from backend
-  if (typeof window !== 'undefined') {
-    return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5281';
-  }
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5281';
+// Absolute URL for SEO meta tags only
+export function getAbsoluteImageUrl(path: string | null | undefined): string {
+  if (!path) return "/default-article.webp";
+  if (path.includes("default-article")) return "/default-article.webp";
+  if (path.startsWith("http")) return path;
+
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5281";
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${baseUrl}${cleanPath}`;
 }
 
 export function groupArticlesByYear(articles: Article[]): { [year: string]: Article[] } {
