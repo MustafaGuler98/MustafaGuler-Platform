@@ -92,7 +92,7 @@ namespace MustafaGuler.Service.Services
             {
                 foreach (var format in WarmupFormats)
                 {
-                    var url = $"http://frontend:3000/_next/image?url={encodedUrl}&w={size}&q=75";
+                    var url = $"http://nginx:80/_next/image?url={encodedUrl}&w={size}&q=75";
 
                     using var request = new HttpRequestMessage(HttpMethod.Get, url);
                     request.Headers.TryAddWithoutValidation("Accept", format);
