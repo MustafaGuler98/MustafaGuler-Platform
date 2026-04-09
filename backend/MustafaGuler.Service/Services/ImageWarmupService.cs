@@ -97,7 +97,7 @@ namespace MustafaGuler.Service.Services
                     using var request = new HttpRequestMessage(HttpMethod.Get, url);
                     request.Headers.TryAddWithoutValidation("Accept", format);
 
-                    using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+                    using var response = await client.SendAsync(request, ct);
 
                     _logger.LogInformation(
                         "Warmup {Status}: {ImageUrl} w={Size} fmt={Format}",
