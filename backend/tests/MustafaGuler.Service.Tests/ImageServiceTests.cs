@@ -22,6 +22,7 @@ namespace MustafaGuler.Service.Tests
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ICurrentUserService> _mockCurrentUserService;
         private readonly Mock<System.Net.Http.IHttpClientFactory> _mockHttpClientFactory;
+        private readonly Mock<IImageWarmupService> _mockWarmupService;
         private readonly Mock<Microsoft.Extensions.Logging.ILogger<ImageService>> _mockLogger;
         private readonly ImageService _imageService;
 
@@ -35,6 +36,7 @@ namespace MustafaGuler.Service.Tests
             _mockMapper = new Mock<IMapper>();
             _mockCurrentUserService = new Mock<ICurrentUserService>();
             _mockHttpClientFactory = new Mock<System.Net.Http.IHttpClientFactory>();
+            _mockWarmupService = new Mock<IImageWarmupService>();
             _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<ImageService>>();
 
             _imageService = new ImageService(
@@ -44,6 +46,7 @@ namespace MustafaGuler.Service.Tests
                 _mockMapper.Object,
                 _mockCurrentUserService.Object,
                 _mockHttpClientFactory.Object,
+                _mockWarmupService.Object,
                 _mockLogger.Object);
         }
 

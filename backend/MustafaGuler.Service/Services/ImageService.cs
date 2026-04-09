@@ -26,7 +26,11 @@ namespace MustafaGuler.Service.Services
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
         private readonly System.Net.Http.IHttpClientFactory _httpClientFactory;
+        private readonly IImageWarmupService _warmupService;
         private readonly ILogger<ImageService> _logger;
+
+        // Only articles and avatars are currently warmed up, but this can be easily extended in the future if needed.
+        private static readonly string[] WarmupFolders = ["articles", "avatars"];
 
         public ImageService(
             IWebHostEnvironment env,
@@ -35,6 +39,7 @@ namespace MustafaGuler.Service.Services
             IMapper mapper,
             ICurrentUserService currentUserService,
             System.Net.Http.IHttpClientFactory httpClientFactory,
+            IImageWarmupService warmupService,
             ILogger<ImageService> logger)
         {
             _env = env;
@@ -43,6 +48,7 @@ namespace MustafaGuler.Service.Services
             _mapper = mapper;
             _currentUserService = currentUserService;
             _httpClientFactory = httpClientFactory;
+            _warmupService = warmupService;
             _logger = logger;
         }
 
@@ -138,6 +144,9 @@ namespace MustafaGuler.Service.Services
 
                 _logger.LogInformation("File uploaded: {FileName}, Size: {Size} bytes, User: {UserId}", fileName, fileData.Length, _currentUserService.UserId);
 
+                if (WarmupFolders.Contains(folder, StringComparer.OrdinalIgnoreCase))
+                    _warmupService.EnqueueWarmup(url);
+
                 var dto = _mapper.Map<ImageInfoDto>(imageEntity);
                 return Result<ImageInfoDto>.Success(dto, 201, Messages.ImageUploaded);
             }
@@ -232,6 +241,9 @@ namespace MustafaGuler.Service.Services
 
                 File.Move(sourcePath, destinationPath);
             }
+
+            // Purge from Nginx proxy cache
+            _warmupService.EnqueuePurge(image.Url);
 
             _logger.LogWarning("Image deleted: {FileName} ({Id})", image.FileName, id);
             return Result.Success(200, Messages.ImageDeleted);

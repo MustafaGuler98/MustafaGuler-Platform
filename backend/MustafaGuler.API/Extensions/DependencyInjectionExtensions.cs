@@ -87,6 +87,15 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IActivityProvider, LocalTTRPGProvider>();
             services.AddScoped<IActivityProvider, LocalQuoteProvider>();
 
+            // Image warm-ups Service
+            services.AddSingleton<ImageWarmupService>();
+            services.AddSingleton<IImageWarmupService>(sp => sp.GetRequiredService<ImageWarmupService>());
+            services.AddHostedService(sp => sp.GetRequiredService<ImageWarmupService>());
+            services.AddHttpClient("ImageWarmup", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
+
             // Background Services
             services.AddHostedService<MusicSyncBackgroundService>();
 
