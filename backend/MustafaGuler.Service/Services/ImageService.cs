@@ -216,34 +216,40 @@ namespace MustafaGuler.Service.Services
                 return Result.Failure(404, Messages.ImageNotFound);
             }
 
-
             // URL format: /uploads/folder/filename.ext
             string relativePath = image.Url.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
             string sourcePath = Path.Combine(_env.WebRootPath, relativePath);
             string deletedFolderPath = Path.Combine(_env.WebRootPath, "uploads", "deleted");
-            string destinationPath = Path.Combine(deletedFolderPath, image.FileName);
 
-            image.IsDeleted = true;
-            image.UpdatedDate = DateTime.UtcNow;
+            // Build name with timestamp to avoid collisions in deleted folder
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(image.FileName);
+            var extension = Path.GetExtension(image.FileName);
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var newFileName = $"{fileNameWithoutExt}_{timestamp}{extension}";
+            var newUrl = $"/uploads/deleted/{newFileName}";
+            var destinationPath = Path.Combine(deletedFolderPath, newFileName);
 
-            _repository.Update(image);
-            await _unitOfWork.CommitAsync();
-
+            // Move file first; if this fails we abort before touching DB to avoid dual-write inconsistency
             if (File.Exists(sourcePath))
             {
                 if (!Directory.Exists(deletedFolderPath))
                     Directory.CreateDirectory(deletedFolderPath);
 
-                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(image.FileName);
-                var extension = Path.GetExtension(image.FileName);
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-                destinationPath = Path.Combine(deletedFolderPath, $"{fileNameWithoutExt}_{timestamp}{extension}");
-
                 File.Move(sourcePath, destinationPath);
             }
+            else
+            {
+                _logger.LogWarning("Delete: source file missing at {SourcePath}, proceeding with DB-only tombstone", sourcePath);
+            }
 
-            // Purge from Nginx proxy cache
-            _warmupService.EnqueuePurge(image.Url);
+            // Sync DB with physical location
+            image.FileName = newFileName;
+            image.Url = newUrl;
+            image.IsDeleted = true;
+            image.UpdatedDate = DateTime.UtcNow;
+
+            _repository.Update(image);
+            await _unitOfWork.CommitAsync();
 
             _logger.LogWarning("Image deleted: {FileName} ({Id})", image.FileName, id);
             return Result.Success(200, Messages.ImageDeleted);

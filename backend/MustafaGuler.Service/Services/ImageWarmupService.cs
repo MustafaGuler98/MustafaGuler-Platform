@@ -9,13 +9,9 @@ using System.Threading.Tasks;
 
 namespace MustafaGuler.Service.Services
 {
-    public enum WarmupAction { Warmup, Purge }
-
-    public record WarmupRequest(string ImageUrl, WarmupAction Action);
-
     public class ImageWarmupService : IImageWarmupService, IHostedService
     {
-        private readonly Channel<WarmupRequest> _channel;
+        private readonly Channel<string> _channel;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ImageWarmupService> _logger;
         private Task? _processingTask;
@@ -29,7 +25,7 @@ namespace MustafaGuler.Service.Services
             IHttpClientFactory httpClientFactory,
             ILogger<ImageWarmupService> logger)
         {
-            _channel = Channel.CreateBounded<WarmupRequest>(new BoundedChannelOptions(100)
+            _channel = Channel.CreateBounded<string>(new BoundedChannelOptions(100)
             {
                 FullMode = BoundedChannelFullMode.DropOldest
             });
@@ -39,14 +35,8 @@ namespace MustafaGuler.Service.Services
 
         public void EnqueueWarmup(string imageUrl)
         {
-            if (!_channel.Writer.TryWrite(new WarmupRequest(imageUrl, WarmupAction.Warmup)))
+            if (!_channel.Writer.TryWrite(imageUrl))
                 _logger.LogWarning("Warmup queue full, dropped request for {ImageUrl}", imageUrl);
-        }
-
-        public void EnqueuePurge(string imageUrl)
-        {
-            if (!_channel.Writer.TryWrite(new WarmupRequest(imageUrl, WarmupAction.Purge)))
-                _logger.LogWarning("Purge queue full, dropped request for {ImageUrl}", imageUrl);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -67,18 +57,15 @@ namespace MustafaGuler.Service.Services
 
         private async Task ProcessQueueAsync(CancellationToken ct)
         {
-            await foreach (var request in _channel.Reader.ReadAllAsync(ct))
+            await foreach (var imageUrl in _channel.Reader.ReadAllAsync(ct))
             {
                 try
                 {
-                    if (request.Action == WarmupAction.Warmup)
-                        await ExecuteWarmupAsync(request.ImageUrl, ct);
-                    else
-                        await ExecutePurgeAsync(request.ImageUrl, ct);
+                    await ExecuteWarmupAsync(imageUrl, ct);
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
                 {
-                    _logger.LogError(ex, "Failed to process {Action} for {ImageUrl}", request.Action, request.ImageUrl);
+                    _logger.LogError(ex, "Failed to warm up {ImageUrl}", imageUrl);
                 }
             }
         }
@@ -102,36 +89,6 @@ namespace MustafaGuler.Service.Services
                     _logger.LogInformation(
                         "Warmup {Status}: {ImageUrl} w={Size} fmt={Format}",
                         response.StatusCode, imageUrl, size, format);
-                }
-            }
-        }
-
-        private async Task ExecutePurgeAsync(string imageUrl, CancellationToken ct)
-        {
-            var client = _httpClientFactory.CreateClient("ImageWarmup");
-            var encodedUrl = Uri.EscapeDataString(imageUrl);
-
-            foreach (var size in WarmupSizes)
-            {
-                foreach (var format in WarmupFormats)
-                {
-                    var url = $"http://nginx:80/nginx-cache-purge/_next/image?url={encodedUrl}&w={size}&q=75";
-
-                    using var request = new HttpRequestMessage(HttpMethod.Get, url);
-                    request.Headers.TryAddWithoutValidation("Accept", format);
-
-                    try
-                    {
-                        using var response = await client.SendAsync(request, ct);
-
-                        _logger.LogInformation(
-                            "Purge {Status}: {ImageUrl} w={Size} fmt={Format}",
-                            response.StatusCode, imageUrl, size, format);
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        _logger.LogWarning(ex, "Purge failed for {ImageUrl} w={Size}", imageUrl, size);
-                    }
                 }
             }
         }
