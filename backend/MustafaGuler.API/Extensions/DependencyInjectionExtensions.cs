@@ -98,6 +98,7 @@ namespace MustafaGuler.API.Extensions
 
             // Background Services
             services.AddHostedService<MusicSyncBackgroundService>();
+            services.AddHostedService<DeletedImagesCleanupService>();
 
             // Kafka Services
             services.AddScoped<IEmailQueueService, EmailQueueService>();
