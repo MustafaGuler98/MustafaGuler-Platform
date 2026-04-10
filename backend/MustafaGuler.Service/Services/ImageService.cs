@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using MustafaGuler.Core.Constants;
 using MustafaGuler.Core.DTOs;
@@ -236,9 +236,6 @@ namespace MustafaGuler.Service.Services
                     Directory.CreateDirectory(deletedFolderPath);
 
                 File.Move(sourcePath, destinationPath);
-
-                // File.Move preserves mtime; reset it so the retention service measures age from delete time
-                File.SetLastWriteTimeUtc(destinationPath, DateTime.UtcNow);
             }
             else
             {
