@@ -122,7 +122,7 @@ namespace MustafaGuler.Service.Services
 
                     try
                     {
-                        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+                        using var response = await client.SendAsync(request, ct);
 
                         _logger.LogInformation(
                             "Purge {Status}: {ImageUrl} w={Size} fmt={Format}",
