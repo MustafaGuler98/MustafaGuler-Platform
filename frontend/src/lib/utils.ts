@@ -34,6 +34,15 @@ export function getImageUrl(path: string | null | undefined): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
+// Determines if the image should be optimized via the backend or handled by Next.js.
+export function shouldUseBackendImageOptimization(src: string): boolean {
+  return src.startsWith("/uploads/articles/") || src.startsWith("/uploads/avatars/");
+}
+export function backendImageLoader({ src, width, quality }: { src: string; width: number; quality?: number }): string {
+  const q = quality || 75;
+  return `/api/images/resize?url=${encodeURIComponent(src)}&w=${width}&q=${q}`;
+}
+
 // Absolute URL for SEO meta tags only
 export function getAbsoluteImageUrl(path: string | null | undefined): string {
   if (!path) return "/default-article.webp";

@@ -25,6 +25,7 @@ TestResults/
 *.log
 **/wwwroot/uploads/
 **/wwwroot/live-status/
+**/wwwroot/cache/
 /wwwroot/archives/
 
 # Frontend (Next.js)

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Article } from "@/types/article";
 import { cn, formatDate, getImageUrl } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { ChevronLeft, ChevronRight, Zap, Database, Folder, Filter, Calendar } from "lucide-react";
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { BlogQuoteWidget, BlogBookWidget, BlogFilmWidget, BlogMusicWidget } from "@/components/blog/widgets/SidebarWidgets";
@@ -150,7 +151,7 @@ export default function BlogClient({ articles, popularArticles, categories, stat
 
                                     {/* Image Area */}
                                     <div className="relative h-48 w-full overflow-hidden border-b border-purple-500/20">
-                                        <Image
+                                        <OptimizedImage
                                             src={getImageUrl(article.mainImage)}
                                             alt={article.title}
                                             width={777}
@@ -220,7 +221,7 @@ export default function BlogClient({ articles, popularArticles, categories, stat
 
                                         {/* Image Header */}
                                         <div className="relative h-44 w-full overflow-hidden border-b border-cyan-500/15">
-                                            <Image
+                                            <OptimizedImage
                                                 src={getImageUrl(article.mainImage)}
                                                 alt={article.title}
                                                 width={777}

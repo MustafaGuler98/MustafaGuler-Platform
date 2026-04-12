@@ -92,6 +92,11 @@ namespace MustafaGuler.Service.Services
                 fileData.Content.Position = 0;
             }
 
+            if (customName != null && customName.Contains("__"))
+            {
+                return Result<ImageInfoDto>.Failure(400, "Filename cannot contain '__' as it is reserved for system caching mechanics.");
+            }
+
             string safeName = SlugHelper.GenerateSlug(customName);
 
             if (string.IsNullOrEmpty(safeName))
@@ -217,6 +222,7 @@ namespace MustafaGuler.Service.Services
             }
 
             // URL format: /uploads/folder/filename.ext
+            string originalUrl = image.Url;
             string relativePath = image.Url.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
             string sourcePath = Path.Combine(_env.WebRootPath, relativePath);
             string deletedFolderPath = Path.Combine(_env.WebRootPath, "uploads", "deleted");
@@ -250,6 +256,31 @@ namespace MustafaGuler.Service.Services
 
             _repository.Update(image);
             await _unitOfWork.CommitAsync();
+
+            string cacheDir = Path.Combine(_env.WebRootPath, "cache");
+            string pathWithoutUploads = originalUrl.TrimStart('/', '\\')
+                                                 .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+                                                 .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase);
+            string subFolder = Path.GetDirectoryName(pathWithoutUploads) ?? "";
+            string finalCacheDir = Path.Combine(cacheDir, subFolder);
+
+            if (Directory.Exists(finalCacheDir))
+            {
+                try
+                {
+                    var baseNameSafe = Path.GetFileName(sourcePath).Replace(".", "_");
+                    var cacheFiles = Directory.GetFiles(finalCacheDir, $"{baseNameSafe}__*");
+                    foreach (var f in cacheFiles)
+                    {
+                        File.Delete(f);
+                        _logger.LogInformation("Deleted cached variant: {file}", f);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to clean up cached variants for {baseNameSafe}", Path.GetFileName(sourcePath));
+                }
+            }
 
             _logger.LogWarning("Image deleted: {FileName} ({Id})", image.FileName, id);
             return Result.Success(200, Messages.ImageDeleted);

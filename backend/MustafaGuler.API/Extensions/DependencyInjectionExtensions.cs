@@ -27,6 +27,7 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ISecurityService, SecurityService>();

@@ -50,7 +50,13 @@ export async function fetchApi<T>(
         }
 
         const text = await response.text();
-        const json = text ? JSON.parse(text) : {};
+        let json;
+        try {
+            json = text ? JSON.parse(text) : {};
+        } catch (e) {
+            console.warn('[API Client JSON Parse Error] Usually caused by Proxy timeout or 500 HTML response.', e);
+            return createErrorResponse<T>(response.status, 'Server returned an invalid response (Likely a timeout or proxy error).');
+        }
 
         // Backend returns standard Result<T> structure
         const result = json as ServiceResponse<T>;
