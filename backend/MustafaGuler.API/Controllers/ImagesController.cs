@@ -118,7 +118,6 @@ namespace MustafaGuler.API.Controllers
             }
             catch (System.Exception)
             {
-                // We should NOT expose the internal exception details to the Anonymous client.
                 return StatusCode(500, new { message = "Internal server error while processing image." });
             }
         }
