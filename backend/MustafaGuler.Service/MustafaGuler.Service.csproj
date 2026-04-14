@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,6 +12,9 @@
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
+    <PackageReference Include="NetVips" Version="3.2.0" />
+    <PackageReference Include="NetVips.Native.linux-x64" Version="8.18.2" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.18.2" />
   </ItemGroup>
 
   <ItemGroup>

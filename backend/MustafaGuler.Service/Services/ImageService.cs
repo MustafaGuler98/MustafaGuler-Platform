@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using MustafaGuler.Core.Constants;
 using MustafaGuler.Core.DTOs;
@@ -26,7 +26,11 @@ namespace MustafaGuler.Service.Services
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
         private readonly System.Net.Http.IHttpClientFactory _httpClientFactory;
+        private readonly IImageWarmupService _warmupService;
         private readonly ILogger<ImageService> _logger;
+
+        // Only articles and avatars are currently warmed up, but this can be easily extended in the future if needed.
+        private static readonly string[] WarmupFolders = ["articles", "avatars"];
 
         public ImageService(
             IWebHostEnvironment env,
@@ -35,6 +39,7 @@ namespace MustafaGuler.Service.Services
             IMapper mapper,
             ICurrentUserService currentUserService,
             System.Net.Http.IHttpClientFactory httpClientFactory,
+            IImageWarmupService warmupService,
             ILogger<ImageService> logger)
         {
             _env = env;
@@ -43,6 +48,7 @@ namespace MustafaGuler.Service.Services
             _mapper = mapper;
             _currentUserService = currentUserService;
             _httpClientFactory = httpClientFactory;
+            _warmupService = warmupService;
             _logger = logger;
         }
 
@@ -84,6 +90,11 @@ namespace MustafaGuler.Service.Services
             if (fileData.Content.CanSeek)
             {
                 fileData.Content.Position = 0;
+            }
+
+            if (customName != null && customName.Contains("__"))
+            {
+                return Result<ImageInfoDto>.Failure(400, "Filename cannot contain '__' as it is reserved for system caching mechanics.");
             }
 
             string safeName = SlugHelper.GenerateSlug(customName);
@@ -137,6 +148,9 @@ namespace MustafaGuler.Service.Services
                 await _unitOfWork.CommitAsync();
 
                 _logger.LogInformation("File uploaded: {FileName}, Size: {Size} bytes, User: {UserId}", fileName, fileData.Length, _currentUserService.UserId);
+
+                if (WarmupFolders.Contains(folder, StringComparer.OrdinalIgnoreCase))
+                    _warmupService.EnqueueWarmup(url);
 
                 var dto = _mapper.Map<ImageInfoDto>(imageEntity);
                 return Result<ImageInfoDto>.Success(dto, 201, Messages.ImageUploaded);
@@ -207,30 +221,65 @@ namespace MustafaGuler.Service.Services
                 return Result.Failure(404, Messages.ImageNotFound);
             }
 
-
             // URL format: /uploads/folder/filename.ext
+            string originalUrl = image.Url;
             string relativePath = image.Url.TrimStart('/', '\\').Replace('/', Path.DirectorySeparatorChar);
             string sourcePath = Path.Combine(_env.WebRootPath, relativePath);
             string deletedFolderPath = Path.Combine(_env.WebRootPath, "uploads", "deleted");
-            string destinationPath = Path.Combine(deletedFolderPath, image.FileName);
 
+            // Build name with timestamp to avoid collisions in deleted folder
+            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(image.FileName);
+            var extension = Path.GetExtension(image.FileName);
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+            var newFileName = $"{fileNameWithoutExt}_{timestamp}{extension}";
+            var newUrl = $"/uploads/deleted/{newFileName}";
+            var destinationPath = Path.Combine(deletedFolderPath, newFileName);
+
+            // Move file first; if this fails we abort before touching DB to avoid dual-write inconsistency
+            if (File.Exists(sourcePath))
+            {
+                if (!Directory.Exists(deletedFolderPath))
+                    Directory.CreateDirectory(deletedFolderPath);
+
+                File.Move(sourcePath, destinationPath);
+            }
+            else
+            {
+                _logger.LogWarning("Delete: source file missing at {SourcePath}, proceeding with DB-only tombstone", sourcePath);
+            }
+
+            // Sync DB with physical location
+            image.FileName = newFileName;
+            image.Url = newUrl;
             image.IsDeleted = true;
             image.UpdatedDate = DateTime.UtcNow;
 
             _repository.Update(image);
             await _unitOfWork.CommitAsync();
 
-            if (File.Exists(sourcePath))
+            string cacheDir = Path.Combine(_env.WebRootPath, "cache");
+            string pathWithoutUploads = originalUrl.TrimStart('/', '\\')
+                                                 .Replace("uploads/", "", StringComparison.OrdinalIgnoreCase)
+                                                 .Replace("uploads\\", "", StringComparison.OrdinalIgnoreCase);
+            string subFolder = Path.GetDirectoryName(pathWithoutUploads) ?? "";
+            string finalCacheDir = Path.Combine(cacheDir, subFolder);
+
+            if (Directory.Exists(finalCacheDir))
             {
-                if (!Directory.Exists(deletedFolderPath))
-                    Directory.CreateDirectory(deletedFolderPath);
-
-                var fileNameWithoutExt = Path.GetFileNameWithoutExtension(image.FileName);
-                var extension = Path.GetExtension(image.FileName);
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
-                destinationPath = Path.Combine(deletedFolderPath, $"{fileNameWithoutExt}_{timestamp}{extension}");
-
-                File.Move(sourcePath, destinationPath);
+                try
+                {
+                    var baseNameSafe = Path.GetFileName(sourcePath).Replace(".", "_");
+                    var cacheFiles = Directory.GetFiles(finalCacheDir, $"{baseNameSafe}__*");
+                    foreach (var f in cacheFiles)
+                    {
+                        File.Delete(f);
+                        _logger.LogInformation("Deleted cached variant: {file}", f);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to clean up cached variants for {baseNameSafe}", Path.GetFileName(sourcePath));
+                }
             }
 
             _logger.LogWarning("Image deleted: {FileName} ({Id})", image.FileName, id);

@@ -8,10 +8,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactCompiler: true,
   images: {
-    unoptimized: isDev && process.env.NEXT_PUBLIC_OPTIMIZE_IMAGES !== 'true',
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 200, 256, 280, 384, 560],
+    deviceSizes: [640, 828, 1080, 1200, 1920],
+    imageSizes: [48, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: 'http',
@@ -19,11 +18,6 @@ const nextConfig: NextConfig = {
         port: '5281',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'mustafaguler.me',
-        pathname: '/**',
-      }
     ],
   },
   // Proxy API requests to backend (enables same-origin cookies)

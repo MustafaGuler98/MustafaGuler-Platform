@@ -1,9 +1,8 @@
-
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Calendar, Zap } from "lucide-react";
 import { articleService } from "@/services/articleServices";
 import { formatDate, getImageUrl } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { BottomNavButtons } from "@/components/articlePage/bottom-nav-buttons";
 import { buildArticleMetadata } from "@/lib/seo";
 import { ARTICLE_MESSAGES } from "@/lib/Messages";
@@ -51,7 +50,7 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
 
             {/* Image wrapper - fixed height for consistency */}
             <div className="relative h-[350px] w-full overflow-hidden border border-primary/30 rounded-xl bg-[#0f0518]">
-              <Image
+              <OptimizedImage
                 src={getImageUrl(post.mainImage)}
                 alt={post.title}
                 fill

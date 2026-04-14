@@ -25,6 +25,7 @@ TestResults/
 *.log
 **/wwwroot/uploads/
 **/wwwroot/live-status/
+**/wwwroot/cache/
 /wwwroot/archives/
 
 # Frontend (Next.js)
@@ -46,6 +47,7 @@ logs/
 # Misc & Backups
 articlesbackup.sql
 
-# Agent
+# Agents
+.claude/
 .agent/
 CLAUDE.md

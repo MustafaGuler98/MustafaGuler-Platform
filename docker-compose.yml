@@ -93,7 +93,7 @@ services:
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
-        INTERNAL_API_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        INTERNAL_API_URL: http://api:8080
     container_name: mustafa-prod-frontend
     environment:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
@@ -115,6 +115,7 @@ services:
     command: "/bin/sh -c 'while :; do sleep 24h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     volumes:
       - static_files:/usr/share/nginx/html/live-status
+      - nginx_image_cache:/var/cache/nginx/images
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
     depends_on:
@@ -147,3 +148,4 @@ volumes:
   seq_data:
   static_files:
   nextjs_image_cache_v2:
+  nginx_image_cache:

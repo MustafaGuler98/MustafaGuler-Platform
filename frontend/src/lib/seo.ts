@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getImageUrl } from "@/lib/utils";
+import { getAbsoluteImageUrl } from "@/lib/utils";
 import { Article } from "@/types/article";
 
 /**
@@ -35,7 +35,7 @@ export function buildArticleMetadata(article: Article | null, slug: string): Met
     : processSeoDescription(article.content);
 
   const ogImage = article.mainImage 
-    ? getImageUrl(article.mainImage) 
+    ? getAbsoluteImageUrl(article.mainImage)
     : "/default-og-image.png";
 
   const pageUrl = `/blog/${slug}`;

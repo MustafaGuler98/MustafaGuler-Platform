@@ -27,6 +27,7 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IArticleService, ArticleService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IImageOptimizerService, ImageOptimizerService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ISecurityService, SecurityService>();
@@ -87,8 +88,18 @@ namespace MustafaGuler.API.Extensions
             services.AddScoped<IActivityProvider, LocalTTRPGProvider>();
             services.AddScoped<IActivityProvider, LocalQuoteProvider>();
 
+            // Image warm-ups Service
+            services.AddSingleton<ImageWarmupService>();
+            services.AddSingleton<IImageWarmupService>(sp => sp.GetRequiredService<ImageWarmupService>());
+            services.AddHostedService(sp => sp.GetRequiredService<ImageWarmupService>());
+            services.AddHttpClient("ImageWarmup", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
+
             // Background Services
             services.AddHostedService<MusicSyncBackgroundService>();
+            services.AddHostedService<DeletedImagesCleanupService>();
 
             // Kafka Services
             services.AddScoped<IEmailQueueService, EmailQueueService>();
